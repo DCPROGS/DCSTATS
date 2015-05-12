@@ -8,75 +8,75 @@
 
 /* Begin PBXFileReference section */
 		497F47261B01DD1200541D6A /* test.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = test.py; sourceTree = "<group>"; };
-		497F47271B01DDD200541D6A /* data_screen.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; name = data_screen.py; path = ../pyDCprogs/data_screen.py; sourceTree = "<group>"; };
-		497F47281B01DDD300541D6A /* data_screen.pyc */ = {isa = PBXFileReference; lastKnownFileType = file; name = data_screen.pyc; path = ../pyDCprogs/data_screen.pyc; sourceTree = "<group>"; };
-		497F47291B01DDD300541D6A /* DC_PyPs_AP.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = DC_PyPs_AP.txt; path = ../pyDCprogs/DC_PyPs_AP.txt; sourceTree = "<group>"; };
-		497F472A1B01DDD300541D6A /* DC_PyPs.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; name = DC_PyPs.py; path = ../pyDCprogs/DC_PyPs.py; sourceTree = "<group>"; };
-		497F472B1B01DDD300541D6A /* dca2.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = dca2.gif; path = ../pyDCprogs/dca2.gif; sourceTree = "<group>"; };
-		497F472C1B01DDD300541D6A /* dca2.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; name = dca2.jpg; path = ../pyDCprogs/dca2.jpg; sourceTree = "<group>"; };
-		497F472D1B01DDD300541D6A /* dca2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = dca2.png; path = ../pyDCprogs/dca2.png; sourceTree = "<group>"; };
-		497F472E1B01DDD300541D6A /* DistPlotParam.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; name = DistPlotParam.py; path = ../pyDCprogs/DistPlotParam.py; sourceTree = "<group>"; };
-		497F472F1B01DDD300541D6A /* DistPlotParam.pyc */ = {isa = PBXFileReference; lastKnownFileType = file; name = DistPlotParam.pyc; path = ../pyDCprogs/DistPlotParam.pyc; sourceTree = "<group>"; };
-		497F47301B01DDD300541D6A /* Fieller.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; name = Fieller.py; path = ../pyDCprogs/Fieller.py; sourceTree = "<group>"; };
-		497F47311B01DDD300541D6A /* Fieller.pyc */ = {isa = PBXFileReference; lastKnownFileType = file; name = Fieller.pyc; path = ../pyDCprogs/Fieller.pyc; sourceTree = "<group>"; };
-		497F47321B01DDD300541D6A /* FrameFieller.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; name = FrameFieller.py; path = ../pyDCprogs/FrameFieller.py; sourceTree = "<group>"; };
-		497F47331B01DDD300541D6A /* FrameFieller.pyc */ = {isa = PBXFileReference; lastKnownFileType = file; name = FrameFieller.pyc; path = ../pyDCprogs/FrameFieller.pyc; sourceTree = "<group>"; };
-		497F47341B01DDD300541D6A /* FrameRantestBinomial.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; name = FrameRantestBinomial.py; path = ../pyDCprogs/FrameRantestBinomial.py; sourceTree = "<group>"; };
-		497F47351B01DDD300541D6A /* FrameRantestBinomial.pyc */ = {isa = PBXFileReference; lastKnownFileType = file; name = FrameRantestBinomial.pyc; path = ../pyDCprogs/FrameRantestBinomial.pyc; sourceTree = "<group>"; };
-		497F47361B01DDD300541D6A /* FrameRantestContinuous_old.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; name = FrameRantestContinuous_old.py; path = ../pyDCprogs/FrameRantestContinuous_old.py; sourceTree = "<group>"; };
-		497F47371B01DDD300541D6A /* FrameRantestContinuous.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; name = FrameRantestContinuous.py; path = ../pyDCprogs/FrameRantestContinuous.py; sourceTree = "<group>"; };
-		497F47381B01DDD300541D6A /* FrameRantestContinuous.pyc */ = {isa = PBXFileReference; lastKnownFileType = file; name = FrameRantestContinuous.pyc; path = ../pyDCprogs/FrameRantestContinuous.pyc; sourceTree = "<group>"; };
-		497F47391B01DDD300541D6A /* k667.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = k667.txt; path = ../pyDCprogs/k667.txt; sourceTree = "<group>"; };
-		497F473A1B01DDD300541D6A /* PlotRandomDist.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; name = PlotRandomDist.py; path = ../pyDCprogs/PlotRandomDist.py; sourceTree = "<group>"; };
-		497F473B1B01DDD300541D6A /* PlotRandomDist.pyc */ = {isa = PBXFileReference; lastKnownFileType = file; name = PlotRandomDist.pyc; path = ../pyDCprogs/PlotRandomDist.pyc; sourceTree = "<group>"; };
-		497F473C1B01DDD300541D6A /* qt_DCProgs Mac.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = "qt_DCProgs Mac.tiff"; path = "../pyDCprogs/qt_DCProgs Mac.tiff"; sourceTree = "<group>"; };
-		497F473D1B01DDD300541D6A /* Rantest.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; name = Rantest.py; path = ../pyDCprogs/Rantest.py; sourceTree = "<group>"; };
-		497F473E1B01DDD300541D6A /* Rantest.pyc */ = {isa = PBXFileReference; lastKnownFileType = file; name = Rantest.pyc; path = ../pyDCprogs/Rantest.pyc; sourceTree = "<group>"; };
-		497F473F1B01DDD300541D6A /* ReadRandat.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; name = ReadRandat.py; path = ../pyDCprogs/ReadRandat.py; sourceTree = "<group>"; };
-		497F47401B01DDD300541D6A /* ReadRandat.pyc */ = {isa = PBXFileReference; lastKnownFileType = file; name = ReadRandat.pyc; path = ../pyDCprogs/ReadRandat.pyc; sourceTree = "<group>"; };
-		497F47411B01DDD300541D6A /* setup.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; name = setup.py; path = ../pyDCprogs/setup.py; sourceTree = "<group>"; };
-		497F47421B01DDD300541D6A /* statistics */ = {isa = PBXFileReference; lastKnownFileType = folder; name = statistics; path = ../pyDCprogs/statistics; sourceTree = "<group>"; };
-		497F47431B01DDD300541D6A /* t.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = t.txt; path = ../pyDCprogs/t.txt; sourceTree = "<group>"; };
-		497F47441B01DDD300541D6A /* test.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = test.txt; path = ../pyDCprogs/test.txt; sourceTree = "<group>"; };
-		497F47451B01DDD300541D6A /* win_setup.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; name = win_setup.py; path = ../pyDCprogs/win_setup.py; sourceTree = "<group>"; };
+		497F47461B01E7DA00541D6A /* data_screen.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = data_screen.py; sourceTree = "<group>"; };
+		497F47471B01E7DA00541D6A /* data_screen.pyc */ = {isa = PBXFileReference; lastKnownFileType = file; path = data_screen.pyc; sourceTree = "<group>"; };
+		497F47481B01E7DA00541D6A /* DC_PyPs_AP.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = DC_PyPs_AP.txt; sourceTree = "<group>"; };
+		497F47491B01E7DA00541D6A /* DC_PyPs.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = DC_PyPs.py; sourceTree = "<group>"; };
+		497F474A1B01E7DA00541D6A /* dca2.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = dca2.gif; sourceTree = "<group>"; };
+		497F474B1B01E7DA00541D6A /* dca2.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = dca2.jpg; sourceTree = "<group>"; };
+		497F474C1B01E7DA00541D6A /* dca2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = dca2.png; sourceTree = "<group>"; };
+		497F474D1B01E7DA00541D6A /* DistPlotParam.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = DistPlotParam.py; sourceTree = "<group>"; };
+		497F474E1B01E7DA00541D6A /* DistPlotParam.pyc */ = {isa = PBXFileReference; lastKnownFileType = file; path = DistPlotParam.pyc; sourceTree = "<group>"; };
+		497F474F1B01E7DA00541D6A /* Fieller.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = Fieller.py; sourceTree = "<group>"; };
+		497F47501B01E7DA00541D6A /* Fieller.pyc */ = {isa = PBXFileReference; lastKnownFileType = file; path = Fieller.pyc; sourceTree = "<group>"; };
+		497F47511B01E7DA00541D6A /* FrameFieller.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = FrameFieller.py; sourceTree = "<group>"; };
+		497F47521B01E7DA00541D6A /* FrameFieller.pyc */ = {isa = PBXFileReference; lastKnownFileType = file; path = FrameFieller.pyc; sourceTree = "<group>"; };
+		497F47531B01E7DA00541D6A /* FrameRantestBinomial.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = FrameRantestBinomial.py; sourceTree = "<group>"; };
+		497F47541B01E7DA00541D6A /* FrameRantestBinomial.pyc */ = {isa = PBXFileReference; lastKnownFileType = file; path = FrameRantestBinomial.pyc; sourceTree = "<group>"; };
+		497F47551B01E7DA00541D6A /* FrameRantestContinuous_old.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = FrameRantestContinuous_old.py; sourceTree = "<group>"; };
+		497F47561B01E7DA00541D6A /* FrameRantestContinuous.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = FrameRantestContinuous.py; sourceTree = "<group>"; };
+		497F47571B01E7DA00541D6A /* FrameRantestContinuous.pyc */ = {isa = PBXFileReference; lastKnownFileType = file; path = FrameRantestContinuous.pyc; sourceTree = "<group>"; };
+		497F47581B01E7DA00541D6A /* k667.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = k667.txt; sourceTree = "<group>"; };
+		497F47591B01E7DA00541D6A /* PlotRandomDist.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = PlotRandomDist.py; sourceTree = "<group>"; };
+		497F475A1B01E7DA00541D6A /* PlotRandomDist.pyc */ = {isa = PBXFileReference; lastKnownFileType = file; path = PlotRandomDist.pyc; sourceTree = "<group>"; };
+		497F475B1B01E7DA00541D6A /* qt_DCProgs Mac.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = "qt_DCProgs Mac.tiff"; sourceTree = "<group>"; };
+		497F475C1B01E7DA00541D6A /* Rantest.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = Rantest.py; sourceTree = "<group>"; };
+		497F475D1B01E7DA00541D6A /* Rantest.pyc */ = {isa = PBXFileReference; lastKnownFileType = file; path = Rantest.pyc; sourceTree = "<group>"; };
+		497F475E1B01E7DA00541D6A /* ReadRandat.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = ReadRandat.py; sourceTree = "<group>"; };
+		497F475F1B01E7DA00541D6A /* ReadRandat.pyc */ = {isa = PBXFileReference; lastKnownFileType = file; path = ReadRandat.pyc; sourceTree = "<group>"; };
+		497F47601B01E7DA00541D6A /* setup.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = setup.py; sourceTree = "<group>"; };
+		497F47611B01E7DA00541D6A /* statistics */ = {isa = PBXFileReference; lastKnownFileType = folder; path = statistics; sourceTree = "<group>"; };
+		497F47621B01E7DA00541D6A /* t.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = t.txt; sourceTree = "<group>"; };
+		497F47631B01E7DA00541D6A /* test.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = test.txt; sourceTree = "<group>"; };
+		497F47641B01E7DA00541D6A /* win_setup.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = win_setup.py; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
 		497F471A1B01D5A900541D6A = {
 			isa = PBXGroup;
 			children = (
+				497F47461B01E7DA00541D6A /* data_screen.py */,
+				497F47471B01E7DA00541D6A /* data_screen.pyc */,
+				497F47481B01E7DA00541D6A /* DC_PyPs_AP.txt */,
+				497F47491B01E7DA00541D6A /* DC_PyPs.py */,
+				497F474A1B01E7DA00541D6A /* dca2.gif */,
+				497F474B1B01E7DA00541D6A /* dca2.jpg */,
+				497F474C1B01E7DA00541D6A /* dca2.png */,
+				497F474D1B01E7DA00541D6A /* DistPlotParam.py */,
+				497F474E1B01E7DA00541D6A /* DistPlotParam.pyc */,
+				497F474F1B01E7DA00541D6A /* Fieller.py */,
+				497F47501B01E7DA00541D6A /* Fieller.pyc */,
+				497F47511B01E7DA00541D6A /* FrameFieller.py */,
+				497F47521B01E7DA00541D6A /* FrameFieller.pyc */,
+				497F47531B01E7DA00541D6A /* FrameRantestBinomial.py */,
+				497F47541B01E7DA00541D6A /* FrameRantestBinomial.pyc */,
+				497F47551B01E7DA00541D6A /* FrameRantestContinuous_old.py */,
+				497F47561B01E7DA00541D6A /* FrameRantestContinuous.py */,
+				497F47571B01E7DA00541D6A /* FrameRantestContinuous.pyc */,
+				497F47581B01E7DA00541D6A /* k667.txt */,
+				497F47591B01E7DA00541D6A /* PlotRandomDist.py */,
+				497F475A1B01E7DA00541D6A /* PlotRandomDist.pyc */,
+				497F475B1B01E7DA00541D6A /* qt_DCProgs Mac.tiff */,
+				497F475C1B01E7DA00541D6A /* Rantest.py */,
+				497F475D1B01E7DA00541D6A /* Rantest.pyc */,
+				497F475E1B01E7DA00541D6A /* ReadRandat.py */,
+				497F475F1B01E7DA00541D6A /* ReadRandat.pyc */,
+				497F47601B01E7DA00541D6A /* setup.py */,
+				497F47611B01E7DA00541D6A /* statistics */,
+				497F47621B01E7DA00541D6A /* t.txt */,
+				497F47631B01E7DA00541D6A /* test.txt */,
+				497F47641B01E7DA00541D6A /* win_setup.py */,
 				497F47261B01DD1200541D6A /* test.py */,
-				497F47271B01DDD200541D6A /* data_screen.py */,
-				497F47281B01DDD300541D6A /* data_screen.pyc */,
-				497F47291B01DDD300541D6A /* DC_PyPs_AP.txt */,
-				497F472A1B01DDD300541D6A /* DC_PyPs.py */,
-				497F472B1B01DDD300541D6A /* dca2.gif */,
-				497F472C1B01DDD300541D6A /* dca2.jpg */,
-				497F472D1B01DDD300541D6A /* dca2.png */,
-				497F472E1B01DDD300541D6A /* DistPlotParam.py */,
-				497F472F1B01DDD300541D6A /* DistPlotParam.pyc */,
-				497F47301B01DDD300541D6A /* Fieller.py */,
-				497F47311B01DDD300541D6A /* Fieller.pyc */,
-				497F47321B01DDD300541D6A /* FrameFieller.py */,
-				497F47331B01DDD300541D6A /* FrameFieller.pyc */,
-				497F47341B01DDD300541D6A /* FrameRantestBinomial.py */,
-				497F47351B01DDD300541D6A /* FrameRantestBinomial.pyc */,
-				497F47361B01DDD300541D6A /* FrameRantestContinuous_old.py */,
-				497F47371B01DDD300541D6A /* FrameRantestContinuous.py */,
-				497F47381B01DDD300541D6A /* FrameRantestContinuous.pyc */,
-				497F47391B01DDD300541D6A /* k667.txt */,
-				497F473A1B01DDD300541D6A /* PlotRandomDist.py */,
-				497F473B1B01DDD300541D6A /* PlotRandomDist.pyc */,
-				497F473C1B01DDD300541D6A /* qt_DCProgs Mac.tiff */,
-				497F473D1B01DDD300541D6A /* Rantest.py */,
-				497F473E1B01DDD300541D6A /* Rantest.pyc */,
-				497F473F1B01DDD300541D6A /* ReadRandat.py */,
-				497F47401B01DDD300541D6A /* ReadRandat.pyc */,
-				497F47411B01DDD300541D6A /* setup.py */,
-				497F47421B01DDD300541D6A /* statistics */,
-				497F47431B01DDD300541D6A /* t.txt */,
-				497F47441B01DDD300541D6A /* test.txt */,
-				497F47451B01DDD300541D6A /* win_setup.py */,
 			);
 			sourceTree = "<group>";
 		};
