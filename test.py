@@ -1,0 +1,1 @@
+print "python in xcode trial"
