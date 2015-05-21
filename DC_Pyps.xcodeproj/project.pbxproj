@@ -39,12 +39,14 @@
 		497F47621B01E7DA00541D6A /* t.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = t.txt; sourceTree = "<group>"; };
 		497F47631B01E7DA00541D6A /* test.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = test.txt; sourceTree = "<group>"; };
 		497F47641B01E7DA00541D6A /* win_setup.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = win_setup.py; sourceTree = "<group>"; };
+		4983FB211B093DFC00EAAC48 /* hedges.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = hedges.py; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
 		497F471A1B01D5A900541D6A = {
 			isa = PBXGroup;
 			children = (
+				4983FB211B093DFC00EAAC48 /* hedges.py */,
 				497F47461B01E7DA00541D6A /* data_screen.py */,
 				497F47471B01E7DA00541D6A /* data_screen.pyc */,
 				497F47481B01E7DA00541D6A /* DC_PyPs_AP.txt */,
