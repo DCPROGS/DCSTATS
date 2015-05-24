@@ -45,9 +45,15 @@ class FrameRantestContinuous(object):
         # AP 021209: New callback (doesn't fix multithreading TkInter problem so could be removed).
         # Callback is not triggered if checkbox is never touched
         # Hence self.paired is set to zero above.
-        c1=Checkbutton(self.frame, text=text1, variable=self.var1, command=self.callback_paired, bg="#dcdcdc").grid(row=22, column=1, padx=10, pady=15, sticky=E)
+        c1=Checkbutton(self.frame, text=text1, variable=self.var1, command=self.callback_paired, bg="#dcdcdc").grid(row=22, column=1, padx=10, pady=5, sticky=E)
         
-        
+        self.var2 = IntVar()
+        hedges="Calculate confidence intervals for Hedge's g?"
+        self.H_CI = 0
+       
+        c2=Checkbutton(self.frame, text=hedges, variable=self.var2, command=self.callback_hedges, bg="#dcdcdc").grid(row=23, column=1, padx=10, pady=5, sticky=E)
+
+
         self.txt = Text(self.frame)
         self.txt.grid(row=25, column=0, columnspan=4, padx=10)
         self.txt.config(width=75, height= 25, font=("Courier", "12"))
@@ -73,6 +79,15 @@ class FrameRantestContinuous(object):
             self.var1.set(0)
         self.paired = self.var1.get()
         print self.paired
+
+    def callback_hedges(self):
+        'Called when ""Hedges CI"" tickbox is checked'
+        if self.var2.get() == 0:
+            self.var2.set(1)
+        else:
+            self.var2.set(0)
+        self.H_CI= self.var2.get()
+        print self.H_CI
 
 ### end of NEW BY AP
 

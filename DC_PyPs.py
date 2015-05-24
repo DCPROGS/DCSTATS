@@ -84,7 +84,7 @@ if __name__ == "__main__":
     Label(lframe, image=picture).pack()
     Label(lframe, text="DC", background="#dcdcdc").pack()
 
-    version = Message(lframe, width = 450, text="\n\nPython version: "+sys.version, background="#dcdcdc")
+    version = Message(lframe, width = 450, text="\n\nPython version: "+sys.version, background="#dcdcdc", font=("Helvetica", 12))
     version.pack()
     
 
