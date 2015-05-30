@@ -6,68 +6,109 @@ from Fieller import Fieller
 __author__="remis"
 __date__ ="$27-May-2009 20:29:30$"
 
-class FrameFieller(object):
+class FrameFieller:
     'GUI for fieller test'
-
-    def createFrame(self):
+    
+    def __init__(self, root):
+        
+        root.title('DC_PyPs - Fieller`s test')
+        root.geometry('480x600')
+        print "ff"
+        self.createFrame(root)
+        #root.mainloop()
+    
+    def createFrame(self, root):
         'Creates main frame and data input field.'
+        
 
-        frame = Tk()
-        frame.title('DC_PyPs - Fieller`s test')
-        frame.geometry('480x600')
+        frame = Frame(root)
+        frame.pack()
         message = Message(frame, width = 400, text=Fieller.introd, justify=LEFT)
         message.grid(row=0, column=0, rowspan=15, columnspan=4)
 
-        Label(frame, text="Nominator (a)").grid(row=15, column=1, sticky=E)
-        Label(frame, text="SD of Nom. (a)", justify=RIGHT).grid(row=16, column=1, sticky=E)
-        Label(frame, text="Denominator (b)").grid(row=17, column=1, columnspan=1, sticky=E)
-        Label(frame, text="SD of Denom. (b)").grid(row=18, column=1, sticky=E)
-        Label(frame, text="Correlation coefficient (a, b)").grid(row=19, column=0, columnspan=2, sticky=E)
-        Label(frame, text="Student's t value").grid(row=20, column=1, sticky=E)
-        Label(frame, text="Note: t is the alpha-level deviate from the \nt-distribution for the appropriate degrees of freedom (that is Na + Nb -2)").grid(row=21, column=0, columnspan=4)
+        #label list
+        self.ll = ("Nominator (a)", "SD of Nom. (a)", "Denominator (b)", "SD of Denom. (b)", "Correlation coefficient (a, b)", "Alpha-level deviate (e.g. 0.95)", "Total number of observations (Na + Nb)")
+        # entry rows 0-6
+        self.sample_value = (14, 3, 7, 2, 0, 0.95, 12)
+        self.entries = []
+        self.sva = []
+        #build labels and entry boxes
+        for p in self.ll:
+            i = len(self.sva)           #i.e. 0 when empty, 1 on next loop
+            self.sva.append(StringVar())
+            print self.sva
+            self.sva[i].trace("w", lambda name, index, mode, var=self.sva[i], i=i: self.entryupdate(var, i))
+            Label(frame, text=p).grid(column=0, row=i+15, sticky=E)
+            e = Entry(frame, width=6, textvariable=self.sva[i])
+            e.grid(column=1, row=i+15)
+            
+            self.entries.append(e)
+            
+            self.entries[i].insert(END,str(self.sample_value[i]))
+            print self.entries
+        
+        self.noneditable = ("t value", "degrees of freedom (that is: Na + Nb -2)" )
+        # entry rows 7 & 8
+        for p in self.noneditable:
+            i = len(self.sva)
+            self.sva.append(StringVar())
+            print self.sva
+            self.sva[i].trace("w", lambda name, index, mode, var=self.sva[i], i=i: self.entryupdate(var, i))
+            Label(frame, text=p).grid(column=0, row=i+15, sticky=E)
+            e = Entry(frame, width=6, textvariable=self.sva[i], state='disabled')
+            e.grid(column=1, row=i+15)
 
+        self.tupdate()
+        self.ll = self.ll + self.noneditable
+
+        #Label(frame, text="t value; degrees of freedom (that is: Na + Nb -2)").grid(row=22, column=0)
+        
+        print "all labels created"
         e = []
-        e1 = Entry(frame, justify=CENTER)
-        e1.grid(row=15, column=2)
-        e1.insert(END, '14')
-        e.append(e1)
-        e2 = Entry(frame, justify=CENTER)
-        e2.grid(row=16, column=2)
-        e2.insert(END, '3')
-        e.append(e2)
-        e3 = Entry(frame, justify=CENTER)
-        e3.grid(row=17, column=2)
-        e3.insert(END, '7')
-        e.append(e3)
-        e4 = Entry(frame, justify=CENTER)
-        e4.grid(row=18, column=2)
-        e4.insert(END, '2')
-        e.append(e4)
-        e5 = Entry(frame, justify=CENTER)
-        e5.grid(row=19, column=2)
-        e5.insert(END, '0')
-        e.append(e5)
-        e6 = Entry(frame, justify=CENTER)
-        e6.grid(row=20, column=2)
-        e6.insert(END, '2')
-        e.append(e6)
 
-        b1 = Button(frame, text="Calculate", command=self.calback).grid(row=22, columnspan=4)
-        Label(frame, text="").grid(row=23, column=0, columnspan=4)
+        
+        b1 = Button(frame, text="Calculate", command=self.calback).grid(row=24, columnspan=4)
+        Label(frame, text="").grid(row=25, column=0, columnspan=4)
 
         txt = Text(frame)
-        txt.grid(row=24, column=0, columnspan=4, padx=20)
+        txt.grid(row=26, column=0, columnspan=4, padx=20)
         txt.config(width=60, height= 8, font=("Courier", "12"))
 
         self.e = e
         self.txt = txt
 
-        frame.mainloop()
+
 
     def calback(self):
         'Called by CALCULATE button.'
         flr = self.getResult()
         self.showResult(flr.dict)
+    
+    def entryupdate(self, sv, i):
+        """http://stackoverflow.com/questions/6548837/how-do-i-get-an-event-callback-when-a-tkinter-entry-widget-is-modified"""
+        ###Note this code executes when the program starts, because all variables are written...
+        print (sv, i, self.ll[i], sv.get())
+        #do updating here
+        
+        #check that alpha is between 0 and 1
+        #if self.ll[i] =
+        #call calculation of t
+        self.tupdate()
+    
+    
+    def tupdate(self):
+        N = self.sva[6].get()
+        try:
+            df = int(N) - 2
+            if df > 0:
+                self.sva[8].set(str(df))
+            else:
+                self.sva[8].set(str(0))
+            
+            print ("updated")
+
+        except:
+            print("no updating with bad value " + N)
 
     def getResult(self):
         'Calls fieller to calculate statistics.'
@@ -92,8 +133,9 @@ class FrameFieller(object):
         \n i.e deviations: lower %(dlow)f, upper %(dhi)f \n Approximate SD of ratio = %(appsd)f \
         \n Approximate CV of ratio (%%) = %(cvr)f \n Approximate limits: lower %(applo)f, upper %(apphi)f' %flrd)
 
-    def __init__(self):
-        self.createFrame()
 
 if __name__ == "__main__":
-    ff = FrameFieller()
+    root=Tk()
+    
+    ff = FrameFieller(root)
+    root.mainloop()
