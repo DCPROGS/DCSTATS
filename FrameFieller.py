@@ -1,7 +1,7 @@
 #! /usr/bin/python
 
 from Tkinter import *
-from Fieller import Fieller
+from Fieller import Fieller, calc_t
 
 __author__="remis"
 __date__ ="$27-May-2009 20:29:30$"
@@ -58,6 +58,7 @@ class FrameFieller:
             e = Entry(frame, width=6, textvariable=self.sva[i], state='disabled')
             e.grid(column=1, row=i+15)
 
+        self.dfupdate()
         self.tupdate()
         self.ll = self.ll + self.noneditable
 
@@ -93,10 +94,20 @@ class FrameFieller:
         #check that alpha is between 0 and 1
         #if self.ll[i] =
         #call calculation of t
-        self.tupdate()
-    
-    
-    def tupdate(self):
+        if i == 6: #N therefore df
+            self.dfupdate()
+            self.tupdate()
+        
+        elif i == 5: #alpha level
+            #self.acheck()
+            #self.tupdate()
+            pass
+
+        elif i == 4: # correlation coeff
+            #self.ccheck()
+            pass
+                
+    def dfupdate(self):
         N = self.sva[6].get()
         try:
             df = int(N) - 2
@@ -109,6 +120,16 @@ class FrameFieller:
 
         except:
             print("no updating with bad value " + N)
+            self.sva[8].set(str(0))
+
+    def tupdate(self):
+
+        df = self.sva[8].get()
+        alpha = self.sva[5].get()
+        # values have already been checked for validity
+        print df, alpha
+        tvalue = calc_t(int(df), float(alpha))
+        self.sva[7].set(str(tvalue))
 
     def getResult(self):
         'Calls fieller to calculate statistics.'

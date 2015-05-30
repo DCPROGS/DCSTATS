@@ -9,6 +9,11 @@ import statistics_EJ as s
 __author__="remis"
 __date__ ="$30-Apr-2009 09:51:16$"
 
+def calc_t(df, power):
+    """wrapper for function in statistics.EJ.py code"""
+        
+    return s.InverseStudentT(df, power)
+
 class Fieller(object):
 
     introd = 'FIELLER: calculates confidence limits for a ratio \
@@ -63,10 +68,7 @@ they are independent). \n'
 
         return g, ratio, disc,clower, cupper, dlow, dhi, appsd, applo, apphi, cvr
 
-    def calc_t(self, power, df):
-        """wrapper for function in statistics.EJ.py code"""
-    
-        return s.InverseStudentT(df, power)
+
     
     
     def setResult(self, g, ratio, disc,clower, cupper, dlow, dhi, appsd, applo, apphi, cvr):
