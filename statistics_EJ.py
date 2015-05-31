@@ -300,14 +300,19 @@ def InverseStudentT(degree_of_freedom, probability):
     return findRoot(probability, -10**4, 10**4, f)
 
 
-def tinv(p, degree_of_freedom):
+def tinv(p, degree_of_freedom, tails=2):
     """Similar to the TINV function in Excel
         
-        p: 1-confidence (eg. 0.05 = 95% confidence)"""
+        p: 1-confidence (eg. 0.05 = 95% confidence)
+        but generates two-tail value by default"""
     
     assert 0 <= p <= 1
     confidence = 1 - p
-    return InverseStudentT(degree_of_freedom, (1+confidence)/2.0)
+    ###AP's modification to get the right tailed distribution
+    if tails == 2:
+        return InverseStudentT(degree_of_freedom, confidence)
+    else:
+        return InverseStudentT(degree_of_freedom, (1+confidence)/2.0)
 
 
 def memoize(function):

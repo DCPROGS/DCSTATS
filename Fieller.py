@@ -17,11 +17,13 @@ def calc_t(df, power):
 class Fieller(object):
 
     introd = 'FIELLER: calculates confidence limits for a ratio \
-according Fieller''s theorem (see Finney\'s book). \n\
-Calculates approximate SD of the ratio r = a / b, \
-given the SD of a (the numerator) and of b (the denominator)\
+according Fieller''s theorem (see Finney\'s book). Output includes the approximate \
+SD of the ratio r = a / b, given the SD of a (the numerator) and of b (the denominator)\
  and the correlation coefficient between a & b (zero if \
-they are independent). \n'
+they are independent). \n\
+Fieller requires the t-statistic which can be provided from a table \
+or calculated from alpha and the degrees of freedom. \
+Alpha-level deviation is for two tailed distribution (e.g. 0.05 leaves 90% area)\n'
 
     dict = {}
 
@@ -48,7 +50,16 @@ they are independent). \n'
         # (which actually cancels) so OK to use vb=0
         # disc=va - 2.0*ratio*cov + rat2*vb - g*(va-cov*cov/vb)
         disc = va - 2.0 * ratio * cov + rat2 * vb - g * (va - r * r * va)
-
+        
+        clower = 0
+        cupper = 0
+        appsd = 0
+        applo = 0
+        apphi = 0
+        cvr = 0
+        dlow = 0
+        dhi = 0
+        
         if disc >= 0:
             d = (tval / b) * math.sqrt(disc)
             # Write pre in a way that does not appear to divide by vb
@@ -66,7 +77,7 @@ they are independent). \n'
             apphi = ratio + tval * appsd
             cvr = 100.0 * appsd / ratio
 
-        return g, ratio, disc,clower, cupper, dlow, dhi, appsd, applo, apphi, cvr
+        return g, ratio, disc, clower, cupper, dlow, dhi, appsd, applo, apphi, cvr
 
 
     
