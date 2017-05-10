@@ -57,14 +57,16 @@ def file_read (data_file_name, file_type='txt'):
 	
 	if file_type == 'txt':
 
+		lines = []
 		f=open(data_file_name, 'rU')
-		block_lines = f.readline()
+		for line in f:
+				lines.append(line)
 		f.close()							#close the file
 
-		#eol = os.linesep                           # not required, probably can remove import of os module
-		lines = block_lines.splitlines() 	#divide into lines at carriage rtns, should be platform independent
-
+		#eol = os.linesep                 # not required, probably can remove import of os module
+		#lines = block_lines.splitlines() 	#divide into lines at carriage rtns, should be platform independent
 		lines_of_file=[]
+		
 		for line in lines:
 			values=line.split('\t')					#divide lines into values at tabs
 			lines_of_file.append(values)
