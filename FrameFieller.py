@@ -12,7 +12,7 @@ class FrameFieller:
     
     def __init__(self, root):
         
-        root.title("DC_PyPs - Fieller's test")
+        root.title("DC Stats for Mac - Fieller's test")
         root.geometry('420x600')
         root.config(background="#dcdcdc")
         #print "ff"

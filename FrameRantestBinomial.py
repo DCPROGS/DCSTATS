@@ -13,7 +13,7 @@ class FrameRantestBinomial:
     'GUI for randomisation test'
     
     def __init__(self, root):
-        root.title('DC_PyPs : Randomisation test : binomial data')
+        root.title('DC Stats for Mac : Randomisation test : binomial data')
         root.geometry('480x700')
         self.createFrame(root)
 

@@ -79,10 +79,8 @@ Alpha-level deviation is for two tailed distribution (e.g. 0.05 leaves 90% area)
 
         return g, ratio, disc, clower, cupper, dlow, dhi, appsd, applo, apphi, cvr
 
-
     
-    
-    def setResult(self, g, ratio, disc,clower, cupper, dlow, dhi, appsd, applo, apphi, cvr):
+    def setResult(self, g, ratio, disc, clower, cupper, dlow, dhi, appsd, applo, apphi, cvr):
         'Puts result into Fiellers class dictionary.'
 
         self.dict['g'] = g
@@ -99,7 +97,7 @@ Alpha-level deviation is for two tailed distribution (e.g. 0.05 leaves 90% area)
 
     def __init__(self, a, b, sa, sb, r, tval):
         self.setInData(a, b, sa, sb, r, tval)
-        g, ratio, disc,clower, cupper, dlow, dhi, appsd, applo, apphi, cvr = self.calcFieller(a, b, sa, sb, r, tval)
+        g, ratio, disc, clower, cupper, dlow, dhi, appsd, applo, apphi, cvr = self.calcFieller(a, b, sa, sb, r, tval)
         self.setResult(g, ratio, disc, clower, cupper, dlow, dhi, appsd, applo, apphi, cvr)
 
 if __name__ == "__main__":

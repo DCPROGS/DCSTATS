@@ -14,7 +14,7 @@ class FrameRantestContinuous:
     'GUI for randomisation test'
 
     def __init__(self, root):
-        root.title('DC_PyPs: Randomisation test : continuously variable data.')
+        root.title('DC Stats for Mac : Randomisation test : continuously variable data.')
         self.createFrame(root)
     
 
@@ -33,6 +33,7 @@ class FrameRantestContinuous:
         s.grid (columnspan=2, sticky=EW)
 
         Label(self.frame, text="Please select the data source:", justify=LEFT, bg="#dcdcdc").grid(row=15, column=0, padx=10, sticky=W)
+        
         Label(self.frame, text="The calculation will proceed automatically with\n the default number of randomisations (5000).\n\nUse [Repeat Calculation] for more repetitions\n(e.g. to estimate P < 0.001)", font=("Helvetica", 12), justify=LEFT, bg="#dcdcdc").grid(row=15, column=1, rowspan=4, sticky=S)
 
         self.b1 = Button(self.frame, text="Input data manually", command=self.callback1, highlightbackground="#dcdcdc").grid(row=18, column=0,  sticky=W, padx=30)
@@ -69,7 +70,7 @@ class FrameRantestContinuous:
         self.txt.config(width=75, height= 25, font=("Courier", "12"))
         self.txt.insert(END, "Results will appear here")
         
-        #both these buttons are ungreyed after results display.
+        #both these buttons are ungreyed after results are displayed.
         #Label(self.frame, text="").grid(row=(26), column=0, columnspan=4)
         self.b4 = Button(self.frame, text="Repeat calculation", state=DISABLED,command=self.callback4,highlightbackground="#dcdcdc")
         self.b4.grid(row=27, padx=40, pady=10, column=0, sticky=E)
@@ -155,7 +156,7 @@ class FrameRantestContinuous:
         data2 = dataScreen[n1:n1+n2]
 
         nset = 1    # number of data sets
-       # self.paired = 0                    replaced by callback so removed?? AP
+       # self.paired = 0                    replaced by callback so can remove? AP
        # self.paired = self.var1.get()
         nran = int(self.e5.get())
 
@@ -190,12 +191,12 @@ class FrameRantestContinuous:
 
     def showResult(self, rntd):
         'Displays calculation results on main frame.'
-        # AP 021209 : many added hard coded tabs ('\t') to ease copy and paste of data
+        # AP 021209 : many added hard coded tabs ('\t') to ease copy and paste of results
         # First line of output now specifies source file or manual entry
 
         self.txt.delete(1.0, END)
 
-        self.txt.insert(END,self.data_source+'\n')
+        self.txt.insert(END, self.data_source+'\n')
 
         #result1 = (rnt.nx, rnt.ny, rnt.xbar, rnt.ybar, rnt.sdx, rnt.sdy, rnt.sex, rnt.sey)
         self.txt.insert(END, '   n                \t  %(nx)d      \t  %(ny)d \
@@ -225,14 +226,16 @@ class FrameRantestContinuous:
         #result5 = (nran, rnt.pg1, rnt.pl1, rnt.pa1, rnt.ne1, rnt.pe1, rnt.ne2, rnt.pe2)
         self.txt.insert(END, '\n\n'+rntd['RanPaired'])
         self.txt.insert(END, '\n\n   %(nran)d randomisations \
-        \n P values for difference between means are: \
+        \n P values for difference between means \
         \n  greater than or equal to observed: P = \t %(pg1)f \
         \n  less than or equal to observed: P = \t %(pl1)f \
         \n  greater than or equal in absolute value to observed: P = \t %(pa1)f \
         \n  Number equal to observed = %(ne1)d (P= %(pe1)f) \
         \n  Number equal in absolute value to observed = %(ne2)d (P= %(pe2)f)' %rntd)
 
-        self.b4.config(state=NORMAL)        # results have been calculated so recalculate and plot distribution buttons become available
+        # results have been calculated, so 'Recalculate' and 'Plot distribution'
+        # buttons become available
+        self.b4.config(state=NORMAL)
         self.b5.config(state=NORMAL)
 
     def callback5(self):
