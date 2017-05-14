@@ -15,9 +15,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "497F471F1B01D5A900541D6A"
-               BuildableName = "DC_Pyps"
-               BlueprintName = "DC_Pyps"
-               ReferencedContainer = "container:DC_Pyps.xcodeproj">
+               BuildableName = "DC Stats for Mac"
+               BlueprintName = "DC Stats for Mac"
+               ReferencedContainer = "container:DC Stats for Mac.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -51,9 +51,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "497F471F1B01D5A900541D6A"
-            BuildableName = "DC_Pyps"
-            BlueprintName = "DC_Pyps"
-            ReferencedContainer = "container:DC_Pyps.xcodeproj">
+            BuildableName = "DC Stats for Mac"
+            BlueprintName = "DC Stats for Mac"
+            ReferencedContainer = "container:DC Stats for Mac.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
       <CommandLineArguments>
@@ -79,9 +79,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "497F471F1B01D5A900541D6A"
-            BuildableName = "DC_Pyps"
-            BlueprintName = "DC_Pyps"
-            ReferencedContainer = "container:DC_Pyps.xcodeproj">
+            BuildableName = "DC Stats for Mac"
+            BlueprintName = "DC Stats for Mac"
+            ReferencedContainer = "container:DC Stats for Mac.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
    </ProfileAction>

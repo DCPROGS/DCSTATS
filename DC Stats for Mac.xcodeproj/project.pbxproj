@@ -11,7 +11,7 @@
 		497F47461B01E7DA00541D6A /* data_screen.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = data_screen.py; sourceTree = "<group>"; };
 		497F47471B01E7DA00541D6A /* data_screen.pyc */ = {isa = PBXFileReference; lastKnownFileType = file; path = data_screen.pyc; sourceTree = "<group>"; };
 		497F47481B01E7DA00541D6A /* DC_PyPs_AP.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = DC_PyPs_AP.txt; sourceTree = "<group>"; };
-		497F47491B01E7DA00541D6A /* DC_PyPs.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = DC_PyPs.py; sourceTree = "<group>"; };
+		497F47491B01E7DA00541D6A /* DC_Stats.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = DC_Stats.py; sourceTree = "<group>"; };
 		497F474A1B01E7DA00541D6A /* dca2.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = dca2.gif; sourceTree = "<group>"; };
 		497F474B1B01E7DA00541D6A /* dca2.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = dca2.jpg; sourceTree = "<group>"; };
 		497F474C1B01E7DA00541D6A /* dca2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = dca2.png; sourceTree = "<group>"; };
@@ -46,7 +46,7 @@
 				497F47461B01E7DA00541D6A /* data_screen.py */,
 				497F47471B01E7DA00541D6A /* data_screen.pyc */,
 				497F47481B01E7DA00541D6A /* DC_PyPs_AP.txt */,
-				497F47491B01E7DA00541D6A /* DC_PyPs.py */,
+				497F47491B01E7DA00541D6A /* DC_Stats.py */,
 				497F474A1B01E7DA00541D6A /* dca2.gif */,
 				497F474B1B01E7DA00541D6A /* dca2.jpg */,
 				497F474C1B01E7DA00541D6A /* dca2.png */,
@@ -77,16 +77,16 @@
 /* End PBXGroup section */
 
 /* Begin PBXLegacyTarget section */
-		497F471F1B01D5A900541D6A /* DC_Pyps */ = {
+		497F471F1B01D5A900541D6A /* DC Stats for Mac */ = {
 			isa = PBXLegacyTarget;
 			buildArgumentsString = "$(ACTION)";
-			buildConfigurationList = 497F47221B01D5A900541D6A /* Build configuration list for PBXLegacyTarget "DC_Pyps" */;
+			buildConfigurationList = 497F47221B01D5A900541D6A /* Build configuration list for PBXLegacyTarget "DC Stats for Mac" */;
 			buildPhases = (
 			);
 			buildToolPath = /sw/bin/python2.7;
 			dependencies = (
 			);
-			name = DC_Pyps;
+			name = "DC Stats for Mac";
 			passBuildSettingsInEnvironment = 1;
 			productName = DC_Pyps;
 		};
@@ -104,7 +104,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 497F471E1B01D5A900541D6A /* Build configuration list for PBXProject "DC_Pyps" */;
+			buildConfigurationList = 497F471E1B01D5A900541D6A /* Build configuration list for PBXProject "DC Stats for Mac" */;
 			compatibilityVersion = "Xcode 3.2";
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
@@ -115,7 +115,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				497F471F1B01D5A900541D6A /* DC_Pyps */,
+				497F471F1B01D5A900541D6A /* DC Stats for Mac */,
 			);
 		};
 /* End PBXProject section */
@@ -227,7 +227,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		497F471E1B01D5A900541D6A /* Build configuration list for PBXProject "DC_Pyps" */ = {
+		497F471E1B01D5A900541D6A /* Build configuration list for PBXProject "DC Stats for Mac" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				497F47201B01D5A900541D6A /* Debug */,
@@ -236,7 +236,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		497F47221B01D5A900541D6A /* Build configuration list for PBXLegacyTarget "DC_Pyps" */ = {
+		497F47221B01D5A900541D6A /* Build configuration list for PBXLegacyTarget "DC Stats for Mac" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				497F47231B01D5A900541D6A /* Debug */,

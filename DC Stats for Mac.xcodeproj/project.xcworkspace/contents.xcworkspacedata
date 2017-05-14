@@ -2,6 +2,6 @@
 <Workspace
    version = "1.0">
    <FileRef
-      location = "self:DC_Pyps.xcodeproj">
+      location = "self:/Users/Andrew/Desktop/code/DC-Stats-for-Mac/DC Stats for Mac.xcodeproj">
    </FileRef>
 </Workspace>
