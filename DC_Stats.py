@@ -28,7 +28,7 @@ class DCP:
         statmenu.rantest = Menu(statmenu)
         statmenu.rantest.add_command(label="Continuously variable data", command=self.on_rantest_continuous)
         statmenu.rantest.add_command(label="Binomial data (each result= yes or no)", command=self.on_rantest_binomial)
-        statmenu.add_cascade(label='Randomisation test', menu=statmenu.rantest)
+        statmenu.add_cascade(label="Randomisation test", menu=statmenu.rantest)
         
         statmenu.add_command(label="CVfit", command=self.on_CVfit, state=DISABLED)
         statmenu.add_command(label="Help", command=self.on_help, state=DISABLED)
@@ -57,9 +57,11 @@ class DCP:
         dcpic = Label(lframe, image=picture, pady=60)
         dcpic.picture = picture
         dcpic.pack()
+        
         Label(lframe, text="David Colquhoun", background="#dcdcdc").pack()
         lframe.pack()
         frame.pack()
+        
         version = Message(frame, width=400, text="\n\nPython version: " + sys.version, background="#dcdcdc", font=("Helvetica", 10), pady=5)
         version.pack()
         
@@ -95,14 +97,16 @@ class DCP:
 
 if __name__ == "__main__":
 
-    #print (sys.version) #parentheses necessary in python 3.
+    print (sys.version) #parentheses necessary in python 3.
+    
     # OSX Notes 6/12/14
-    # ---------
+    # -----------------
     # usr/bin/python is 2.7.6 in Yosemite (10.10) and uses Tcl 8.5 (64-bit and thus can be retina).
-    # This environment is used if DC_Pyps.py is launched from an Automator Script
-    # DC_pyps does not need numpy etc so can use native Python from Apple
-    # by contrast Tcl 8.4 is 32-bit and non-retina - used by 2.7.1 which is the default on AJRP's 2013 retina
-    # macbook see
+    # This environment is used if DC_Stats.py is launched from an Automator Script
+    # DC_stats does not need numpy etc so can use native Python from Apple
+    # by contrast Tcl 8.4 is 32-bit and non-retina - used by 2.7.1 which is the default on
+    # 2013 retina macbook
+    # see
     # https://www.python.org/download/mac/tcltk/ for details
     # http://stackoverflow.com/questions/1405913/
     #
