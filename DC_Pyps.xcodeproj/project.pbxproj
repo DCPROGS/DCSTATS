@@ -32,7 +32,6 @@
 		497F47581B01E7DA00541D6A /* k667.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = k667.txt; sourceTree = "<group>"; };
 		497F47591B01E7DA00541D6A /* PlotRandomDist.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = PlotRandomDist.py; sourceTree = "<group>"; };
 		497F475A1B01E7DA00541D6A /* PlotRandomDist.pyc */ = {isa = PBXFileReference; lastKnownFileType = file; path = PlotRandomDist.pyc; sourceTree = "<group>"; };
-		497F475B1B01E7DA00541D6A /* qt_DCProgs Mac.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = "qt_DCProgs Mac.tiff"; sourceTree = "<group>"; };
 		497F475C1B01E7DA00541D6A /* Rantest.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = Rantest.py; sourceTree = "<group>"; };
 		497F475D1B01E7DA00541D6A /* Rantest.pyc */ = {isa = PBXFileReference; lastKnownFileType = file; path = Rantest.pyc; sourceTree = "<group>"; };
 		497F475E1B01E7DA00541D6A /* ReadRandat.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = ReadRandat.py; sourceTree = "<group>"; usesTabs = 1; };
@@ -72,7 +71,6 @@
 				497F47581B01E7DA00541D6A /* k667.txt */,
 				497F47591B01E7DA00541D6A /* PlotRandomDist.py */,
 				497F475A1B01E7DA00541D6A /* PlotRandomDist.pyc */,
-				497F475B1B01E7DA00541D6A /* qt_DCProgs Mac.tiff */,
 				497F475C1B01E7DA00541D6A /* Rantest.py */,
 				497F475D1B01E7DA00541D6A /* Rantest.pyc */,
 				497F475E1B01E7DA00541D6A /* ReadRandat.py */,
@@ -106,7 +104,7 @@
 		497F471B1B01D5A900541D6A /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0630;
+				LastUpgradeCheck = 0830;
 				ORGANIZATIONNAME = Andrew;
 				TargetAttributes = {
 					497F471F1B01D5A900541D6A = {
@@ -144,13 +142,16 @@
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_NO_COMMON_BLOCKS = YES;
@@ -186,8 +187,10 @@
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;

@@ -22,7 +22,7 @@ def read_Data(file_type):
 
     # Imagine taking a header here, with data titles?
 
-    #Make lines into vertical lists of floating point numbers
+    #Make lines into lists of floating point numbers
     datalines = lines_into_traces(lines_of_file)
     data1 = datalines[0]
     data2 = datalines[1]
@@ -48,12 +48,10 @@ def read_Data(file_type):
 
     return in_data, data_file_name
 
-def file_read_excel_tab (file):
-	pass
 
 def file_read (data_file_name, file_type='txt'):
 	"""Strip lines of ASCII text from file"""
-	#print ('Reading',data_file_name,'....')           #silence this output
+	print ('Reading',data_file_name,'....')           #silence this output
 	
 	if file_type == 'txt':
 
