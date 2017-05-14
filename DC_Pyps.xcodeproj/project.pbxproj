@@ -8,9 +8,6 @@
 
 /* Begin PBXFileReference section */
 		495F97241B188C33008F94B7 /* statistics_EJ.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = statistics_EJ.py; sourceTree = "<group>"; };
-		495F97251B1892BB008F94B7 /* fruit.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = fruit.py; sourceTree = "<group>"; };
-		495F97261B19A42C008F94B7 /* validate.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = validate.py; sourceTree = "<group>"; };
-		497F47261B01DD1200541D6A /* test.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = test.py; sourceTree = "<group>"; };
 		497F47461B01E7DA00541D6A /* data_screen.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = data_screen.py; sourceTree = "<group>"; };
 		497F47471B01E7DA00541D6A /* data_screen.pyc */ = {isa = PBXFileReference; lastKnownFileType = file; path = data_screen.pyc; sourceTree = "<group>"; };
 		497F47481B01E7DA00541D6A /* DC_PyPs_AP.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = DC_PyPs_AP.txt; sourceTree = "<group>"; };
@@ -26,7 +23,6 @@
 		497F47521B01E7DA00541D6A /* FrameFieller.pyc */ = {isa = PBXFileReference; lastKnownFileType = file; path = FrameFieller.pyc; sourceTree = "<group>"; };
 		497F47531B01E7DA00541D6A /* FrameRantestBinomial.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = FrameRantestBinomial.py; sourceTree = "<group>"; };
 		497F47541B01E7DA00541D6A /* FrameRantestBinomial.pyc */ = {isa = PBXFileReference; lastKnownFileType = file; path = FrameRantestBinomial.pyc; sourceTree = "<group>"; };
-		497F47551B01E7DA00541D6A /* FrameRantestContinuous_old.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = FrameRantestContinuous_old.py; sourceTree = "<group>"; };
 		497F47561B01E7DA00541D6A /* FrameRantestContinuous.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = FrameRantestContinuous.py; sourceTree = "<group>"; };
 		497F47571B01E7DA00541D6A /* FrameRantestContinuous.pyc */ = {isa = PBXFileReference; lastKnownFileType = file; path = FrameRantestContinuous.pyc; sourceTree = "<group>"; };
 		497F47581B01E7DA00541D6A /* k667.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = k667.txt; sourceTree = "<group>"; };
@@ -59,13 +55,10 @@
 				497F474F1B01E7DA00541D6A /* Fieller.py */,
 				497F47501B01E7DA00541D6A /* Fieller.pyc */,
 				497F47511B01E7DA00541D6A /* FrameFieller.py */,
-				495F97261B19A42C008F94B7 /* validate.py */,
-				495F97251B1892BB008F94B7 /* fruit.py */,
 				495F97241B188C33008F94B7 /* statistics_EJ.py */,
 				497F47521B01E7DA00541D6A /* FrameFieller.pyc */,
 				497F47531B01E7DA00541D6A /* FrameRantestBinomial.py */,
 				497F47541B01E7DA00541D6A /* FrameRantestBinomial.pyc */,
-				497F47551B01E7DA00541D6A /* FrameRantestContinuous_old.py */,
 				497F47561B01E7DA00541D6A /* FrameRantestContinuous.py */,
 				497F47571B01E7DA00541D6A /* FrameRantestContinuous.pyc */,
 				497F47581B01E7DA00541D6A /* k667.txt */,
@@ -78,7 +71,6 @@
 				497F47611B01E7DA00541D6A /* statistics */,
 				497F47621B01E7DA00541D6A /* t.txt */,
 				497F47631B01E7DA00541D6A /* test.txt */,
-				497F47261B01DD1200541D6A /* test.py */,
 			);
 			sourceTree = "<group>";
 		};

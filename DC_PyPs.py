@@ -16,7 +16,7 @@ class DCP:
         frame = Frame(master)
         frame.config(background="#dcdcdc") #well, it has to be, right?
         #frame.pack()
-        master.title('DC_PyPs v. 0.3')    #   Main frame title
+        master.title('DC Stats for Mac v. 0.4')    #   Main frame title
         master.config(background="#dcdcdc")
         #master.geometry('450x480')
         menubar = Menu(master)
