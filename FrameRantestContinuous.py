@@ -217,7 +217,7 @@ class FrameRantestContinuous:
         self.txt.insert(END, self.data_source + '\n')
 
         #result1 = (rnt.nx, rnt.ny, rnt.xbar, rnt.ybar, rnt.sdx, rnt.sdy, rnt.sex, rnt.sey)
-        self.txt.insert(END, '   n                \t  %(nx)d      \t  %(ny)d \
+        self.txt.insert(END, '  n \t\t  %(nx)d \t\t  %(ny)d \
         \n  Mean       \t %(xbar)f    \t  %(ybar)f \
         \n  s(x), s(y) \t %(sdx)f     \t  %(sdy)f \
         \n  s(x/ybar)  \t %(sex)f     \t  %(sey)f' %rntd)
@@ -230,21 +230,21 @@ class FrameRantestContinuous:
         self.txt.insert(END, '\n\n'+rntd['tPaired'])
         if self.paired:
             #result3 = (rnt.df, rnt.dbar, rnt.sdbar, rnt.tval, rnt.P)
-            self.txt.insert(END, '\n  t(%(df)d)= \t %(dbar)f \t / \t%(sdbar)f \t = \t %(tval)f \
+            self.txt.insert(END, '\n   t(%(df)d)= \t %(dbar)f \t / \t%(sdbar)f \t = \t%(tval)f \
             \n  two tail P =\t %(P)f' %rntd)
             self.meanToPlot = rntd['dbar']
 
         else:
             #result4 = (rnt.dobs, rnt.df, rnt.adiff, rnt.sdiff, rnt.tval, rnt.P)
-            self.txt.insert(END, '\n\n Observed difference between means= \t %(dobs)f \
-            \n t(%(df)d) = \t %(adiff)f / %(sdiff)f = \t %(tval)f \
-            \n two tail P = \t %(P)f' %rntd)
+            self.txt.insert(END, '\n  Observed difference between means = \t %(dobs)f \
+            \n  t(%(df)d) = \t %(adiff)f / %(sdiff)f = \t %(tval)f \
+            \n  two tail P = \t %(P)f' %rntd)
             self.meanToPlot = rntd['dobs']
 
         #result5 = (nran, rnt.pg1, rnt.pl1, rnt.pa1, rnt.ne1, rnt.pe1, rnt.ne2, rnt.pe2)
-        self.txt.insert(END, '\n\n'+rntd['RanPaired'])
-        self.txt.insert(END, '\n\n   %(nran)d randomisations \
-        \n P values for difference between means \
+        self.txt.insert(END, '\n\n' + rntd['RanPaired'])
+        self.txt.insert(END, ' %(nran)d randomisations \
+        \n  P values for difference between means \
         \n  greater than or equal to observed: P = \t %(pg1)f \
         \n  less than or equal to observed: P = \t %(pl1)f \
         \n  greater than or equal in absolute value to observed: P = \t %(pa1)f \
@@ -253,8 +253,8 @@ class FrameRantestContinuous:
 
         print (rntd)
         #report of hedges calcuations
-        self.txt.insert(END, '\n\n   Effect size -  \
-                        \n Hedges unbiased d = \t %(hedges_d)f\
+        self.txt.insert(END, '\n\nEffect size  \
+                        \n  Hedges unbiased d = \t %(hedges_d)f\
                         \n  approximate 95%% confidence intervals \
                         \n  upper 95%% CI =\t %(hedges_upperCI)f \
                         \n  lower 95%% CI =\t %(hedges_lowerCI)f ' %rntd)
