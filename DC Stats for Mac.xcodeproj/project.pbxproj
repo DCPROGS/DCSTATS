@@ -25,7 +25,7 @@
 		497F47541B01E7DA00541D6A /* FrameRantestBinomial.pyc */ = {isa = PBXFileReference; lastKnownFileType = file; path = FrameRantestBinomial.pyc; sourceTree = "<group>"; };
 		497F47561B01E7DA00541D6A /* FrameRantestContinuous.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = FrameRantestContinuous.py; sourceTree = "<group>"; };
 		497F47571B01E7DA00541D6A /* FrameRantestContinuous.pyc */ = {isa = PBXFileReference; lastKnownFileType = file; path = FrameRantestContinuous.pyc; sourceTree = "<group>"; };
-		497F47581B01E7DA00541D6A /* k667.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = k667.txt; sourceTree = "<group>"; };
+		497F47581B01E7DA00541D6A /* test_lowP.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = test_lowP.txt; sourceTree = "<group>"; };
 		497F47591B01E7DA00541D6A /* PlotRandomDist.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = PlotRandomDist.py; sourceTree = "<group>"; };
 		497F475A1B01E7DA00541D6A /* PlotRandomDist.pyc */ = {isa = PBXFileReference; lastKnownFileType = file; path = PlotRandomDist.pyc; sourceTree = "<group>"; };
 		497F475C1B01E7DA00541D6A /* Rantest.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = Rantest.py; sourceTree = "<group>"; };
@@ -33,8 +33,7 @@
 		497F475E1B01E7DA00541D6A /* ReadRandat.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = ReadRandat.py; sourceTree = "<group>"; usesTabs = 1; };
 		497F475F1B01E7DA00541D6A /* ReadRandat.pyc */ = {isa = PBXFileReference; lastKnownFileType = file; path = ReadRandat.pyc; sourceTree = "<group>"; };
 		497F47611B01E7DA00541D6A /* statistics */ = {isa = PBXFileReference; lastKnownFileType = folder; path = statistics; sourceTree = "<group>"; };
-		497F47621B01E7DA00541D6A /* t.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = t.txt; sourceTree = "<group>"; };
-		497F47631B01E7DA00541D6A /* test.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = test.txt; sourceTree = "<group>"; };
+		497F47631B01E7DA00541D6A /* test_hiP.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = test_hiP.txt; sourceTree = "<group>"; };
 		4983FB211B093DFC00EAAC48 /* hedges.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = hedges.py; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -61,7 +60,7 @@
 				497F47541B01E7DA00541D6A /* FrameRantestBinomial.pyc */,
 				497F47561B01E7DA00541D6A /* FrameRantestContinuous.py */,
 				497F47571B01E7DA00541D6A /* FrameRantestContinuous.pyc */,
-				497F47581B01E7DA00541D6A /* k667.txt */,
+				497F47581B01E7DA00541D6A /* test_lowP.txt */,
 				497F47591B01E7DA00541D6A /* PlotRandomDist.py */,
 				497F475A1B01E7DA00541D6A /* PlotRandomDist.pyc */,
 				497F475C1B01E7DA00541D6A /* Rantest.py */,
@@ -69,8 +68,7 @@
 				497F475E1B01E7DA00541D6A /* ReadRandat.py */,
 				497F475F1B01E7DA00541D6A /* ReadRandat.pyc */,
 				497F47611B01E7DA00541D6A /* statistics */,
-				497F47621B01E7DA00541D6A /* t.txt */,
-				497F47631B01E7DA00541D6A /* test.txt */,
+				497F47631B01E7DA00541D6A /* test_hiP.txt */,
 			);
 			sourceTree = "<group>";
 		};

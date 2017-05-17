@@ -65,7 +65,7 @@ class Rantest(object):
         for m in range(1, ITMAX+1):
             EM = m
             TEM = EM + EM
-            D = EM * (B -m) * X / ((QAM + TEM) * (A + TEM))
+            D = EM * (B - m) * X / ((QAM + TEM) * (A + TEM))
             AP = AZ + D * AM
             BP = BZ + D * BM
             D = -(A + EM) * (QAB + EM) * X / ((A + TEM) * (QAP + TEM))
@@ -303,14 +303,23 @@ class Rantest(object):
 
 
     def setContinuousData(self, in_data, nran, jset, paired):
+        
+        #jset is a flag for larger datasets and compatibility with older programs?
+        #normally called with 1
+        #TODO set default jset value here?
+        
+        j_offset = (jset-1) * 7
+        
+        self.dict['nx'] = in_data[j_offset + 1]
+        self.dict['ny'] = in_data[j_offset + 2]
 
-        self.dict['nx'] = in_data[(jset-1)*7+1]
-        self.dict['ny'] = in_data[(jset-1)*7+2]
-        titled = in_data[(jset-1)*7+3]
-        titlex = in_data[(jset-1)*7+4]
-        titley = in_data[(jset-1)*7+5]
-        xobs = in_data[(jset-1)*7+6]
-        yobs = in_data[(jset-1)*7+7]
+        # AP 170517 are these global variables? they don't seem to be used elsewhere
+        titled = in_data[j_offset + 3]
+        titlex = in_data[j_offset + 4]
+        titley = in_data[j_offset + 5]
+        
+        xobs = in_data[j_offset + 6]
+        yobs = in_data[j_offset + 7]
 
         return xobs, yobs
 
@@ -328,7 +337,7 @@ class Rantest(object):
         elif paired and nx != ny:
             print ("Paired test is still impossible if nx != ny")
             paired = False
-            self.dict['RanPaired'] = "Paired tickbox check but paired tests impossible, nx != ny.\n Unpaired randomisation test."
+            self.dict['RanPaired'] = "Paired tickbox check but paired tests impossible, nx != ny.\n Doing unpaired randomisation test."
         
         else:
             self.dict['RanPaired'] = "Unpaired randomisation test."
@@ -402,6 +411,7 @@ class Rantest(object):
                 if dran == dobs: ne1 = ne1 + 1
                 if math.fabs(dran) == math.fabs(dobs): ne2 = ne2 + 1
 
+        #store results for output
         self.dict['nran'] = nran
         self.dict['dobs'] = dobs
         self.dict['randiff'] = randiff

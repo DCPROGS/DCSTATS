@@ -2,17 +2,17 @@
 
 """Basic statistics utility functions.
     
-    The implementation of Student's t distribution inverse CDF was ported to Python
-    from JSci. The parameters are set to only be accurate to approximately 5
-    decimal places.
-    
-    The JSci port comes frist. "New" code is near the bottom.
-    
-    JSci information:
-    http://jsci.sourceforge.net/
-    Original Author: Mark Hale
-    Original Licence: LGPL
-    """
+The implementation of Student's t distribution inverse CDF was ported to Python
+from JSci. The parameters are set to only be accurate to approximately 5
+decimal places.
+
+The JSci port comes first. "New" code is near the bottom.
+
+JSci information:
+http://jsci.sourceforge.net/
+Original Author: Mark Hale
+Original Licence: LGPL
+"""
 
 import math
 
@@ -27,7 +27,7 @@ LOGSQRT2PI = math.log(SQRT2PI);
 lg_frtbig = 2.25e76
 pnt68 = 0.6796875
 # lower value = higher precision
-PRECISION = 4.0*EPS
+PRECISION = 4.0 * EPS
 
 def betaFraction(x, p, q):
     """Evaluates of continued fraction part of incomplete beta function.
@@ -37,17 +37,17 @@ def betaFraction(x, p, q):
     sum_pq  = p + q
     p_plus  = p + 1.0
     p_minus = p - 1.0
-    h = 1.0-sum_pq*x/p_plus;
+    h = 1.0 - sum_pq * x / p_plus;
     if abs(h) < XMININ:
         h = XMININ
-    h = 1.0/h
+    h = 1.0 / h
     frac = h
     m = 1
     delta = 0.0
     c = 1.0
     
     while m <= MAX_ITERATIONS and abs(delta-1.0) > PRECISION:
-        m2 = 2*m
+        m2 = 2 * m
         
         # even index for d
         d=m*(q-m)*x/((p_minus+m2)*(p+m2))
@@ -209,7 +209,7 @@ def logBeta(p, q):
     if p <= 0 or q <= 0 or p + q > LOG_GAMMA_X_MAX_VALUE:
         return 0
     
-    return logGamma(p)+logGamma(q)-logGamma(p+q)
+    return logGamma(p) + logGamma(q) - logGamma(p + q)
 
 
 def incompleteBeta(x, p, q):
@@ -227,14 +227,14 @@ def incompleteBeta(x, p, q):
         return 0.0
     if x >= 1.0:
         return 1.0
-    if p <= 0.0 or q <= 0.0 or (p+q) > LOG_GAMMA_X_MAX_VALUE:
+    if p <= 0.0 or q <= 0.0 or (p + q) > LOG_GAMMA_X_MAX_VALUE:
         return 0.0
     
-    beta_gam = math.exp(-logBeta(p,q) + p*math.log(x) + q*math.log(1.0-x))
-    if x < (p+1.0)/(p+q+2.0):
-        return beta_gam*betaFraction(x, p, q)/p
+    beta_gam = math.exp(-logBeta(p, q) + p * math.log(x) + q * math.log(1.0 - x))
+    if x < (p + 1.0)/(p + q + 2.0):
+        return beta_gam * betaFraction(x, p, q) / p
     else:
-        return 1.0-(beta_gam*betaFraction(1.0-x,q,p)/q)
+        return 1.0 - (beta_gam * betaFraction(1.0 - x, q, p) / q)
 
 
 ACCURACY = 10**-7
@@ -265,7 +265,7 @@ def StudentTCDF(degree_of_freedom, X):
         
         Ported from Java: http://jsci.sourceforge.net/"""
     
-    A = 0.5 * incompleteBeta(degree_of_freedom/(degree_of_freedom+X*X), 0.5*degree_of_freedom, 0.5)
+    A = 0.5 * incompleteBeta(degree_of_freedom / (degree_of_freedom + X * X), 0.5 *degree_of_freedom, 0.5)
     if X > 0:
         return 1 - A
     return A
@@ -297,7 +297,7 @@ def InverseStudentT(degree_of_freedom, probability):
     def f(x):
         return StudentTCDF(degree_of_freedom, x)
 
-    return findRoot(probability, -10**4, 10**4, f)
+    return findRoot(probability, -10 ** 4, 10 ** 4, f)
 
 
 def tinv(p, degree_of_freedom, tails=2):
@@ -327,6 +327,14 @@ def memoize(function):
 cached_tinv = memoize(tinv)
 
 
+def simple_stats(r):
+    total = sum(r)
+    average = total / float(len(r))
+    sum_deviation_squared = sum([(i - average) ** 2 for i in r])
+    standard_deviation = math.sqrt(sum_deviation_squared / (len(r) - 1 or 1))
+
+    return average, standard_deviation
+
 def stats(r, confidence_interval=0.05):
     """Returns statistics about a sequence of numbers.
         
@@ -335,12 +343,12 @@ def stats(r, confidence_interval=0.05):
         Returns (average, median, standard deviation, min, max, confidence interval)"""
     
     total = sum(r)
-    average = total/float(len(r))
-    sum_deviation_squared = sum([(i-average)**2 for i in r])
-    standard_deviation = math.sqrt(sum_deviation_squared/(len(r)-1 or 1))
+    average = total / float(len(r))
+    sum_deviation_squared = sum([(i - average) ** 2 for i in r])
+    standard_deviation = math.sqrt(sum_deviation_squared / (len(r) - 1 or 1))
     s = list(r)
     s.sort()
-    median = s[len(s)/2]
+    median = s[len(s) / 2]
     minimum = s[0]
     maximum = s[-1]
     # See: http://davidmlane.com/hyperstat/
@@ -352,5 +360,5 @@ def stats(r, confidence_interval=0.05):
     # Degrees of freedom = n-1
     # t = tinv(0.05, degrees_of_freedom)
     # confidence = +/- t * s_m
-    confidence = cached_tinv(confidence_interval, len(r)-1) * s_m
+    confidence = cached_tinv(confidence_interval, len(r) - 1) * s_m
     return average, median, standard_deviation, minimum, maximum, confidence

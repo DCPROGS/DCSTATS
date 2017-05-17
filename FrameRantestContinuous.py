@@ -6,6 +6,7 @@ from Rantest import Rantest
 from data_screen import Data_Screen
 from PlotRandomDist import PlotRandomDist
 from ReadRandat import read_Data
+from hedges import Hedges_d
 
 __author__="remis"
 __date__ ="$27-May-2009 12:45:34$"
@@ -56,13 +57,14 @@ class FrameRantestContinuous:
         # Hence self.paired is set to zero above.
         c1=Checkbutton(self.frame, text=text1, variable=self.var1, command=self.callback_paired, bg="#dcdcdc").grid(row=23, column=0, padx=30, pady=5, sticky=W)
         
+        ###Not implemented yet so check button is disabled
+        ###Simple CI are calculated until bootstrap is implemented
         self.var2 = IntVar()
-        hedges="Calculate confidence intervals for Hedge's g?"
+        hedges = "Calculate exact confidence intervals for Hedge's d?"
         self.H_CI = 0
-        # Callback is not triggered if checkbox is never touched
+        # Callback will not be triggered if checkbox is never touched
         # Hence self.H_CI is set to zero above.
-        
-        c2=Checkbutton(self.frame, text=hedges, variable=self.var2, command=self.callback_hedges, bg="#dcdcdc").grid(row=23, column=1, padx=30, pady=5, sticky=W)
+        c2=Checkbutton(self.frame, text=hedges, state=DISABLED, variable=self.var2, command=self.callback_hedges, bg="#dcdcdc").grid(row=23, column=1, padx=30, pady=5, sticky=W)
 
 
         self.txt = Text(self.frame)
@@ -72,7 +74,7 @@ class FrameRantestContinuous:
         
         #both these buttons are ungreyed after results are displayed.
         #Label(self.frame, text="").grid(row=(26), column=0, columnspan=4)
-        self.b4 = Button(self.frame, text="Repeat calculation", state=DISABLED,command=self.callback4,highlightbackground="#dcdcdc")
+        self.b4 = Button(self.frame, text="Repeat calculation", state=DISABLED, command=self.callback4,highlightbackground="#dcdcdc")
         self.b4.grid(row=27, padx=40, pady=10, column=0, sticky=E)
 
         self.b5 = Button(self.frame, text="Plot Distribution", state=DISABLED, command=self.callback5,highlightbackground="#dcdcdc")
@@ -83,13 +85,13 @@ class FrameRantestContinuous:
     def callback_paired(self):
         'Called when ""Paired Test?"" tickbox is checked'
         self.paired = self.var1.get()
-        print self.paired
+        print (self.paired)
 
     def callback_hedges(self):
         'Called when ""Hedges CI"" tickbox is checked'
 
         self.H_CI= self.var2.get()
-        print self.H_CI
+        print (self.H_CI)
 
 ### end of NEW BY AP
 
@@ -144,9 +146,9 @@ class FrameRantestContinuous:
     def getData(self):
         'Calls a table to enter data manually.'
 
-### NEW BY AP
+        ### NEW BY AP
         self.data_source = 'Data entered by hand'
-### end of NEW BY AP
+        ### end of NEW BY AP
 
         from_screen = Data_Screen(self.frame)
         n1 = from_screen.n1
@@ -158,8 +160,11 @@ class FrameRantestContinuous:
         nset = 1    # number of data sets
        # self.paired = 0                    replaced by callback so can remove? AP
        # self.paired = self.var1.get()
+       
+       #number of randomisations
         nran = int(self.e5.get())
 
+        #why is in_data local - could be stored in object
         in_data = []
         in_data.append(nset)
         for j in range(0, nset):
@@ -187,16 +192,29 @@ class FrameRantestContinuous:
         #rnt.doRantestContinuous(in_data, nran, jset, self.paired)
         self.randiff = rnt.dict['randiff']
 
+        #calculation of hedges d and approximate 95% confidence intervals
+        hedges_calculation = Hedges_d(xobs, yobs)
+        hedges_calculation.hedges_d_unbiased()
+        lowerCI, upperCI = hedges_calculation.approx_CI()
+        
+        #option to have bootstrap calculated CIs should go here
+        
+        #store results
+        rnt.dict['hedges_d'] = hedges_calculation.d
+        rnt.dict['hedges_lowerCI'] = lowerCI
+        rnt.dict['hedges_upperCI'] = upperCI
+        
         return rnt.dict
+    
 
     def showResult(self, rntd):
         'Displays calculation results on main frame.'
-        # AP 021209 : many added hard coded tabs ('\t') to ease copy and paste of results
+        # AP 021209 : hard coded tabs ('\t') ease subsequent copy and paste of results
         # First line of output now specifies source file or manual entry
 
         self.txt.delete(1.0, END)
 
-        self.txt.insert(END, self.data_source+'\n')
+        self.txt.insert(END, self.data_source + '\n')
 
         #result1 = (rnt.nx, rnt.ny, rnt.xbar, rnt.ybar, rnt.sdx, rnt.sdy, rnt.sex, rnt.sey)
         self.txt.insert(END, '   n                \t  %(nx)d      \t  %(ny)d \
@@ -232,6 +250,14 @@ class FrameRantestContinuous:
         \n  greater than or equal in absolute value to observed: P = \t %(pa1)f \
         \n  Number equal to observed = %(ne1)d (P= %(pe1)f) \
         \n  Number equal in absolute value to observed = %(ne2)d (P= %(pe2)f)' %rntd)
+
+        print (rntd)
+        #report of hedges calcuations
+        self.txt.insert(END, '\n\n   Effect size -  \
+                        \n Hedges unbiased d = \t %(hedges_d)f\
+                        \n  approximate 95%% confidence intervals \
+                        \n  upper 95%% CI =\t %(hedges_upperCI)f \
+                        \n  lower 95%% CI =\t %(hedges_lowerCI)f ' %rntd)
 
         # results have been calculated, so 'Recalculate' and 'Plot distribution'
         # buttons become available
