@@ -2,7 +2,11 @@
 from os import system
 import sys
 from platform import system as platform
-from Tkinter import *
+if sys.version_info[0] < 3:
+    from Tkinter import *
+else:
+    from tkinter import *
+    
 from FrameFieller import FrameFieller
 from FrameRantestContinuous import FrameRantestContinuous
 from FrameRantestBinomial import FrameRantestBinomial

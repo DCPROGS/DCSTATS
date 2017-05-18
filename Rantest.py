@@ -3,6 +3,7 @@
 """rantest.py -- RANDOMISATION TEST FOR TWO SAMPLES.\
                Converted from David Colquhoun's FORTRAN version RANTEST.FOR"""
 
+import sys
 import math
 import random
 
@@ -192,7 +193,10 @@ class Rantest(object):
         for n in range(0, nran):
 
             # Randomisation happens here
-            iran = range(0, n1 + n2)
+            if sys.version_info[0] < 3:
+                iran = range(0,(nx + ny))
+            else:
+                iran = list(range(0, n1 + n2))
             random.shuffle(iran)
 
             is2 = 0.0
@@ -392,7 +396,10 @@ class Rantest(object):
 
             # start randomisation
             for n in range(0, nran):
-                iran = range(0,(nx + ny))
+                if sys.version_info[0] < 3:
+                    iran = range(0,(nx + ny))
+                else:
+                    iran = list(range(0,(nx + ny)))
                 random.shuffle(iran)
                 sy = 0.0
                 for i in range(0, ny):
@@ -432,4 +439,4 @@ class Rantest(object):
 
 if __name__ == "__main__":
 
-    print introd
+    print (introd)

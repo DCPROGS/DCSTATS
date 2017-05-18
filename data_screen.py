@@ -3,9 +3,14 @@
 __author__="remis"
 __date__ ="$14-May-2009 12:23:09$"
 
-import tkSimpleDialog
-from Tkinter import *
+import sys
 import random
+if sys.version_info[0] < 3:
+    from Tkinter import *
+    import tkSimpleDialog
+else:
+    from tkinter import *
+    from tkinter import simpledialog as tkSimpleDialog
 
 class Data_Screen(tkSimpleDialog.Dialog):
 

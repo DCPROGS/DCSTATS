@@ -1,7 +1,13 @@
 #! /usr/bin/python
 
-from Tkinter import *
-from ttk import Separator
+import sys
+if sys.version_info[0] < 3:
+    from Tkinter import *
+    from ttk import Separator
+else:
+    from tkinter import *
+    from tkinter.ttk import Separator
+
 from Fieller import Fieller, calc_t
 
 __author__="remis"
@@ -85,7 +91,7 @@ class FrameFieller:
         txt.config(width=60, height=9, font=("Courier", "11"))
         txt.insert(END, "Results will appear here")
 
-        print "fieller frame GUI created"
+        print ("fieller frame GUI created")
         self.txt = txt
 
 
@@ -154,7 +160,7 @@ class FrameFieller:
         alpha = self.sva[5].get()
         # values have already been checked for validity
         two_tail = 1 - float(alpha)
-        print df, alpha, two_tail
+        print (df, alpha, two_tail)
         
         tvalue = calc_t(int(df), two_tail )
         t_str = ("{:.5f}".format(tvalue))

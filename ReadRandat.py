@@ -1,6 +1,9 @@
-import os
+import os, sys
 import csv
-import tkFileDialog
+if sys.version_info[0] < 3:
+    import tkFileDialog
+else:
+    from tkinter import filedialog as tkFileDialog
 
 __author__="Remijigus Lape and Andrew Plested"
 __date__ ="$01-Dec-2009 16:16:16$"
@@ -123,6 +126,6 @@ if __name__ == "__main__":
     if os.path.exists(scnFile):
         HeaderList = readHeader(scnFile)
     else:
-        print 'file not found'
+        print ('file not found')
 
 
