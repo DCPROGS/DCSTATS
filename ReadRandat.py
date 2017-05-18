@@ -9,6 +9,8 @@ __date__ ="$01-Dec-2009 16:16:16$"
 #in file_write, os.linesep is used now to write the end-of-line
 # Jargon: Traces are lists of floating point numbers
 #           Lines are strings of tab-delimited floating point numbers
+#
+#Note: this module is unsafe and not robust to bad input.
 
 def read_Data(file_type):
     """"Asks for a tab delimited text file or excel tab-delim to use in randomization test.

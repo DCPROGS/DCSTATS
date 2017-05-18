@@ -6,7 +6,7 @@ from Rantest import Rantest
 from data_screen import Data_Screen
 from PlotRandomDist import PlotRandomDist
 from ReadRandat import read_Data
-from hedges import Hedges_d
+from Hedges import Hedges_d
 
 __author__="remis"
 __date__ ="$27-May-2009 12:45:34$"
@@ -46,10 +46,12 @@ class FrameRantestContinuous:
 
         Label(self.frame, text="Number of randomisations:", bg="#dcdcdc").grid(row=22, column=0, padx=30, pady=5, sticky=W)
         
+        #default number of randomizations is 5000
         self.e5 = Entry(self.frame, justify=CENTER, width=12, highlightbackground="#dcdcdc")
         self.e5.grid(row=22, column=1, sticky=W, pady=5)
         self.e5.insert(END, '5000')
 
+        #checkbox for doing a paired test
         self.var1 = IntVar()
         text1="Paired test?"
         self.paired = 0
@@ -57,6 +59,7 @@ class FrameRantestContinuous:
         # Hence self.paired is set to zero above.
         c1=Checkbutton(self.frame, text=text1, variable=self.var1, command=self.callback_paired, bg="#dcdcdc").grid(row=23, column=0, padx=30, pady=5, sticky=W)
         
+        #checkbox to do bootstrap confidence intervals for Hedges' d
         ###Not implemented yet so check button is disabled
         ###Simple CI are calculated until bootstrap is implemented
         self.var2 = IntVar()
@@ -182,7 +185,7 @@ class FrameRantestContinuous:
         return in_data, nran
 
     def getResult(self, in_data, nran):
-        'Calls rantest and Hedges to calculate statistics.'
+        'Calls Rantest and Hedges to calculate statistics.'
 
         jset = 1
         rnt = Rantest()
@@ -193,6 +196,7 @@ class FrameRantestContinuous:
         self.randiff = rnt.dict['randiff']
 
         #calculation of hedges d and approximate 95% confidence intervals
+        #not tested against known values yet AP 170518
         hedges_calculation = Hedges_d(xobs, yobs)
         hedges_calculation.hedges_d_unbiased()
         lowerCI, upperCI = hedges_calculation.approx_CI()
