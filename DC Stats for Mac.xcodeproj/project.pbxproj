@@ -32,7 +32,6 @@
 		497F475D1B01E7DA00541D6A /* Rantest.pyc */ = {isa = PBXFileReference; lastKnownFileType = file; path = Rantest.pyc; sourceTree = "<group>"; };
 		497F475E1B01E7DA00541D6A /* ReadRandat.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = ReadRandat.py; sourceTree = "<group>"; usesTabs = 1; };
 		497F475F1B01E7DA00541D6A /* ReadRandat.pyc */ = {isa = PBXFileReference; lastKnownFileType = file; path = ReadRandat.pyc; sourceTree = "<group>"; };
-		497F47611B01E7DA00541D6A /* statistics */ = {isa = PBXFileReference; lastKnownFileType = folder; path = statistics; sourceTree = "<group>"; };
 		497F47631B01E7DA00541D6A /* test_hiP.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = test_hiP.txt; sourceTree = "<group>"; };
 		4983FB211B093DFC00EAAC48 /* hedges.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = hedges.py; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -67,7 +66,6 @@
 				497F475D1B01E7DA00541D6A /* Rantest.pyc */,
 				497F475E1B01E7DA00541D6A /* ReadRandat.py */,
 				497F475F1B01E7DA00541D6A /* ReadRandat.pyc */,
-				497F47611B01E7DA00541D6A /* statistics */,
 				497F47631B01E7DA00541D6A /* test_hiP.txt */,
 			);
 			sourceTree = "<group>";

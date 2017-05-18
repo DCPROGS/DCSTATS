@@ -182,7 +182,7 @@ class FrameRantestContinuous:
         return in_data, nran
 
     def getResult(self, in_data, nran):
-        'Calls rantest to calculate statistics.'
+        'Calls rantest and Hedges to calculate statistics.'
 
         jset = 1
         rnt = Rantest()
