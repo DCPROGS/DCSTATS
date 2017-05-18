@@ -26,7 +26,7 @@ class Hedges_d:
             self.asymptotic_SE_d_unpaired()
         
         if len (self.s1) < 20 or len (self.s2) < 20:
-            print ("Small sample size, should use correct df for approx 95% CI [not yet implemented]")
+            print ("Small sample size, should use correct df for approx 95% CI (not yet implemented)")
         
         lower95CI = self.d - 1.96 * self.SE_d
         upper95CI = self.d + 1.96 * self.SE_d
