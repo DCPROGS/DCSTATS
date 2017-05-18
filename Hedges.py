@@ -3,9 +3,10 @@ import math
 from statistics_EJ import simple_stats as mean_SD
 
 class Hedges_d:
-    ### calculation of Hedges' unbiased g (Hedges' d)
+    ### calculation of Hedges' d (Hedges' unbiased g)
+    ### see Nakagawa and Cuthill (2007) Biol. Rev.
     ### simple 95% confidence intervals
-    ### TODO : bootstrap to get better confidence intervals
+    ### TODO : bootstrap to get better (non-parametric) confidence intervals
     
     def __init__(self, sample1, sample2):
         ## sample1 and sample2 are the arrays to compare
@@ -13,7 +14,6 @@ class Hedges_d:
         self.s2 = sample2
         self.d = 0
         self.SE_d = 0
-    
 
     def approx_CI (self):
         # 95% CI = ES - 1.96 * SE_d to ES + 1.96 * SE_d
