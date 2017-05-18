@@ -199,7 +199,7 @@ class FrameRantestContinuous:
         #not tested against known values yet AP 170518
         hedges_calculation = Hedges_d(xobs, yobs)
         hedges_calculation.hedges_d_unbiased()
-        lowerCI, upperCI = hedges_calculation.approx_CI()
+        lowerCI, upperCI = hedges_calculation.approx_CI(self.paired)    #needed for degrees of freedom
         
         #option to have bootstrap calculated CIs should go here
         
@@ -255,7 +255,8 @@ class FrameRantestContinuous:
         \n  Number equal to observed = %(ne1)d (P= %(pe1)f) \
         \n  Number equal in absolute value to observed = %(ne2)d (P= %(pe2)f)' %rntd)
 
-        print (rntd)
+        #print (rntd)   #debugging
+        
         #report of hedges calcuations
         self.txt.insert(END, '\n\nEffect size  \
                         \n  Hedges unbiased d = \t %(hedges_d)f\

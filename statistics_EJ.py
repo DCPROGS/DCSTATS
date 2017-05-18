@@ -239,6 +239,7 @@ def incompleteBeta(x, p, q):
 
 ACCURACY = 10**-7
 MAX_ITERATIONS = 10000
+
 def findRoot(value, x_low, x_high, function):
     """Use the bisection method to find root such that function(root) == value."""
     
@@ -256,7 +257,7 @@ def findRoot(value, x_low, x_high, function):
         guess = (x_high + x_low) / 2.0
         v = function(guess)
         difference = v - value
-    
+        #print (guess)
     return guess
 
 
@@ -326,7 +327,7 @@ def memoize(function):
 # Cache tinv results, since we typically call it with the same args over and over
 cached_tinv = memoize(tinv)
 
-
+#AP's addition for Hedge's calculation
 def simple_stats(r):
     total = sum(r)
     average = total / float(len(r))

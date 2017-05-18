@@ -1,6 +1,7 @@
 import random
 import math
 from statistics_EJ import simple_stats as mean_SD
+from statistics_EJ import InverseStudentT
 
 class Hedges_d:
     ### calculation of Hedges' d (Hedges' unbiased g)
@@ -15,21 +16,41 @@ class Hedges_d:
         self.d = 0
         self.SE_d = 0
 
-    def approx_CI (self):
+    def approx_CI (self, paired):
         # 95% CI = ES - 1.96 * SE_d to ES + 1.96 * SE_d
         # ES is effect size: Hedge's d (the unbiased form)
         # se is asymptotic standard error for the ffect size
         # small samples (< 20) should use t distribution with appropriate df rather than 1.96
         # Nakagawa and Cuthill (2007) Biol. Rev.
         
+        n1 = len (self.s1)
+        n2 = len (self.s2)
+        
         if self.SE_d == 0:
             self.asymptotic_SE_d_unpaired()
         
-        if len (self.s1) < 20 or len (self.s2) < 20:
-            print ("Small sample size, should use correct df for approx 95% CI (not yet implemented)")
+        #default for large samples
+        t = 1.96
+
+        if paired:
+            df = n1 -1
+        else:
+            df = n1 + n2 - 2            #unpaired.
         
-        lower95CI = self.d - 1.96 * self.SE_d
-        upper95CI = self.d + 1.96 * self.SE_d
+        if df < 120:
+            print ("Small sample size (degrees of freedom < 120)")
+            
+            #for very large df, t at P > 0.975 approaches 1.96
+            #see Stats_test.py
+            #df = 10, t  = 2.23
+            #df = 120, t = 1.98
+            #df = 1000, t  = 1.962
+            t = InverseStudentT (df, 0.975)
+
+            print ("Degrees of Freedom: {:d} , t @ P_t-CDF = 0.975 : {:.2f} ".format(df, t))
+                                     
+        lower95CI = self.d - t * self.SE_d
+        upper95CI = self.d + t * self.SE_d
         return (lower95CI, upper95CI)
     
     def asymptotic_SE_d_unpaired (self):

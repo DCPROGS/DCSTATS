@@ -33,6 +33,7 @@
 		497F475E1B01E7DA00541D6A /* ReadRandat.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = ReadRandat.py; sourceTree = "<group>"; usesTabs = 1; };
 		497F475F1B01E7DA00541D6A /* ReadRandat.pyc */ = {isa = PBXFileReference; lastKnownFileType = file; path = ReadRandat.pyc; sourceTree = "<group>"; };
 		497F47631B01E7DA00541D6A /* test_hiP.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = test_hiP.txt; sourceTree = "<group>"; };
+		4980E6671ECD8E8F002A53F4 /* Stats_test.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = Stats_test.py; sourceTree = "<group>"; };
 		4983FB211B093DFC00EAAC48 /* Hedges.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = Hedges.py; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -41,6 +42,7 @@
 			isa = PBXGroup;
 			children = (
 				4983FB211B093DFC00EAAC48 /* Hedges.py */,
+				4980E6671ECD8E8F002A53F4 /* Stats_test.py */,
 				497F47461B01E7DA00541D6A /* data_screen.py */,
 				497F47471B01E7DA00541D6A /* data_screen.pyc */,
 				497F47481B01E7DA00541D6A /* DC_PyPs_AP.txt */,
