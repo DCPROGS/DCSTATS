@@ -1,5 +1,10 @@
-import tkSimpleDialog
-from Tkinter import *
+import sys
+if sys.version_info[0] < 3:
+    from Tkinter import *
+    import tkSimpleDialog
+else:
+    from tkinter import *
+    from tkinter import simpledialog as tkSimpleDialog
 
 __author__="remis"
 __date__ ="$27-May-2009 23:02:26$"

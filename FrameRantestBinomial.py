@@ -1,9 +1,15 @@
 #! /usr/bin/python
 
-from Tkinter import *
-from ttk import Separator
-from Rantest import Rantest
+import sys
+if sys.version_info[0] < 3:
+    from Tkinter import *
+    from ttk import Separator
+else:
+    from tkinter import *
+    from tkinter.ttk import Separator
+    
 from PlotRandomDist import PlotRandomDist
+from Rantest import Rantest
 
 __author__="remis"
 __date__ ="$26-May-2009 22:51:40$"

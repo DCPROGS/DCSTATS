@@ -159,7 +159,7 @@ def logGamma(x):
         if y <= 0.5 or y >= pnt68:
             xden = 1.0;
             xnum = 0.0;
-            for i in xrange(8):
+            for i in range(8):
                 xnum = xnum * xm1 + lg_p1[i];
                 xden = xden * xm1 + lg_q1[i];
             return corr + xm1 * (lg_d1 + xm1 * (xnum / xden));
@@ -167,7 +167,7 @@ def logGamma(x):
             xm2 = y - 1.0;
             xden = 1.0;
             xnum = 0.0;
-            for i in xrange(8):
+            for i in range(8):
                 xnum = xnum * xm2 + lg_p2[i];
                 xden = xden * xm2 + lg_q2[i];
             return corr + xm2 * (lg_d2 + xm2 * (xnum / xden));
@@ -176,7 +176,7 @@ def logGamma(x):
         xm2 = y - 2.0;
         xden = 1.0;
         xnum = 0.0;
-        for i in xrange(8):
+        for i in range(8):
             xnum = xnum * xm2 + lg_p2[i];
             xden = xden * xm2 + lg_q2[i];
         return xm2 * (lg_d2 + xm2 * (xnum / xden));
@@ -185,7 +185,7 @@ def logGamma(x):
         xm4 = y - 4.0;
         xden = -1.0;
         xnum = 0.0;
-        for i in xrange(8):
+        for i in range(8):
             xnum = xnum * xm4 + lg_p4[i];
             xden = xden * xm4 + lg_q4[i];
         return lg_d4 + xm4 * (xnum / xden);
@@ -193,7 +193,7 @@ def logGamma(x):
     assert y <= lg_frtbig
     res = lg_c[6];
     ysq = y * y;
-    for i in xrange(6):
+    for i in range(6):
         res = res / ysq + lg_c[i];
     res /= y;
     corr = math.log(y);

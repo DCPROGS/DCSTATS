@@ -102,4 +102,4 @@ Alpha-level deviation is for two tailed distribution (e.g. 0.05 leaves 90% area)
 
 if __name__ == "__main__":
 
-    print introd
+    print (introd)

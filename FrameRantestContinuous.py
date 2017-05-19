@@ -1,7 +1,13 @@
 #! /usr/bin/python
 
-from Tkinter import *
-from ttk import Separator
+import sys
+if sys.version_info[0] < 3:
+    from Tkinter import *
+    from ttk import Separator
+else:
+    from tkinter import *
+    from tkinter.ttk import Separator
+    
 from Rantest import Rantest
 from data_screen import Data_Screen
 from PlotRandomDist import PlotRandomDist
