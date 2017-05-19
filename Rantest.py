@@ -194,7 +194,7 @@ class Rantest(object):
 
             # Randomisation happens here
             if sys.version_info[0] < 3:
-                iran = range(0,(nx + ny))
+                iran = range(0,(n1 + n2))
             else:
                 iran = list(range(0, n1 + n2))
             random.shuffle(iran)
