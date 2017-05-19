@@ -8,7 +8,7 @@ else:
     from tkinter import *
     from tkinter.ttk import Separator
 
-from Fieller import Fieller, calc_t
+from fieller import Fieller, calc_t
 
 __author__="remis"
 __date__ ="$27-May-2009 20:29:30$"

@@ -9,7 +9,7 @@ else:
     from tkinter.ttk import Separator
     
 from PlotRandomDist import PlotRandomDist
-from Rantest import Rantest
+from rantest import Rantest
 
 __author__="remis"
 __date__ ="$26-May-2009 22:51:40$"
