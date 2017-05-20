@@ -9,6 +9,7 @@ import statistics_EJ as s
 __author__="remis"
 __date__ ="$30-Apr-2009 09:51:16$"
 
+## This wrapper is not used in this module.
 def calc_t(df, power):
     """wrapper for function in statistics.EJ.py code"""
         
@@ -17,13 +18,13 @@ def calc_t(df, power):
 class Fieller(object):
 
     introd = 'FIELLER: calculates confidence limits for a ratio \
-according Fieller''s theorem (see Finney\'s book). Output includes the approximate \
-SD of the ratio r = a / b, given the SD of a (the numerator) and of b (the denominator)\
- and the correlation coefficient between a & b (zero if \
-they are independent). \n\
-Fieller requires the t-statistic which can be provided from a table \
-or calculated from alpha and the degrees of freedom. \
-Alpha-level deviation is for two tailed distribution (e.g. 0.05 leaves 90% area)\n'
+    according Fieller''s theorem (see Finney\'s book). Output includes the approximate \
+    SD of the ratio r = a / b, given the SD of a (the numerator) and of b (the denominator)\
+     and the correlation coefficient between a & b (zero if \
+    they are independent). \n\
+    Fieller requires the t-statistic which can be provided from a table \
+    or calculated from alpha and the degrees of freedom. \
+    Alpha-level deviation is for two tailed distribution (e.g. 0.05 leaves 90% area)\n'
 
     dict = {}
 
@@ -75,7 +76,8 @@ Alpha-level deviation is for two tailed distribution (e.g. 0.05 leaves 90% area)
             appsd = math.sqrt(va + rat2 * vb - 2.0 * ratio * cov) / b
             applo = ratio - tval * appsd
             apphi = ratio + tval * appsd
-            cvr = 100.0 * appsd / ratio
+            if ratio != 0:
+                cvr = 100.0 * appsd / ratio
 
         return g, ratio, disc, clower, cupper, dlow, dhi, appsd, applo, apphi, cvr
 
