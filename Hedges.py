@@ -7,7 +7,7 @@ class Hedges_d:
     ### calculation of Hedges' d (Hedges' unbiased g)
     ### see Nakagawa and Cuthill (2007) Biol. Rev.
     ### simple 95% confidence intervals
-    ### TODO : bootstrap to get better (non-parametric) confidence intervals
+    ### bootstrap to get better (non-parametric) confidence intervals
     
     def __init__(self, sample1, sample2):
         ## sample1 and sample2 are the arrays to compare
@@ -92,7 +92,7 @@ class Hedges_d:
         #store answer
         self.d = biased_d * correction
 
-    ##following is not used yet
+
     def bootstrap_CI (self, repeats, bCA=False):
         
         # repeats is the number of times that it is repeated.
@@ -108,6 +108,7 @@ class Hedges_d:
         for n in range (repeats):
             
             #need to call a calculation of Hedges_d that returns a value, not storing it
+            #current alternative, just include here, it is so simple. 
             br1 = bootstrap(self.s1)
             br2 = bootstrap(self.s2)
         
