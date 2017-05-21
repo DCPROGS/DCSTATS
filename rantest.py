@@ -1,5 +1,4 @@
 #!/usr/bin python
-
 """rantest.py -- RANDOMISATION TEST FOR TWO SAMPLES.\
                Converted from David Colquhoun's FORTRAN version RANTEST.FOR"""
 

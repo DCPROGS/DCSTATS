@@ -8,7 +8,7 @@ else:
     from tkinter import *
     from tkinter.ttk import Separator
     
-from Rantest import Rantest
+from rantest import Rantest
 from data_screen import Data_Screen
 from PlotRandomDist import PlotRandomDist
 from ReadRandat import read_Data

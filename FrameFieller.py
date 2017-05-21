@@ -8,7 +8,7 @@ else:
     from tkinter import *
     from tkinter.ttk import Separator
 
-from Fieller import Fieller, calc_t
+from fieller import Fieller, calc_t
 
 __author__="remis"
 __date__ ="$27-May-2009 20:29:30$"
@@ -98,7 +98,7 @@ class FrameFieller:
     def calback(self):
         'Called by CALCULATE button.'
         flr = self.getResult()
-        self.showResult(flr.dict)
+        self.showResult(flr)
     
     def entryupdate(self, sv, i):
         """http://stackoverflow.com/questions/6548837/how-do-i-get-an-event-callback-when-a-tkinter-entry-widget-is-modified"""
@@ -179,15 +179,16 @@ class FrameFieller:
 
         return Fieller(a, b, sa, sb, r, tval)
     
-    def showResult(self, flrd):
+    def showResult(self, flr):
         'Displays calculation results on main frame.'
-        #print flrd
+        print(flr)
         self.txt.delete(1.0, END)
-        if flrd["cvr"] != 0:
-            self.txt.insert(END, ' Ratio (=a/b) = %(ratio)f \
-            \n g = %(g)f \n Confidence limits: lower %(clower)f, upper %(cupper)f \
-            \n i.e deviations: lower %(dlow)f, upper %(dhi)f \n Approximate SD of ratio = %(appsd)f \
-            \n Approximate CV of ratio (%%) = %(cvr)f \n Approximate limits: lower %(applo)f, upper %(apphi)f' %flrd)
+        if flr.cvr != 0:
+            self.txt.insert(END, flr)
+            #self.txt.insert(END, ' Ratio (=a/b) = %(ratio)f \
+            #\n g = %(g)f \n Confidence limits: lower %(clower)f, upper %(cupper)f \
+            #\n i.e deviations: lower %(dlow)f, upper %(dhi)f \n Approximate SD of ratio = %(appsd)f \
+            #\n Approximate CV of ratio (%%) = %(cvr)f \n Approximate limits: lower %(applo)f, upper %(apphi)f' %flrd)
         else:
             self.txt.insert(END, "No calculation done, disc >= 0.")
 

@@ -1,3 +1,4 @@
 *.pyc
 DC Stats for Mac.xcodeproj
 nbproject
+__pycache__
