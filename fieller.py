@@ -1,6 +1,8 @@
 #!/usr/bin python
+
 """fieller.py -- To calculate Fieller''s theorem\
                Converted from FORTRAN version FIELLER.FOR"""
+
 
 import math
 import statistics_EJ as s
@@ -8,12 +10,15 @@ import statistics_EJ as s
 __author__="remis"
 __date__ ="$30-Apr-2009 09:51:16$"
 
+
+## This wrapper is not used in this module.
 def calc_t(df, power):
     """wrapper for function in statistics.EJ.py code"""
         
     return s.InverseStudentT(df, power)
 
 class Fieller(object):
+
     introd = 'FIELLER: calculates confidence limits for a ratio \
 according Fieller''s theorem (see Finney\'s book). Output includes the approximate \
 SD of the ratio r = a / b, given the SD of a (the numerator) and of b (the denominator)\
@@ -76,3 +81,8 @@ Alpha-level deviation is for two tailed distribution (e.g. 0.05 leaves 90% area)
             '\n Approximate SD of ratio = {0:.6f}'.format(self.appsd) +
             '\n Approximate CV of ratio (%) = {0:.6f}'.format(self.cvr) + 
             '\n Approximate limits: lower {0:.6f}, upper {0:.6f}'.format(self.applo, self.apphi))
+
+if __name__ == "__main__":
+
+    print (introd)
+
