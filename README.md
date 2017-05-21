@@ -9,7 +9,7 @@ To run, open the Terminal, navigate to the DC-Stats-for-Mac directory and type:
 
   python DC_Stats.py
 
-You can do a randomization test on continuous or binomial data, and look at Fiellers theorem for the standard deviation of a ratio too. For continuous randomization test, rudimentary information about effect size (Hedges' unbiased d and its approximate confidence interval) is also included in the output. 
+You can do a randomization test on continuous or binomial data, and look at Fiellers theorem for the standard deviation of a ratio too. For continuous randomization test, rudimentary information about effect size (Hedges' unbiased d and its approximate confidence interval from bootstrap) is also included in the output. 
 
 To use data from Excel, save it in two columns as tab-delimited text.
 
