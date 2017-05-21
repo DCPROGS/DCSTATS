@@ -93,19 +93,49 @@ class Hedges_d:
         self.d = biased_d * correction
 
     ##following is not used yet
-    def bootstrap_CI (self, function, repeats):
+    def bootstrap_CI (self, repeats, bCA=False):
         
-        # function is an object that returns the function of interest
         # repeats is the number of times that it is repeated.
-        pass
-    
+        # bCA: bias-corrected and accelerated - recommended to improve pctile coverage
+        # bCA not implemented yet
+        
+        hedges_d_bs = []     #unbiased, values from bootstrap
+        
+        n1 = len (self.s1)
+        n2 = len (self.s2)
+        correction = 1 - 3 / (4 * (n1 + n2 - 2) - 1)
+        
+        for n in range (repeats):
+            
+            #need to call a calculation of Hedges_d that returns a value, not storing it
+            br1 = bootstrap(self.s1)
+            br2 = bootstrap(self.s2)
+        
+            mbr1, sbr1 = mean_SD(br1)
+            mbr2, sbr2 = mean_SD(br2)
+        
+            s_pooled = math.sqrt(((n2 - 1) * sbr2 ** 2 + (n1 - 1) * sbr1 ** 2) / (n1 + n2 - 2))
+        
+            #Hedges' g
+            biased_d = (mbr2 - mbr1) / s_pooled
+        
+            hedges_d_bs.append(biased_d)
+            # correction has no influence on the bootstrap distribution so apply it later to save multiplications
+
+        hedges_d_bs.sort()
+        lower95CI = hedges_d_bs[int(0.025 * repeats)] * correction
+        upper95CI = hedges_d_bs[int(0.975 * repeats)] * correction
+        return (lower95CI, upper95CI)
+        
+
+
     def bias_corrected_bs_CI(self):
         pass
 
-    def bootstrap (sample):
-        #if sample is [], then the same is returned
-        l = len(sample)
-        sup_s = sample * l
-        return random.sample(sup_s, l)
+def bootstrap (sample):
+    #if sample is [], then the same is returned
+    l = len(sample)
+    sup_s = sample * l             #concatenate l identical copies
+    return random.sample(sup_s, l)
 
 

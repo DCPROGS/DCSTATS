@@ -205,8 +205,9 @@ class FrameRantestContinuous:
         #not tested against known values yet AP 170518
         hedges_calculation = Hedges_d(xobs, yobs)
         hedges_calculation.hedges_d_unbiased()
-        lowerCI, upperCI = hedges_calculation.approx_CI(self.paired)    #needed for degrees of freedom
-        
+        #lowerCI, upperCI = hedges_calculation.approx_CI(self.paired)
+        #paired needed for degrees of freedom
+        lowerCI, upperCI = hedges_calculation.bootstrap_CI(5000)
         #option to have bootstrap calculated CIs should go here
         
         #store results
