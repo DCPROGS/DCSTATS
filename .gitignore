@@ -3,3 +3,4 @@ DC Stats for Mac.xcodeproj
 nbproject
 __pycache__
 .DS_Store
+.ipynb_checkpoints

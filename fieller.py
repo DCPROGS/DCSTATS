@@ -70,7 +70,8 @@ Alpha-level deviation is for two tailed distribution (e.g. 0.05 leaves 90% area)
             self.appsd = math.sqrt(va + rat2 * vb - 2.0 * self.ratio * cov) / self.b
             self.applo = self.ratio - self.tval * self.appsd
             self.apphi = self.ratio + self.tval * self.appsd
-            self.cvr = 100.0 * self.appsd / self.ratio
+            if self.ratio != 0:
+                self.cvr = 100.0 * self.appsd / self.ratio
 
     def __repr__(self):
         return ('\nResult: ' +
