@@ -50,7 +50,7 @@ class Rantest(object):
     def __init__(self):
         pass
 
-class RantestBinomial(object):
+class RantestBinomial(Rantest):
     
     def __init__(self, ir1, if1, ir2, if2):
         """ 
@@ -69,8 +69,11 @@ class RantestBinomial(object):
         self.n2 = ir2 + if2 # tot number of tests in second trial
         self.p1 = float(self.ir1) / float(self.n1) # prob of success in first trial
         self.p2 = float(self.ir2) / float(self.n2) # prob of success in second trial
+        
+        self.__rantest_done = False
+        self.__t_test()
 
-    def tTestBinomial(self):
+    def __t_test(self):
         """" Use Gaussian approx to do 2 sample t test. """
 
         ppool = float(self.ir1 + self.ir2) / float(self.n1 + self.n2)
@@ -85,62 +88,60 @@ class RantestBinomial(object):
         x = df / (df + self.tval **2)
         self.P = incompleteBeta(x, 0.5 *df, 0.5)
 
-    def doRantestBinomial(self, icrit, nran):
+    def run_rantest(self, nran):
+
         self.nran = nran
-
         self.dobs = self.p1 - self.p2
-        allobs = []
-        for i in range(0, self.n1):
-            if i < self.ir1:
-                allobs.append(1.0)
-            else:
-                allobs.append(0.0)
-        for i in range(0, self.n2):
-            if i < self.ir2:
-                allobs.append(1.0)
-            else:
-                allobs.append(0.0)
-
-        self.ng1 = 0
-        self.nl1 = 0
-        self.na1 = 0
-        self.ne1 = 0
-        self.ne2 = 0
+        allobs = [1]*self.ir1 + [0]*self.if1 + [1]*self.ir2 + [0]*self.if2
 
         self.randiff = []
-
+        self.randis1 = []
         for n in range(0, self.nran):
-
-            # Randomisation happens here
-            if sys.version_info[0] < 3:
+            # this if is needed for Python backward compatibility 
+            if sys.version_info[0] < 3: 
                 iran = range(0,(self.n1 + self.n2))
             else:
                 iran = list(range(0, self.n1 + self.n2))
             random.shuffle(iran)
-
-            is2 = 0.0
-            for i in range(0, self.n2):
-                j = self.n1 + self.n2 - i - 1
-                is2 = is2 + allobs[iran[j]]
-            is1 = self.ir1 + self.ir2 - is2
-            xb1 = is1 / float(self.n1)    # mean
-            yb1 = is2 / float(self.n2)    # mean
-            dran = xb1 - yb1
-            self.randiff.append(float(is1))
-
-            # icrit=2
-            if dran >= self.dobs: self.ng1 = self.ng1 + 1
-            if dran <= self.dobs: self.nl1 = self.nl1 + 1
-            if dran == self.dobs: self.ne1 = self.ne1 + 1
-            if math.fabs(dran) >= math.fabs(self.dobs): self.na1 = self.na1 + 1
-            if math.fabs(dran) == math.fabs(self.dobs): self.ne2 = self.ne2 + 1
+            
+            # number of success in randomised second trial
+            is2 = [allobs[i] for i in iran[self.n1:]].count(1)
+            is1 = self.ir1 + self.ir2 - is2 # number of success in randomised first trial
+            dran = is1 / float(self.n1) - is2 / float(self.n2) # difference between means
+            self.randis1.append(float(is1))
+            self.randiff.append(float(dran))
+            
+        self.ng1 = len([i for i in self.randiff if i >= self.dobs])
+        self.ne1 = len([i for i in self.randiff if i == self.dobs])
+        self.nl1 = len([i for i in self.randiff if i <= self.dobs])
 
         self.pg1 = float(self.ng1) / float(self.nran)
         self.pl1 = float(self.nl1) / float(self.nran)
         self.pe1 = float(self.ne1) / float(self.nran)
-        self.pa1 = float(self.na1) / float(self.nran)
-        self.pe2 = float(self.ne2) / float(self.nran)
-
+        self.__rantest_done = True
+        
+    def __repr__(self):
+        
+        repr_string = ('\n Set 1: {0:d} successes out of {1:d};'.format(self.ir1, self.n1) +
+            '\n p1 = {0:.6f};   SD(p1) = {1:.6f}'.format(self.p1, self.sd1) +
+            '\n Set 2: {0:d} successes out of {1:d};'.format(self.ir2, self.n2) +
+            '\n p2 = {0:.6f};   SD(p2) = {1:.6f}'.format(self.p2, self.sd2) +
+            '\n Observed difference between sets, p1-p2 = {0:.6f}'.format(self.p1 - self.p2) +
+            '\n\n Observed 2x2 table:' +
+            '\n  Set 1:    {0:d}      {1:d}      {2:d}'.format(self.ir1, self.if1, self.n1) +
+            '\n  Set 2:    {0:d}      {1:d}      {2:d}'.format(self.ir2, self.if2, self.n2) +
+            '\n  Total:    {0:d}      {1:d}      {2:d}'.format(
+            self.ir1 + self.ir2, self.if1 + self.if2, self.n1 + self.n2))
+            
+        if self.__rantest_done == True:
+            repr_string += ('\n\n Two-sample unpaired test using Gaussian approximation to binomial:' +
+                '\n standard normal deviate = {0:.6f}; two tail P = {1:.6f}.'.format(self.tval, self.P) +
+                '\n\n {0:d} randomisations:'.format(self.nran) +
+                '\n P values for difference between sets are:' +
+                '\n  r1 greater than or equal to observed: P = {0:.6f}'.format(self.pg1) +
+                '\n  r1 less than or equal to observed: P = {0:.6f}'.format(self.pl1) +
+                '\n  r1 equal to observed: number = {0:d} (P = {1:.6f})'.format(self.ne1, self.pe1))
+        return repr_string
 
 class RantestContinuous(object):
     def __init__(self):

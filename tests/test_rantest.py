@@ -1,10 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-#import math
 import random
 
-from rantest import Rantest
 from rantest import RantestBinomial
 from rantest import RantestContinuous
 from test_statistics import isclose
@@ -73,53 +71,21 @@ def test_regression_rantest_continuos():
     
 def test_regression_rantest_binomial():
     
-    ir1 = 3
-    if1 = 4
-    ir2 = 4
-    if2 = 5
+    ir1, if1 = 3, 4
+    ir2, if2 = 4, 5
     nran = 5000
-    
-    n1 = ir1 + if1
-    n2 = ir2 + if2
-
     rnt = RantestBinomial(ir1, if1, ir2, if2)
-    rnt.tTestBinomial()
-    rnt.doRantestBinomial(2, nran)
-    #rntd = rnt.dict
+    rnt.run_rantest(nran)
     
-    result1 = (rnt.ir1, rnt.n1, rnt.p1, rnt.sd1, rnt.ir2, rnt.n2, rnt.p2, rnt.sd2, rnt.p1 - rnt.p2)
-    
-    print(' Set 1: %d successes out of %d; \
-        \n p1 = %f;   SD(p1) = %f \
-        \n Set 2: %d successes out of %d; \
-        \n p2 = %f;   SD(p2) = %f \
-        \n Observed difference between sets, p1-p2 = %f' %result1)
-        
     assert isclose(rnt.p1, 0.428571, rel_tol=0.0001)
     assert isclose(rnt.p2, 0.444444, rel_tol=0.0001)
     assert isclose(rnt.sd1, 0.187044, rel_tol=0.0001)
     assert isclose(rnt.sd2, 0.165635, rel_tol=0.0001)
-        
-    irt = rnt.ir1 + rnt.ir2
-    ift = rnt.n1 + rnt.n2 - rnt.ir1 - rnt.ir2
-    nt = rnt.n1 + rnt.n2
-    result2 = (rnt.ir1, rnt.if1, rnt.n1, rnt.ir2, rnt.if2, rnt.n2, irt, ift, nt)
-
-    print('\n Observed 2x2 table: \
-        \n  Set 1:    %d      %d      %d \
-        \n  Set 2:    %d      %d      %d \
-        \n  Total:    %d      %d      %d' %result2)
-
-    print('\n Two-sample unpaired test using Gaussian approximation to binomial: \
-        \n standard normal deviate = {0:.6f}; two tail P = {1:.6f}.'.format(rnt.tval, rnt.P))
-    
     assert isclose(rnt.tval, 0.063492, rel_tol=0.0001)
     assert isclose(rnt.P, 0.949375, rel_tol=0.0001)
 
-    print('\n {0:d} randomisations \
-        \n P values for difference between sets are: \
-        \n  r1 greater than or equal to observed: P = {1:.6f} \
-        \n  r1 less than or equal to observed: P = {2:.6f} \
-        \n  r1 equal to observed: number = {3:d} (P = {4:.6f})'.format(
-        rnt.nran, rnt.pg1, rnt.pl1, rnt.ne1, rnt.pe1))
-
+    assert (rnt.pg1 > 0.6) and (rnt.pg1 < 0.8)
+    assert (rnt.pl1 > 0.6) and (rnt.pl1 < 0.8)
+    assert (rnt.pe1 > 0.2) and (rnt.pe1 < 0.4)
+    assert (rnt.ne1 > 1800) and (rnt.ne1 < 2000)
+ 
