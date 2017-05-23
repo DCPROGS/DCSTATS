@@ -53,29 +53,10 @@ class Rantest(object):
 class RantestBinomial(object):
     
     def __init__(self):
-        pass
-    
-    dict = {}
-
-    def meanvar(self, X):
-
-        n = len(X)
-        sumx = X[0]
-        sumxx = 0.0
-        for i in range(1, n):
-            sumx = sumx + X[i]
-            sumxx = sumxx + ((i+1) * X[i] - sumx)**2 / float((i+1)*i)
-        xbar = sumx / float(n)
-        varx = sumxx /float(n - 1)
-        sdx = math.sqrt(varx)
-        sex = sdx / math.sqrt(n)
-
-        return xbar, varx, sdx, sex
+        self.dict = {}
 
     def tTestBinomial(self, n1, n2, ir1, ir2):
-        ''
-
-        #Use Gaussian approx to do 2 sample t test
+        """" Use Gaussian approx to do 2 sample t test. """
         p1 = float(ir1) / float(n1)
         p2 = float(ir2) / float(n2)
         ppool = float(ir1 + ir2) / float(n1 + n2)
@@ -173,41 +154,10 @@ class RantestBinomial(object):
 
 
 class RantestContinuous(object):
-
-    introd = "  RANTEST performs a randomisation test to compare two " +\
-    "independent samples.  According to the null hypothesis of " +\
-    "no-difference, each outcome would have been the same " +\
-    "regardless of which group the individual happened to " +\
-    "be allocated to.  Therefore all N = n1 + n2 observations are " +\
-    "pooled and, as in the actual experiment, divided at " +\
-    "random into groups of size n1 and n2.  The fraction " +\
-    "of randomisations that gives rise to a difference " +\
-    "between the groups at least as large as that observed " +\
-    "gives the P value.\n" +\
-    "  In the binomial case, in which the measurement is the " +\
-    "fraction of 'successes' in each sample (say r1 out " +\
-    "of n1, and r2 out of n2) a 'success' is given a " +\
-    "score of 1, 'failure' scores 0.\n"
-
-    criterion =  " Randomisation test on binomial data could be done\
-    using as criterion: (1) number of successes in set 1 (r1)\
-    or (2) difference between the p=r/n values.\
-    Both criteria give the same one-tail P value.\
-    Use of r1 as criterion is the direct Monte Carlo\
-    equivalent of summing the the exact Fisher test probabilities\
-    for the observed 2x2 table with those for all tables that depart\
-    further from the null hypothesis in the observed direction.\
-    A 2-tail probablilty can be found by doubling the one-tail\
-    value, at least if the displayed distribution is symmetrical\
-    Use of (p1-p2) as criterion gives both one and two-tail\
-    probabilities directly by seeing how many random allocations\
-    of the observations to groups of size n1 and n2 produce and\
-    absolute value of (p1-p2) at least as big as that observed."
-
-    dict = {}
+    def __init__(self):
+        self.dict = {}
 
     def meanvar(self, X):
-
         n = len(X)
         sumx = X[0]
         sumxx = 0.0
@@ -218,107 +168,7 @@ class RantestContinuous(object):
         varx = sumxx /float(n - 1)
         sdx = math.sqrt(varx)
         sex = sdx / math.sqrt(n)
-
         return xbar, varx, sdx, sex
-
-    def tTestBinomial(self, n1, n2, ir1, ir2):
-        ''
-
-        #Use Gaussian approx to do 2 sample t test
-        p1 = float(ir1) / float(n1)
-        p2 = float(ir2) / float(n2)
-        ppool = float(ir1 + ir2) / float(n1 + n2)
-        sd1 = math.sqrt(p1 * (1.0 - p1) / float(n1))
-        sd2 = math.sqrt(p2 * (1.0 - p2) / float(n2))
-        sd1p = math.sqrt(ppool * (1.0 - ppool) / float(n1))
-        sd2p = math.sqrt(ppool * (1.0 - ppool) / float(n2))
-        sdiff = math.sqrt(sd1p * sd1p + sd2p * sd2p)
-
-        tval = math.fabs(p1 - p2) / sdiff
-        df = 100000    # to get Gaussian
-        x = df / (df + tval * tval)
-        #P = self.betai(0.5 * df, 0.5, x)
-        P = incompleteBeta(x, 0.5 *df, 0.5)
-
-        self.dict['p1'] = p1
-        self.dict['p2'] = p2
-        self.dict['sd1'] = sd1
-        self.dict['sd2'] = sd2
-        self.dict['tval'] = tval
-        self.dict['P'] = P
-
-        self.dict['ir1'] = ir1
-        self.dict['ir2'] = ir2
-        self.dict['n1'] = n1
-        self.dict['n2'] = n2
-
-    def doRantestBinomial(self, n1, n2, ir1, ir2, icrit, nran):
-
-        p1 = float(ir1) / float(n1)
-        p2 = float(ir2) / float(n2)
-        dobs = p1 - p2
-
-        allobs = []
-        for i in range(0, n1):
-            if i < ir1:
-                allobs.append(1.0)
-            else:
-                allobs.append(0.0)
-        for i in range(0, n2):
-            if i < ir2:
-                allobs.append(1.0)
-            else:
-                allobs.append(0.0)
-
-        ng1 = 0
-        nl1 = 0
-        na1 = 0
-        ne1 = 0
-        ne2 = 0
-
-        randiff = []
-
-        for n in range(0, nran):
-
-            # Randomisation happens here
-            if sys.version_info[0] < 3:
-                iran = range(0,(n1 + n2))
-            else:
-                iran = list(range(0, n1 + n2))
-            random.shuffle(iran)
-
-            is2 = 0.0
-            for i in range(0, n2):
-                j = n1 + n2 - i - 1
-                is2 = is2 + allobs[iran[j]]
-            is1 = ir1 + ir2 - is2
-            xb1 = is1 / float(n1)    # mean
-            yb1 = is2 / float(n2)    # mean
-            dran = xb1 - yb1
-            randiff.append(float(is1))
-
-            # icrit=2
-            if dran >= dobs: ng1 = ng1 + 1
-            if dran <= dobs: nl1 = nl1 + 1
-            if dran == dobs: ne1 = ne1 + 1
-            if math.fabs(dran) >= math.fabs(dobs): na1 = na1 + 1
-            if math.fabs(dran) == math.fabs(dobs): ne2 = ne2 + 1
-
-        self.dict['pg1'] = float(ng1) / float(nran)
-        self.dict['pl1'] = float(nl1) / float(nran)
-        self.dict['pe1'] = float(ne1) / float(nran)
-        self.dict['pa1'] = float(na1) / float(nran)
-        self.dict['pe2'] = float(ne2) / float(nran)
-
-        self.dict['dobs'] = dobs    # check, also used for student test
-        self.dict['randiff'] = randiff
-
-        self.dict['ng1'] = ng1
-        self.dict['nl1'] = nl1
-        self.dict['na1'] = na1
-        self.dict['ne1'] = ne1
-        self.dict['ne2'] = ne2
-        self.dict['nran'] = nran
 
     def tTestContinuous(self, xobs, yobs, paired):
 
@@ -363,10 +213,7 @@ class RantestContinuous(object):
             #P = self.betai(0.5 * df, 0.5, x)
             P = incompleteBeta(x, 0.5 *df, 0.5)
    
-
-        
         else:    # if not paired
-            
             df = nx + ny - 2
             s = (sdx * sdx * (nx-1) + sdy * sdy * (ny-1)) / df
             sdiff = math.sqrt(s * (1.0 / nx + 1.0 / ny))
@@ -394,7 +241,6 @@ class RantestContinuous(object):
         self.dict['adiff'] = adiff
         self.dict['sdiff'] = sdiff
         self.dict['sdbar'] = sdbar
-
 
     def setContinuousData(self, in_data, nran, jset, paired):
         
@@ -524,10 +370,4 @@ class RantestContinuous(object):
         self.dict['ne1'] = ne1
         self.dict['ne2'] = ne2
 
-    def __init__(self):
-        pass
-
-if __name__ == "__main__":
-
-    print (introd)
-    # 444 lines
+# 444 lines
