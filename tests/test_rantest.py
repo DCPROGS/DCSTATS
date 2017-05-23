@@ -85,9 +85,9 @@ def test_regression_rantest_binomial():
     rnt = RantestBinomial(ir1, if1, ir2, if2)
     rnt.tTestBinomial()
     rnt.doRantestBinomial(2, nran)
-    rntd = rnt.dict
+    #rntd = rnt.dict
     
-    result1 = (rnt.ir1, rnt.n1, rntd['p1'], rntd['sd1'], rnt.ir2, rnt.n2, rntd['p2'], rntd['sd2'], rntd['p1'] - rntd['p2'])
+    result1 = (rnt.ir1, rnt.n1, rnt.p1, rnt.sd1, rnt.ir2, rnt.n2, rnt.p2, rnt.sd2, rnt.p1 - rnt.p2)
     
     print(' Set 1: %d successes out of %d; \
         \n p1 = %f;   SD(p1) = %f \
@@ -95,10 +95,10 @@ def test_regression_rantest_binomial():
         \n p2 = %f;   SD(p2) = %f \
         \n Observed difference between sets, p1-p2 = %f' %result1)
         
-    assert isclose(rntd['p1'], 0.428571, rel_tol=0.0001)
-    assert isclose(rntd['p2'], 0.444444, rel_tol=0.0001)
-    assert isclose(rntd['sd1'], 0.187044, rel_tol=0.0001)
-    assert isclose(rntd['sd2'], 0.165635, rel_tol=0.0001)
+    assert isclose(rnt.p1, 0.428571, rel_tol=0.0001)
+    assert isclose(rnt.p2, 0.444444, rel_tol=0.0001)
+    assert isclose(rnt.sd1, 0.187044, rel_tol=0.0001)
+    assert isclose(rnt.sd2, 0.165635, rel_tol=0.0001)
         
     irt = rnt.ir1 + rnt.ir2
     ift = rnt.n1 + rnt.n2 - rnt.ir1 - rnt.ir2
@@ -111,14 +111,15 @@ def test_regression_rantest_binomial():
         \n  Total:    %d      %d      %d' %result2)
 
     print('\n Two-sample unpaired test using Gaussian approximation to binomial: \
-        \n standard normal deviate = %(tval)f; two tail P = %(P)f.' %rntd)
+        \n standard normal deviate = {0:.6f}; two tail P = {1:.6f}.'.format(rnt.tval, rnt.P))
     
-    assert isclose(rntd['tval'], 0.063492, rel_tol=0.0001)
-    assert isclose(rntd['P'], 0.949375, rel_tol=0.0001)
+    assert isclose(rnt.tval, 0.063492, rel_tol=0.0001)
+    assert isclose(rnt.P, 0.949375, rel_tol=0.0001)
 
-    print('\n %(nran)d randomisations \
+    print('\n {0:d} randomisations \
         \n P values for difference between sets are: \
-        \n  r1 greater than or equal to observed: P = %(pg1)f \
-        \n  r1 less than or equal to observed: P = %(pl1)f \
-        \n  r1 equal to observed: number = %(ne1)d (P = %(pe1)f)' %rntd)
+        \n  r1 greater than or equal to observed: P = {1:.6f} \
+        \n  r1 less than or equal to observed: P = {2:.6f} \
+        \n  r1 equal to observed: number = {3:d} (P = {4:.6f})'.format(
+        rnt.nran, rnt.pg1, rnt.pl1, rnt.ne1, rnt.pe1))
 

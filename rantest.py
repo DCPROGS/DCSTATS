@@ -65,41 +65,30 @@ class RantestBinomial(object):
         self.if1 = if1
         self.ir2 = ir2
         self.if2 = if2
-        self.n1 = ir1 + if1 
-        self.n2 = ir2 + if2
-
-        self.dict = {}
+        self.n1 = ir1 + if1 # tot number of tests in first trial 
+        self.n2 = ir2 + if2 # tot number of tests in second trial
+        self.p1 = float(self.ir1) / float(self.n1) # prob of success in first trial
+        self.p2 = float(self.ir2) / float(self.n2) # prob of success in second trial
 
     def tTestBinomial(self):
         """" Use Gaussian approx to do 2 sample t test. """
-        p1 = float(self.ir1) / float(self.n1)
-        p2 = float(self.ir2) / float(self.n2)
+
         ppool = float(self.ir1 + self.ir2) / float(self.n1 + self.n2)
-        sd1 = math.sqrt(p1 * (1.0 - p1) / float(self.n1))
-        sd2 = math.sqrt(p2 * (1.0 - p2) / float(self.n2))
+        self.sd1 = math.sqrt(self.p1 * (1.0 - self.p1) / float(self.n1))
+        self.sd2 = math.sqrt(self.p2 * (1.0 - self.p2) / float(self.n2))
         sd1p = math.sqrt(ppool * (1.0 - ppool) / float(self.n1))
         sd2p = math.sqrt(ppool * (1.0 - ppool) / float(self.n2))
         sdiff = math.sqrt(sd1p * sd1p + sd2p * sd2p)
 
-        tval = math.fabs(p1 - p2) / sdiff
+        self.tval = math.fabs(self.p1 - self.p2) / sdiff
         df = 100000    # to get Gaussian
-        x = df / (df + tval * tval)
-        #P = self.betai(0.5 * df, 0.5, x)
-        P = incompleteBeta(x, 0.5 *df, 0.5)
-
-        self.dict['p1'] = p1
-        self.dict['p2'] = p2
-        self.dict['sd1'] = sd1
-        self.dict['sd2'] = sd2
-        self.dict['tval'] = tval
-        self.dict['P'] = P
+        x = df / (df + self.tval **2)
+        self.P = incompleteBeta(x, 0.5 *df, 0.5)
 
     def doRantestBinomial(self, icrit, nran):
+        self.nran = nran
 
-        p1 = float(self.ir1) / float(self.n1)
-        p2 = float(self.ir2) / float(self.n2)
-        dobs = p1 - p2
-
+        self.dobs = self.p1 - self.p2
         allobs = []
         for i in range(0, self.n1):
             if i < self.ir1:
@@ -112,15 +101,15 @@ class RantestBinomial(object):
             else:
                 allobs.append(0.0)
 
-        ng1 = 0
-        nl1 = 0
-        na1 = 0
-        ne1 = 0
-        ne2 = 0
+        self.ng1 = 0
+        self.nl1 = 0
+        self.na1 = 0
+        self.ne1 = 0
+        self.ne2 = 0
 
-        randiff = []
+        self.randiff = []
 
-        for n in range(0, nran):
+        for n in range(0, self.nran):
 
             # Randomisation happens here
             if sys.version_info[0] < 3:
@@ -137,30 +126,20 @@ class RantestBinomial(object):
             xb1 = is1 / float(self.n1)    # mean
             yb1 = is2 / float(self.n2)    # mean
             dran = xb1 - yb1
-            randiff.append(float(is1))
+            self.randiff.append(float(is1))
 
             # icrit=2
-            if dran >= dobs: ng1 = ng1 + 1
-            if dran <= dobs: nl1 = nl1 + 1
-            if dran == dobs: ne1 = ne1 + 1
-            if math.fabs(dran) >= math.fabs(dobs): na1 = na1 + 1
-            if math.fabs(dran) == math.fabs(dobs): ne2 = ne2 + 1
+            if dran >= self.dobs: self.ng1 = self.ng1 + 1
+            if dran <= self.dobs: self.nl1 = self.nl1 + 1
+            if dran == self.dobs: self.ne1 = self.ne1 + 1
+            if math.fabs(dran) >= math.fabs(self.dobs): self.na1 = self.na1 + 1
+            if math.fabs(dran) == math.fabs(self.dobs): self.ne2 = self.ne2 + 1
 
-        self.dict['pg1'] = float(ng1) / float(nran)
-        self.dict['pl1'] = float(nl1) / float(nran)
-        self.dict['pe1'] = float(ne1) / float(nran)
-        self.dict['pa1'] = float(na1) / float(nran)
-        self.dict['pe2'] = float(ne2) / float(nran)
-
-        self.dict['dobs'] = dobs    # check, also used for student test
-        self.dict['randiff'] = randiff
-
-        self.dict['ng1'] = ng1
-        self.dict['nl1'] = nl1
-        self.dict['na1'] = na1
-        self.dict['ne1'] = ne1
-        self.dict['ne2'] = ne2
-        self.dict['nran'] = nran
+        self.pg1 = float(self.ng1) / float(self.nran)
+        self.pl1 = float(self.nl1) / float(self.nran)
+        self.pe1 = float(self.ne1) / float(self.nran)
+        self.pa1 = float(self.na1) / float(self.nran)
+        self.pe2 = float(self.ne2) / float(self.nran)
 
 
 class RantestContinuous(object):

@@ -93,12 +93,10 @@ class FrameRantestBinomial:
         self.e = e
         self.txt = txt
 
-
-
     def calback1(self):
         'Called by button CALCULATE.'
         rnt = self.getResult()
-        self.showResult(rnt, rnt.dict)
+        self.showResult(rnt)
 
     def getResult(self):
         'Calls rantest to calculate statistics.'
@@ -116,17 +114,15 @@ class FrameRantestBinomial:
         rnt = RantestBinomial(ir1, if1, ir2, if2)
         rnt.tTestBinomial()
         rnt.doRantestBinomial(2, nran)
-        self.randiff = rnt.dict['randiff']
+        self.randiff = rnt.randiff
         self.ir1 = rnt.ir1
-
         return rnt
 
-    def showResult(self, rnt, rntd):
+    def showResult(self, rnt):
         'Displays calculation results on main frame.'
 
         self.txt.delete(1.0, END)
-
-        result1 = (rnt.ir1, rnt.n1, rntd['p1'], rntd['sd1'], rnt.ir2, rnt.n2, rntd['p2'], rntd['sd2'], rntd['p1'] - rntd['p2'])
+        result1 = (rnt.ir1, rnt.n1, rnt.p1, rnt.sd1, rnt.ir2, rnt.n2, rnt.p2, rnt.sd2, rnt.p1 - rnt.p2)
         self.txt.insert(END, ' Set 1: %d successes out of %d; \
         \n p1 = %f;   SD(p1) = %f \
         \n Set 2: %d successes out of %d; \
@@ -144,17 +140,15 @@ class FrameRantestBinomial:
         \n  Set 2:    %d      %d      %d \
         \n  Total:    %d      %d      %d' %result2)
 
-        #result3 = (rnt.tval, rnt.P)
         self.txt.insert(END, '\n Two-sample unpaired test using Gaussian approximation to binomial: \
-        \n standard normal deviate = %(tval)f; two tail P = %(P)f.' %rntd)
+        \n standard normal deviate = {0:.6f}; two tail P = {1:.6f}.'.format(rnt.tval, rnt.P))
 
-        #result4 = (rnt.nran, rnt.pg1, rnt.pl1, rnt.ne1, rnt.pe1)
-        self.txt.insert(END, '\n %(nran)d randomisations \
+        self.txt.insert(END, '\n {0:d} randomisations \
         \n P values for difference between sets are: \
-        \n  r1 greater than or equal to observed: P = %(pg1)f \
-        \n  r1 less than or equal to observed: P = %(pl1)f \
-        \n  r1 equal to observed: number = %(ne1)d (P = %(pe1)f)' %rntd)
-
+        \n  r1 greater than or equal to observed: P = {1:.6f} \
+        \n  r1 less than or equal to observed: P = {2:.6f} \
+        \n  r1 equal to observed: number = {3:d} (P = {4:.6f})'.format(
+        rnt.nran, rnt.pg1, rnt.pl1, rnt.ne1, rnt.pe1))
 
     def calback2(self):
         'Called by PLOT DISTRIBUTION button'
