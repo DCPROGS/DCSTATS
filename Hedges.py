@@ -1,3 +1,5 @@
+#!/usr/bin python
+
 import random
 import math
 from statistics_EJ import simple_stats as mean_SD
@@ -16,7 +18,7 @@ class Hedges_d:
         self.d = 0
         self.SE_d = 0
 
-    def approx_CI (self, paired):
+    def approx_CI (self, paired=False):
         # 95% CI = ES - 1.96 * SE_d to ES + 1.96 * SE_d
         # ES is effect size: Hedge's d (the unbiased form)
         # se is asymptotic standard error for the ffect size
