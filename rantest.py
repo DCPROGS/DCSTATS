@@ -52,18 +52,33 @@ class Rantest(object):
 
 class RantestBinomial(object):
     
-    def __init__(self):
+    def __init__(self, ir1, if1, ir2, if2):
+        """ 
+        Parameters
+        ----------
+        ir1 : number of successes in first trial, int
+        if1 : number of failures in first trial, int
+        ir2 : number of successes in second trial, int
+        if2 : number of failures in second trial, int       
+        """
+        self.ir1 = ir1
+        self.if1 = if1
+        self.ir2 = ir2
+        self.if2 = if2
+        self.n1 = ir1 + if1 
+        self.n2 = ir2 + if2
+
         self.dict = {}
 
-    def tTestBinomial(self, n1, n2, ir1, ir2):
+    def tTestBinomial(self):
         """" Use Gaussian approx to do 2 sample t test. """
-        p1 = float(ir1) / float(n1)
-        p2 = float(ir2) / float(n2)
-        ppool = float(ir1 + ir2) / float(n1 + n2)
-        sd1 = math.sqrt(p1 * (1.0 - p1) / float(n1))
-        sd2 = math.sqrt(p2 * (1.0 - p2) / float(n2))
-        sd1p = math.sqrt(ppool * (1.0 - ppool) / float(n1))
-        sd2p = math.sqrt(ppool * (1.0 - ppool) / float(n2))
+        p1 = float(self.ir1) / float(self.n1)
+        p2 = float(self.ir2) / float(self.n2)
+        ppool = float(self.ir1 + self.ir2) / float(self.n1 + self.n2)
+        sd1 = math.sqrt(p1 * (1.0 - p1) / float(self.n1))
+        sd2 = math.sqrt(p2 * (1.0 - p2) / float(self.n2))
+        sd1p = math.sqrt(ppool * (1.0 - ppool) / float(self.n1))
+        sd2p = math.sqrt(ppool * (1.0 - ppool) / float(self.n2))
         sdiff = math.sqrt(sd1p * sd1p + sd2p * sd2p)
 
         tval = math.fabs(p1 - p2) / sdiff
@@ -79,25 +94,20 @@ class RantestBinomial(object):
         self.dict['tval'] = tval
         self.dict['P'] = P
 
-        self.dict['ir1'] = ir1
-        self.dict['ir2'] = ir2
-        self.dict['n1'] = n1
-        self.dict['n2'] = n2
+    def doRantestBinomial(self, icrit, nran):
 
-    def doRantestBinomial(self, n1, n2, ir1, ir2, icrit, nran):
-
-        p1 = float(ir1) / float(n1)
-        p2 = float(ir2) / float(n2)
+        p1 = float(self.ir1) / float(self.n1)
+        p2 = float(self.ir2) / float(self.n2)
         dobs = p1 - p2
 
         allobs = []
-        for i in range(0, n1):
-            if i < ir1:
+        for i in range(0, self.n1):
+            if i < self.ir1:
                 allobs.append(1.0)
             else:
                 allobs.append(0.0)
-        for i in range(0, n2):
-            if i < ir2:
+        for i in range(0, self.n2):
+            if i < self.ir2:
                 allobs.append(1.0)
             else:
                 allobs.append(0.0)
@@ -114,18 +124,18 @@ class RantestBinomial(object):
 
             # Randomisation happens here
             if sys.version_info[0] < 3:
-                iran = range(0,(n1 + n2))
+                iran = range(0,(self.n1 + self.n2))
             else:
-                iran = list(range(0, n1 + n2))
+                iran = list(range(0, self.n1 + self.n2))
             random.shuffle(iran)
 
             is2 = 0.0
-            for i in range(0, n2):
-                j = n1 + n2 - i - 1
+            for i in range(0, self.n2):
+                j = self.n1 + self.n2 - i - 1
                 is2 = is2 + allobs[iran[j]]
-            is1 = ir1 + ir2 - is2
-            xb1 = is1 / float(n1)    # mean
-            yb1 = is2 / float(n2)    # mean
+            is1 = self.ir1 + self.ir2 - is2
+            xb1 = is1 / float(self.n1)    # mean
+            yb1 = is2 / float(self.n2)    # mean
             dran = xb1 - yb1
             randiff.append(float(is1))
 

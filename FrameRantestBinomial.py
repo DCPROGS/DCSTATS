@@ -97,8 +97,8 @@ class FrameRantestBinomial:
 
     def calback1(self):
         'Called by button CALCULATE.'
-        dict = self.getResult()
-        self.showResult(dict)
+        rnt = self.getResult()
+        self.showResult(rnt, rnt.dict)
 
     def getResult(self):
         'Calls rantest to calculate statistics.'
@@ -113,32 +113,32 @@ class FrameRantestBinomial:
         n1 = ir1 + if1
         n2 = ir2 + if2
 
-        rnt = RantestBinomial()
-        rnt.tTestBinomial(n1, n2, ir1, ir2)
-        rnt.doRantestBinomial(n1, n2, ir1, ir2, 2, nran)
+        rnt = RantestBinomial(ir1, if1, ir2, if2)
+        rnt.tTestBinomial()
+        rnt.doRantestBinomial(2, nran)
         self.randiff = rnt.dict['randiff']
-        self.ir1 = rnt.dict['ir1']
+        self.ir1 = rnt.ir1
 
-        return rnt.dict
+        return rnt
 
-    def showResult(self, rntd):
+    def showResult(self, rnt, rntd):
         'Displays calculation results on main frame.'
 
         self.txt.delete(1.0, END)
 
-        result1 = (rntd['ir1'], rntd['n1'], rntd['p1'], rntd['sd1'], rntd['ir2'], rntd['n2'], rntd['p2'], rntd['sd2'], rntd['p1'] - rntd['p2'])
+        result1 = (rnt.ir1, rnt.n1, rntd['p1'], rntd['sd1'], rnt.ir2, rnt.n2, rntd['p2'], rntd['sd2'], rntd['p1'] - rntd['p2'])
         self.txt.insert(END, ' Set 1: %d successes out of %d; \
         \n p1 = %f;   SD(p1) = %f \
         \n Set 2: %d successes out of %d; \
         \n p2 = %f;   SD(p2) = %f \
         \n Observed difference between sets, p1-p2 = %f' %result1)
 
-        if1 = rntd['n1'] - rntd['ir1']
-        if2 = rntd['n2'] - rntd['ir2']
-        irt = rntd['ir1'] + rntd['ir2']
-        ift = rntd['n1'] + rntd['n2'] - rntd['ir1'] - rntd['ir2']
-        nt = rntd['n1'] + rntd['n2']
-        result2 = (rntd['ir1'], if1, rntd['n1'], rntd['ir2'], if2, rntd['n2'], irt, ift, nt)
+        if1 = rnt.n1 - rnt.ir1
+        if2 = rnt.n2 - rnt.ir2
+        irt = rnt.ir1 + rnt.ir2
+        ift = rnt.n1 + rnt.n2 - rnt.ir1 - rnt.ir2
+        nt = rnt.n1 + rnt.n2
+        result2 = (rnt.ir1, if1, rnt.n1, rnt.ir2, if2, rnt.n2, irt, ift, nt)
         self.txt.insert(END, '\n Observed 2x2 table: \
         \n  Set 1:    %d      %d      %d \
         \n  Set 2:    %d      %d      %d \

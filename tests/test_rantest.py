@@ -82,12 +82,12 @@ def test_regression_rantest_binomial():
     n1 = ir1 + if1
     n2 = ir2 + if2
 
-    rnt = RantestBinomial()
-    rnt.tTestBinomial(n1, n2, ir1, ir2)
-    rnt.doRantestBinomial(n1, n2, ir1, ir2, 2, nran)
+    rnt = RantestBinomial(ir1, if1, ir2, if2)
+    rnt.tTestBinomial()
+    rnt.doRantestBinomial(2, nran)
     rntd = rnt.dict
     
-    result1 = (rntd['ir1'], rntd['n1'], rntd['p1'], rntd['sd1'], rntd['ir2'], rntd['n2'], rntd['p2'], rntd['sd2'], rntd['p1'] - rntd['p2'])
+    result1 = (rnt.ir1, rnt.n1, rntd['p1'], rntd['sd1'], rnt.ir2, rnt.n2, rntd['p2'], rntd['sd2'], rntd['p1'] - rntd['p2'])
     
     print(' Set 1: %d successes out of %d; \
         \n p1 = %f;   SD(p1) = %f \
@@ -100,10 +100,10 @@ def test_regression_rantest_binomial():
     assert isclose(rntd['sd1'], 0.187044, rel_tol=0.0001)
     assert isclose(rntd['sd2'], 0.165635, rel_tol=0.0001)
         
-    irt = rntd['ir1'] + rntd['ir2']
-    ift = rntd['n1'] + rntd['n2'] - rntd['ir1'] - rntd['ir2']
-    nt = rntd['n1'] + rntd['n2']
-    result2 = (rntd['ir1'], if1, rntd['n1'], rntd['ir2'], if2, rntd['n2'], irt, ift, nt)
+    irt = rnt.ir1 + rnt.ir2
+    ift = rnt.n1 + rnt.n2 - rnt.ir1 - rnt.ir2
+    nt = rnt.n1 + rnt.n2
+    result2 = (rnt.ir1, rnt.if1, rnt.n1, rnt.ir2, rnt.if2, rnt.n2, irt, ift, nt)
 
     print('\n Observed 2x2 table: \
         \n  Set 1:    %d      %d      %d \
