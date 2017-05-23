@@ -6,6 +6,8 @@ import sys
 import math
 import random
 
+from statistics_EJ import incompleteBeta
+
 # AP 091202 Minor corrections to spelling and spacing of introd.
 # AP 140418 more cosmetic changes for deposition
 # AP 150512 corrected implementation of paired tests, more verbose output.
@@ -47,77 +49,6 @@ class Rantest(object):
 
     dict = {}
 
-    def betacf(self, A, B, X):
-        """Used by betai(). Evaluates continued fraction for incomplete beta 
-        function by modified Lentz_s method. 
-        Adopted from Numerical Recipes in Fortran77: The Art Of Scientific 
-        Computing by Press et al 1997. """
-
-        ITMAX = 100
-        EPS = 3.E-7
-        AM = 1.0
-        BM = 1.0
-        AZ = 1.0
-        QAB = A + B
-        QAP = A + 1.0
-        QAM = A - 1.0
-        BZ = 1.0 - QAB * X / QAP
-        for m in range(1, ITMAX+1):
-            EM = m
-            TEM = EM + EM
-            D = EM * (B - m) * X / ((QAM + TEM) * (A + TEM))
-            AP = AZ + D * AM
-            BP = BZ + D * BM
-            D = -(A + EM) * (QAB + EM) * X / ((A + TEM) * (QAP + TEM))
-            APP = AP + D * AZ
-            BPP = BP + D * BZ
-            AOLD = AZ
-            AM = AP / BPP
-            BM = BP / BPP
-            AZ = APP / BPP
-            BZ = 1.0
-            #if math.fabs(AZ - AOLD) > EPS * math.fabs(AZ):
-            #    print 'A or B too big, or ITMAX too small'
-        BETACF = AZ
-        return BETACF
-
-    def gammln(self, XX):
-        """Returns natural logarithm of gamma function.
-        Adapted from Numerical Recipes in Fortran77: The Art Of Scientific
-        Computing by Press et al 1997. """
-
-        COF = [76.18009173e0, -86.50532033e0, 24.01409822e0, -1.231739516e0, .120858003e-2, -.536382e-5]
-        STP = 2.50662827465e0
-        ONE = 1.0e0
-        HALF = 0.5e0
-        FPF = 5.5e0
-        X= XX - ONE
-        TMP = X + FPF
-        TMP = (X + HALF) * math.log(TMP) - TMP
-        SER = ONE
-        for j in range(0, 6):
-            X = X + ONE
-            SER = SER + COF[j] / X
-        GAMMLN = TMP + math.log(STP * SER)
-        return GAMMLN
-
-    def betai(self, A, B, X):
-        """Incomplete beta function. 
-        Adapted from Numerical Recipes in Fortran77: The Art Of Scientific
-        Computing by Press et al 1997. """
-
-        if (X < 0) or (X > 1): print ('bad argument X in BETAI')
-        if (X == 0) or (X == 1):
-            BT=0.0
-        else:
-            BT = math.exp(self.gammln(A + B) - self.gammln(A) - self.gammln(B) + A * math.log(X) + B * math.log(1.0 - X))
-        if X < (A + 1.0) / (A + B + 2.0):
-            BETAI = BT * self.betacf(A, B, X) / A
-            return BETAI
-        else:
-            BETAI = 1.0 - BT * self.betacf(B, A, 1.0 - X) / B
-            return BETAI
-
     def meanvar(self, X):
 
         n = len(X)
@@ -149,7 +80,8 @@ class Rantest(object):
         tval = math.fabs(p1 - p2) / sdiff
         df = 100000    # to get Gaussian
         x = df / (df + tval * tval)
-        P = self.betai(0.5 * df, 0.5, x)
+        #P = self.betai(0.5 * df, 0.5, x)
+        P = incompleteBeta(x, 0.5 *df, 0.5)
 
         self.dict['p1'] = p1
         self.dict['p2'] = p2
@@ -271,7 +203,8 @@ class Rantest(object):
             sdbar = sdd / math.sqrt(ny)
             tval = dbar / sdbar
             x = df / (df + tval * tval)
-            P = self.betai(0.5 * df, 0.5, x)
+            #P = self.betai(0.5 * df, 0.5, x)
+            P = incompleteBeta(x, 0.5 *df, 0.5)
    
 
         
@@ -439,3 +372,4 @@ class Rantest(object):
 if __name__ == "__main__":
 
     print (introd)
+    # 444 lines
