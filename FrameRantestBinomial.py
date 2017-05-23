@@ -10,6 +10,7 @@ else:
     
 from PlotRandomDist import PlotRandomDist
 from rantest import Rantest
+from rantest import RantestBinomial
 
 __author__="remis"
 __date__ ="$26-May-2009 22:51:40$"
@@ -112,7 +113,7 @@ class FrameRantestBinomial:
         n1 = ir1 + if1
         n2 = ir2 + if2
 
-        rnt = Rantest()
+        rnt = RantestBinomial()
         rnt.tTestBinomial(n1, n2, ir1, ir2)
         rnt.doRantestBinomial(n1, n2, ir1, ir2, 2, nran)
         self.randiff = rnt.dict['randiff']

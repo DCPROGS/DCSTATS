@@ -5,6 +5,8 @@
 import random
 
 from rantest import Rantest
+from rantest import RantestBinomial
+from rantest import RantestContinuous
 from test_statistics import isclose
 
 def test_regression_rantest_continuos():
@@ -29,7 +31,7 @@ def test_regression_rantest_continuos():
     jset = 1
     nran = 5000
     are_paired = True
-    rnt = Rantest()
+    rnt = RantestContinuous()
     xobs, yobs = rnt.setContinuousData(in_data, nran, jset, are_paired)
     
     rnt.tTestContinuous(xobs, yobs, are_paired)
@@ -80,7 +82,7 @@ def test_regression_rantest_binomial():
     n1 = ir1 + if1
     n2 = ir2 + if2
 
-    rnt = Rantest()
+    rnt = RantestBinomial()
     rnt.tTestBinomial(n1, n2, ir1, ir2)
     rnt.doRantestBinomial(n1, n2, ir1, ir2, 2, nran)
     rntd = rnt.dict
