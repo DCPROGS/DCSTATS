@@ -144,7 +144,17 @@ class RantestBinomial(Rantest):
         return repr_string
 
 class RantestContinuous(object):
-    def __init__(self):
+    def __init__(self, X, Y, are_paired):
+        """ 
+        Parameters
+        ----------
+        X : observations in first trial, list of floats
+        Y : observations in second trial, list of floats
+        are_paired : are observations paired, boolean
+        """
+        self.X, self.Y = X, Y
+        self.are_paired = are_paired
+        self.nx, self.ny = len(X), len(Y)
         self.dict = {}
 
     def meanvar(self, X):
@@ -160,15 +170,12 @@ class RantestContinuous(object):
         sex = sdx / math.sqrt(n)
         return xbar, varx, sdx, sex
 
-    def tTestContinuous(self, xobs, yobs, paired):
+    def tTestContinuous(self):
 
-        nx = len(xobs)
-        ny = len(yobs)
         df = 1
-        
         # calculate mean and variance of nx and ny
-        xbar, varx, sdx, sex = self.meanvar(xobs)
-        ybar, vary, sdy, sey = self.meanvar(yobs)
+        xbar, varx, sdx, sex = self.meanvar(self.X)
+        ybar, vary, sdy, sey = self.meanvar(self.Y)
         
         D = []
         dbar = 0.0
@@ -179,34 +186,34 @@ class RantestContinuous(object):
         sdiff = 0.0
         sdbar = 0.0
 
-        if paired and nx == ny:
-            for i in range(0, nx):
-                D.append(xobs[i] - yobs[i])    # differences for paired test
+        if self.are_paired and self.nx == self.ny:
+            for i in range(0, self.nx):
+                D.append(self.X[i] - self.Y[i])    # differences for paired test
             dbar, vard, sdd, sed = self.meanvar(D)
             self.dict['tPaired'] = "Two-sample paired Student's t test"
                 
-        elif paired and nx != ny:
+        elif self.are_paired and self.nx != self.ny:
             print ("Paired test is impossible if nx != ny")
-            paired = False
+            self.are_paired = False
             self.dict['tPaired'] = "Paired tickbox check but paired tests impossible, nx != ny.\n Two-sample unpaired Student's t test."
         
         else:
             self.dict['tPaired'] = "Two-sample unpaired Student's t test"
         
        
-        if paired:               # And do a 2-sample paired t-test
+        if self.are_paired:               # And do a 2-sample paired t-test
             
-            df = nx - 1
-            sdbar = sdd / math.sqrt(ny)
+            df = self.nx - 1
+            sdbar = sdd / math.sqrt(self.ny)
             tval = dbar / sdbar
             x = df / (df + tval * tval)
             #P = self.betai(0.5 * df, 0.5, x)
             P = incompleteBeta(x, 0.5 *df, 0.5)
    
         else:    # if not paired
-            df = nx + ny - 2
-            s = (sdx * sdx * (nx-1) + sdy * sdy * (ny-1)) / df
-            sdiff = math.sqrt(s * (1.0 / nx + 1.0 / ny))
+            df = self.nx + self.ny - 2
+            s = (sdx * sdx * (self.nx-1) + sdy * sdy * (self.ny-1)) / df
+            sdiff = math.sqrt(s * (1.0 / self.nx + 1.0 / self.ny))
             adiff = math.fabs(xbar - ybar)
             tval = adiff / sdiff
             x = df / (df + tval * tval)
@@ -232,41 +239,17 @@ class RantestContinuous(object):
         self.dict['sdiff'] = sdiff
         self.dict['sdbar'] = sdbar
 
-    def setContinuousData(self, in_data, nran, jset, paired):
-        
-        #jset is a flag for larger datasets and compatibility with older programs?
-        #normally called with 1
-        #TODO set default jset value here?
-        
-        j_offset = (jset-1) * 7
-        
-        self.dict['nx'] = in_data[j_offset + 1]
-        self.dict['ny'] = in_data[j_offset + 2]
-
-        # AP 170517 are these global variables? they don't seem to be used elsewhere
-        titled = in_data[j_offset + 3]
-        titlex = in_data[j_offset + 4]
-        titley = in_data[j_offset + 5]
-        
-        xobs = in_data[j_offset + 6]
-        yobs = in_data[j_offset + 7]
-
-        return xobs, yobs
-
-    def doRantestContinuous(self, xobs, yobs, paired, nran):
-
-        nx = len(xobs)
-        ny = len(yobs)
+    def doRantestContinuous(self, nran):
 
         D = []
-        if paired and nx == ny:
-            for i in range(0, nx):
-                D.append(xobs[i] - yobs[i])    # differences for paired test
+        if self.are_paired and self.nx == self.ny:
+            for i in range(0, self.nx):
+                D.append(self.X[i] - self.Y[i])    # differences for paired test
             self.dict['RanPaired'] = "Paired randomisation test."
     
-        elif paired and nx != ny:
+        elif self.are_paired and self.nx != self.ny:
             print ("Paired test is still impossible if nx != ny")
-            paired = False
+            self.are_paired = False
             self.dict['RanPaired'] = "Paired tickbox check but paired tests impossible, nx != ny.\n Doing unpaired randomisation test."
         
         else:
@@ -282,21 +265,21 @@ class RantestContinuous(object):
         ne1 = 0
         ne2 = 0
 
-        if paired:
+        if self.are_paired:
             dobs = self.dict['dbar']    # observed mean difference
             # put absolute differences into allobs() for paired test
-            for i in range(0, nx):
+            for i in range(0, self.nx):
                 allobs.append(math.fabs(D[i]))
             # start randomisation
             for n in range(0, nran):
                 sd = 0.0
-                for i in range(0, nx):
+                for i in range(0, self.nx):
                     u = random.random()
                     if u < 0.5:
                         sd = sd - allobs[i]
                     else:
                         sd = sd + allobs[i]
-                dran = sd / float(nx)    # mean difference
+                dran = sd / float(self.nx)    # mean difference
                 randiff.append(dran)
                 if dran >= dobs: ng1 = ng1 + 1
                 if dran <= dobs: nl1 = nl1 + 1
@@ -311,30 +294,30 @@ class RantestContinuous(object):
             # Put all obs into one array for unpaired test
             k = 0
             stot = 0.0
-            for i in range(0, nx):
+            for i in range(0, self.nx):
                 k = k + 1
-                stot = stot + xobs[i]
-                allobs.append(xobs[i])
-            for i in range(0, ny):
+                stot = stot + self.X[i]
+                allobs.append(self.X[i])
+            for i in range(0, self.ny):
                 k = k + 1
-                stot = stot + yobs[i]
-                allobs.append(yobs[i])
+                stot = stot + self.Y[i]
+                allobs.append(self.Y[i])
 
             # start randomisation
             for n in range(0, nran):
                 if sys.version_info[0] < 3:
-                    iran = range(0,(nx + ny))
+                    iran = range(0,(self.nx + self.ny))
                 else:
-                    iran = list(range(0,(nx + ny)))
+                    iran = list(range(0,(self.nx + self.ny)))
                 random.shuffle(iran)
                 sy = 0.0
-                for i in range(0, ny):
-                    j = nx + ny - i - 1
+                for i in range(0, self.ny):
+                    j = self.nx + self.ny - i - 1
                     sy = sy + allobs[iran[j]]
 
                 sx = stot - sy
-                xb1 = sx / float(nx)    # mean
-                yb1 = sy / float(ny)    # mean
+                xb1 = sx / float(self.nx)    # mean
+                yb1 = sy / float(self.ny)    # mean
                 dran = xb1 - yb1
 
                 randiff.append(dran)

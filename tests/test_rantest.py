@@ -11,30 +11,14 @@ def test_regression_rantest_continuos():
     # Samples from treatment T1 and T2
     T1 = [100, 108, 119, 127, 132, 135, 136] #, 164]
     T2 = [122, 130, 138, 142, 152, 154, 176]
-    nset = 1
-    in_data = []
-    in_data.append(nset)
-    for j in range(0, nset):
-        in_data.append(len(T1))
-        in_data.append(len(T2))
-        titled = 'Set'
-        titlex = 'Sample 1'
-        titley = 'Sample 2'
-        in_data.append(titled)
-        in_data.append(titlex)
-        in_data.append(titley)
-        in_data.append(T1)
-        in_data.append(T2)
-
-    jset = 1
     nran = 5000
     are_paired = True
-    rnt = RantestContinuous()
-    xobs, yobs = rnt.setContinuousData(in_data, nran, jset, are_paired)
+
+    rnt = RantestContinuous(T1, T2, are_paired)
+    rnt.tTestContinuous()
     
-    rnt.tTestContinuous(xobs, yobs, are_paired)
-    print('n \t\t %(nx)d      \t  %(ny)d \
-        \nMean \t\t %(xbar)f    \t  %(ybar)f \
+    print('n \t\t {0:d}      \t  {1:d}'.format(rnt.nx, rnt.ny) +
+        '\nMean \t\t %(xbar)f    \t  %(ybar)f \
         \nSD \t\t %(sdx)f     \t  %(sdy)f \
         \nSDM \t\t %(sex)f     \t  %(sey)f' %rnt.dict)
     
@@ -45,10 +29,10 @@ def test_regression_rantest_continuos():
     assert isclose(rnt.dict['sex'], 5.295358, rel_tol=0.00001)
     assert isclose(rnt.dict['sey'], 6.730982, rel_tol=0.00001)
         
-    rnt.doRantestContinuous(xobs, yobs, are_paired, nran)
+    rnt.doRantestContinuous(nran)
     randiff = rnt.dict['randiff']
     
-    if rnt.dict['nx'] == rnt.dict['ny'] and are_paired:
+    if rnt.nx == rnt.ny and are_paired:
     #result2 = (rnt.dbar, rnt.sdd, rnt.sed)
         print('\n\n Mean difference (dbar) = \t %(dbar)f \
             \n  s(d) = \t %(sdd)f \t s(dbar) = \t %(sed)f' %rnt.dict)
@@ -68,6 +52,12 @@ def test_regression_rantest_continuos():
         \n  greater than or equal in absolute value to observed: P = \t %(pa1)f \
         \n  Number equal to observed = %(ne1)d (P= %(pe1)f) \
         \n  Number equal in absolute value to observed = %(ne2)d (P= %(pe2)f)' %rnt.dict)
+        
+#    print('\n\nEffect size' +
+#        '\n  Hedges unbiased d = \t {0:.6f}'.format(rnt.hedges_d) +
+#        '\n  approximate 95%% confidence intervals ' +
+#        '\n  upper 95%% CI =\t {0:.6f}'.format(rnt.hedges_upperCI) +
+#        '\n  lower 95%% CI =\t {0:.6f}'.format(rnt.hedges_lowerCI))
     
 def test_regression_rantest_binomial():
     

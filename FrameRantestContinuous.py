@@ -109,8 +109,8 @@ class FrameRantestContinuous:
         'Called by GET DATA AND CALCULATE button.'
         self.in_data, self.nran = self.getData()
         
-        rntdict = self.getResult(self.in_data, self.nran)
-        self.showResult(rntdict)
+        rnt = self.getResult(self.in_data, self.nran)
+        self.showResult(rnt)
 
 ### NEW BY AP
     def callback2(self):
@@ -123,12 +123,12 @@ class FrameRantestContinuous:
         self.e5.insert(END, '5000') #reset to low value
         self.nran = int(self.e5.get())
 
-        rntdict = self.getResult(self.in_data, self.nran)
-        self.showResult(rntdict)
+        rnt = self.getResult(self.in_data, self.nran)
+        self.showResult(rnt)
 
     def callback3(self):
         'Called by TAKE DATA FROM excel button'
-        self.in_data, self.dfile = read_Data('excel')
+        self.X, self.Y, self.dfile = read_Data('excel')
         #dfile contains source data path and filename
         self.data_source = 'Data from ' + self.dfile
         
@@ -136,8 +136,8 @@ class FrameRantestContinuous:
         self.e5.insert(END, '5000')     #reset to low value
         self.nran = int(self.e5.get())
 
-        rntdict = self.getResult(self.in_data, self.nran)
-        self.showResult(rntdict)
+        rnt = self.getResult(self.X, self.Y, self.nran)
+        self.showResult(rnt)
 
     def callback4(self):
         'Called by REPEAT button'
@@ -148,8 +148,8 @@ class FrameRantestContinuous:
         
         self.nran = int(self.e5.get())
         
-        rntdict = self.getResult(self.in_data, self.nran)
-        self.showResult(rntdict)
+        rnt = self.getResult(self.in_data, self.nran)
+        self.showResult(rnt)
 
 ### end of NEW BY AP
 
@@ -191,20 +191,20 @@ class FrameRantestContinuous:
 
         return in_data, nran
 
-    def getResult(self, in_data, nran):
+    def getResult(self, X, Y, nran):
         'Calls Rantest and Hedges to calculate statistics.'
 
         jset = 1
-        rnt = RantestContinuous()
-        xobs, yobs = rnt.setContinuousData(in_data, nran, jset, self.paired)
-        rnt.tTestContinuous(xobs, yobs, self.paired)
-        rnt.doRantestContinuous(xobs, yobs, self.paired, nran)
+        rnt = RantestContinuous(X, Y, self.paired)
+#        xobs, yobs = rnt.setContinuousData(in_data, nran, jset, self.paired)
+        rnt.tTestContinuous()
+        rnt.doRantestContinuous(nran)
         #rnt.doRantestContinuous(in_data, nran, jset, self.paired)
         self.randiff = rnt.dict['randiff']
 
         #calculation of hedges d and approximate 95% confidence intervals
         #not tested against known values yet AP 170518
-        hedges_calculation = Hedges_d(xobs, yobs)
+        hedges_calculation = Hedges_d(X, Y)
         hedges_calculation.hedges_d_unbiased()
         #lowerCI, upperCI = hedges_calculation.approx_CI(self.paired)
         #paired needed for degrees of freedom
@@ -212,14 +212,14 @@ class FrameRantestContinuous:
         #option to have bootstrap calculated CIs should go here
         
         #store results
-        rnt.dict['hedges_d'] = hedges_calculation.d
-        rnt.dict['hedges_lowerCI'] = lowerCI
-        rnt.dict['hedges_upperCI'] = upperCI
+        self.hedges_d = hedges_calculation.d
+        self.hedges_lowerCI = lowerCI
+        self.hedges_upperCI = upperCI
         
-        return rnt.dict
+        return rnt
     
 
-    def showResult(self, rntd):
+    def showResult(self, rnt):
         'Displays calculation results on main frame.'
         # AP 021209 : hard coded tabs ('\t') ease subsequent copy and paste of results
         # First line of output now specifies source file or manual entry
@@ -229,48 +229,54 @@ class FrameRantestContinuous:
         self.txt.insert(END, self.data_source + '\n')
 
         #result1 = (rnt.nx, rnt.ny, rnt.xbar, rnt.ybar, rnt.sdx, rnt.sdy, rnt.sex, rnt.sey)
-        self.txt.insert(END, '  n \t\t  %(nx)d \t\t  %(ny)d \
-        \n  Mean       \t %(xbar)f    \t  %(ybar)f \
+        self.txt.insert(END, '  n \t\t  {0:d} \t\t  {1:d}'.format(rnt.nx, rnt.ny) +
+        '\n  Mean       \t %(xbar)f    \t  %(ybar)f \
         \n  s(x), s(y) \t %(sdx)f     \t  %(sdy)f \
-        \n  s(x/ybar)  \t %(sex)f     \t  %(sey)f' %rntd)
+        \n  s(x/ybar)  \t %(sex)f     \t  %(sey)f' %rnt.dict)
 
-        if rntd['nx'] == rntd['ny'] and self.paired:
+        if rnt.nx == rnt.ny and self.paired:
             #result2 = (rnt.dbar, rnt.sdd, rnt.sed)
             self.txt.insert(END, '\n\n Mean difference (dbar) = \t %(dbar)f \
-            \n  s(d) = \t %(sdd)f \t s(dbar) = \t %(sed)f' %rntd)
+            \n  s(d) = \t %(sdd)f \t s(dbar) = \t %(sed)f' %rnt.dict)
 
-        self.txt.insert(END, '\n\n'+rntd['tPaired'])
+        self.txt.insert(END, '\n\n'+rnt.dict['tPaired'])
         if self.paired:
             #result3 = (rnt.df, rnt.dbar, rnt.sdbar, rnt.tval, rnt.P)
             self.txt.insert(END, '\n   t(%(df)d)= \t %(dbar)f \t / \t%(sdbar)f \t = \t%(tval)f \
-            \n  two tail P =\t %(P)f' %rntd)
-            self.meanToPlot = rntd['dbar']
+            \n  two tail P =\t %(P)f' %rnt.dict)
+            self.meanToPlot = rnt.dict['dbar']
 
         else:
             #result4 = (rnt.dobs, rnt.df, rnt.adiff, rnt.sdiff, rnt.tval, rnt.P)
             self.txt.insert(END, '\n  Observed difference between means = \t %(dobs)f \
             \n  t(%(df)d) = \t %(adiff)f / %(sdiff)f = \t %(tval)f \
-            \n  two tail P = \t %(P)f' %rntd)
-            self.meanToPlot = rntd['dobs']
+            \n  two tail P = \t %(P)f' %rnt.dict)
+            self.meanToPlot = rnt.dict['dobs']
 
         #result5 = (nran, rnt.pg1, rnt.pl1, rnt.pa1, rnt.ne1, rnt.pe1, rnt.ne2, rnt.pe2)
-        self.txt.insert(END, '\n\n' + rntd['RanPaired'])
+        self.txt.insert(END, '\n\n' + rnt.dict['RanPaired'])
         self.txt.insert(END, ' %(nran)d randomisations \
         \n  P values for difference between means \
         \n  greater than or equal to observed: P = \t %(pg1)f \
         \n  less than or equal to observed: P = \t %(pl1)f \
         \n  greater than or equal in absolute value to observed: P = \t %(pa1)f \
         \n  Number equal to observed = %(ne1)d (P= %(pe1)f) \
-        \n  Number equal in absolute value to observed = %(ne2)d (P= %(pe2)f)' %rntd)
+        \n  Number equal in absolute value to observed = %(ne2)d (P= %(pe2)f)' %rnt.dict)
 
         #print (rntd)   #debugging
         
         #report of hedges calcuations
-        self.txt.insert(END, '\n\nEffect size  \
-                        \n  Hedges unbiased d = \t %(hedges_d)f\
-                        \n  approximate 95%% confidence intervals \
-                        \n  upper 95%% CI =\t %(hedges_upperCI)f \
-                        \n  lower 95%% CI =\t %(hedges_lowerCI)f ' %rntd)
+        self.txt.insert(END, '\n\nEffect size' +
+            '\n  Hedges unbiased d = \t {0:.6f}'.format(self.hedges_d) +
+            '\n  approximate 95%% confidence intervals ' +
+            '\n  upper 95%% CI =\t {0:.6f}'.format(self.hedges_upperCI) +
+            '\n  lower 95%% CI =\t {0:.6f}'.format(self.hedges_lowerCI))
+            
+        print('\n\nEffect size' +
+            '\n  Hedges unbiased d = \t {0:.6f}'.format(self.hedges_d) +
+            '\n  approximate 95%% confidence intervals ' +
+            '\n  upper 95%% CI =\t {0:.6f}'.format(self.hedges_upperCI) +
+            '\n  lower 95%% CI =\t {0:.6f}'.format(self.hedges_lowerCI))
 
         # results have been calculated, so 'Recalculate' and 'Plot distribution'
         # buttons become available

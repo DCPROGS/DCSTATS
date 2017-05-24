@@ -32,26 +32,26 @@ def read_Data(file_type):
     data1 = datalines[0]
     data2 = datalines[1]
 
-    n1 = len(data1)
-    n2 = len(data2)
-    nset = 1    # number of data sets
+#    n1 = len(data1)
+#    n2 = len(data2)
+#    nset = 1    # number of data sets
 
     #standard construction of in_data
-    in_data = []
-    in_data.append(nset)
-    for j in range(0, nset):
-        in_data.append(n1)
-        in_data.append(n2)
-        titled = 'Set'
-        titlex = 'Sample 1'
-        titley = 'Sample 2'
-        in_data.append(titled)
-        in_data.append(titlex)
-        in_data.append(titley)
-        in_data.append(data1)
-        in_data.append(data2)
+#    in_data = []
+#    in_data.append(nset)
+#    for j in range(0, nset):
+#        in_data.append(n1)
+#        in_data.append(n2)
+#        titled = 'Set'
+#        titlex = 'Sample 1'
+#        titley = 'Sample 2'
+#        in_data.append(titled)
+#        in_data.append(titlex)
+#        in_data.append(titley)
+#        in_data.append(data1)
+#        in_data.append(data2)
 
-    return in_data, data_file_name
+    return data1, data2, data_file_name
 
 
 def file_read (data_file_name, file_type='txt'):
