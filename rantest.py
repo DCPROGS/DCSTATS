@@ -6,6 +6,8 @@ import sys
 import math
 import random
 
+from statistics_EJ import incompleteBeta
+
 # AP 091202 Minor corrections to spelling and spacing of introd.
 # AP 140418 more cosmetic changes for deposition
 # AP 150512 corrected implementation of paired tests, more verbose output.
@@ -45,81 +47,107 @@ class Rantest(object):
     of the observations to groups of size n1 and n2 produce and\
     absolute value of (p1-p2) at least as big as that observed."
 
-    dict = {}
+    def __init__(self):
+        pass
 
-    def betacf(self, A, B, X):
-        """Used by betai(). Evaluates continued fraction for incomplete beta 
-        function by modified Lentz_s method. 
-        Adopted from Numerical Recipes in Fortran77: The Art Of Scientific 
-        Computing by Press et al 1997. """
+class RantestBinomial(Rantest):
+    
+    def __init__(self, ir1, if1, ir2, if2):
+        """ 
+        Parameters
+        ----------
+        ir1 : number of successes in first trial, int
+        if1 : number of failures in first trial, int
+        ir2 : number of successes in second trial, int
+        if2 : number of failures in second trial, int       
+        """
+        self.ir1 = ir1
+        self.if1 = if1
+        self.ir2 = ir2
+        self.if2 = if2
+        self.n1 = ir1 + if1 # tot number of tests in first trial 
+        self.n2 = ir2 + if2 # tot number of tests in second trial
+        self.p1 = float(self.ir1) / float(self.n1) # prob of success in first trial
+        self.p2 = float(self.ir2) / float(self.n2) # prob of success in second trial
+        
+        self.__rantest_done = False
+        self.__t_test()
 
-        ITMAX = 100
-        EPS = 3.E-7
-        AM = 1.0
-        BM = 1.0
-        AZ = 1.0
-        QAB = A + B
-        QAP = A + 1.0
-        QAM = A - 1.0
-        BZ = 1.0 - QAB * X / QAP
-        for m in range(1, ITMAX+1):
-            EM = m
-            TEM = EM + EM
-            D = EM * (B - m) * X / ((QAM + TEM) * (A + TEM))
-            AP = AZ + D * AM
-            BP = BZ + D * BM
-            D = -(A + EM) * (QAB + EM) * X / ((A + TEM) * (QAP + TEM))
-            APP = AP + D * AZ
-            BPP = BP + D * BZ
-            AOLD = AZ
-            AM = AP / BPP
-            BM = BP / BPP
-            AZ = APP / BPP
-            BZ = 1.0
-            #if math.fabs(AZ - AOLD) > EPS * math.fabs(AZ):
-            #    print 'A or B too big, or ITMAX too small'
-        BETACF = AZ
-        return BETACF
+    def __t_test(self):
+        """" Use Gaussian approx to do 2 sample t test. """
 
-    def gammln(self, XX):
-        """Returns natural logarithm of gamma function.
-        Adapted from Numerical Recipes in Fortran77: The Art Of Scientific
-        Computing by Press et al 1997. """
+        ppool = float(self.ir1 + self.ir2) / float(self.n1 + self.n2)
+        self.sd1 = math.sqrt(self.p1 * (1.0 - self.p1) / float(self.n1))
+        self.sd2 = math.sqrt(self.p2 * (1.0 - self.p2) / float(self.n2))
+        sd1p = math.sqrt(ppool * (1.0 - ppool) / float(self.n1))
+        sd2p = math.sqrt(ppool * (1.0 - ppool) / float(self.n2))
+        sdiff = math.sqrt(sd1p * sd1p + sd2p * sd2p)
 
-        COF = [76.18009173e0, -86.50532033e0, 24.01409822e0, -1.231739516e0, .120858003e-2, -.536382e-5]
-        STP = 2.50662827465e0
-        ONE = 1.0e0
-        HALF = 0.5e0
-        FPF = 5.5e0
-        X= XX - ONE
-        TMP = X + FPF
-        TMP = (X + HALF) * math.log(TMP) - TMP
-        SER = ONE
-        for j in range(0, 6):
-            X = X + ONE
-            SER = SER + COF[j] / X
-        GAMMLN = TMP + math.log(STP * SER)
-        return GAMMLN
+        self.tval = math.fabs(self.p1 - self.p2) / sdiff
+        df = 100000    # to get Gaussian
+        x = df / (df + self.tval **2)
+        self.P = incompleteBeta(x, 0.5 *df, 0.5)
 
-    def betai(self, A, B, X):
-        """Incomplete beta function. 
-        Adapted from Numerical Recipes in Fortran77: The Art Of Scientific
-        Computing by Press et al 1997. """
+    def run_rantest(self, nran):
 
-        if (X < 0) or (X > 1): print ('bad argument X in BETAI')
-        if (X == 0) or (X == 1):
-            BT=0.0
-        else:
-            BT = math.exp(self.gammln(A + B) - self.gammln(A) - self.gammln(B) + A * math.log(X) + B * math.log(1.0 - X))
-        if X < (A + 1.0) / (A + B + 2.0):
-            BETAI = BT * self.betacf(A, B, X) / A
-            return BETAI
-        else:
-            BETAI = 1.0 - BT * self.betacf(B, A, 1.0 - X) / B
-            return BETAI
+        self.nran = nran
+        self.dobs = self.p1 - self.p2
+        allobs = [1]*self.ir1 + [0]*self.if1 + [1]*self.ir2 + [0]*self.if2
+
+        self.randiff = []
+        self.randis1 = []
+        for n in range(0, self.nran):
+            # this if is needed for Python backward compatibility 
+            if sys.version_info[0] < 3: 
+                iran = range(0,(self.n1 + self.n2))
+            else:
+                iran = list(range(0, self.n1 + self.n2))
+            random.shuffle(iran)
+            
+            # number of success in randomised second trial
+            is2 = [allobs[i] for i in iran[self.n1:]].count(1)
+            is1 = self.ir1 + self.ir2 - is2 # number of success in randomised first trial
+            dran = is1 / float(self.n1) - is2 / float(self.n2) # difference between means
+            self.randis1.append(float(is1))
+            self.randiff.append(float(dran))
+            
+        self.ng1 = len([i for i in self.randiff if i >= self.dobs])
+        self.ne1 = len([i for i in self.randiff if i == self.dobs])
+        self.nl1 = len([i for i in self.randiff if i <= self.dobs])
+
+        self.pg1 = float(self.ng1) / float(self.nran)
+        self.pl1 = float(self.nl1) / float(self.nran)
+        self.pe1 = float(self.ne1) / float(self.nran)
+        self.__rantest_done = True
+        
+    def __repr__(self):
+        
+        repr_string = ('\n Set 1: {0:d} successes out of {1:d};'.format(self.ir1, self.n1) +
+            '\n p1 = {0:.6f};   SD(p1) = {1:.6f}'.format(self.p1, self.sd1) +
+            '\n Set 2: {0:d} successes out of {1:d};'.format(self.ir2, self.n2) +
+            '\n p2 = {0:.6f};   SD(p2) = {1:.6f}'.format(self.p2, self.sd2) +
+            '\n Observed difference between sets, p1-p2 = {0:.6f}'.format(self.p1 - self.p2) +
+            '\n\n Observed 2x2 table:' +
+            '\n  Set 1:    {0:d}      {1:d}      {2:d}'.format(self.ir1, self.if1, self.n1) +
+            '\n  Set 2:    {0:d}      {1:d}      {2:d}'.format(self.ir2, self.if2, self.n2) +
+            '\n  Total:    {0:d}      {1:d}      {2:d}'.format(
+            self.ir1 + self.ir2, self.if1 + self.if2, self.n1 + self.n2))
+            
+        if self.__rantest_done == True:
+            repr_string += ('\n\n Two-sample unpaired test using Gaussian approximation to binomial:' +
+                '\n standard normal deviate = {0:.6f}; two tail P = {1:.6f}.'.format(self.tval, self.P) +
+                '\n\n {0:d} randomisations:'.format(self.nran) +
+                '\n P values for difference between sets are:' +
+                '\n  r1 greater than or equal to observed: P = {0:.6f}'.format(self.pg1) +
+                '\n  r1 less than or equal to observed: P = {0:.6f}'.format(self.pl1) +
+                '\n  r1 equal to observed: number = {0:d} (P = {1:.6f})'.format(self.ne1, self.pe1))
+        return repr_string
+
+class RantestContinuous(object):
+    def __init__(self):
+        self.dict = {}
 
     def meanvar(self, X):
-
         n = len(X)
         sumx = X[0]
         sumxx = 0.0
@@ -130,106 +158,7 @@ class Rantest(object):
         varx = sumxx /float(n - 1)
         sdx = math.sqrt(varx)
         sex = sdx / math.sqrt(n)
-
         return xbar, varx, sdx, sex
-
-    def tTestBinomial(self, n1, n2, ir1, ir2):
-        ''
-
-        #Use Gaussian approx to do 2 sample t test
-        p1 = float(ir1) / float(n1)
-        p2 = float(ir2) / float(n2)
-        ppool = float(ir1 + ir2) / float(n1 + n2)
-        sd1 = math.sqrt(p1 * (1.0 - p1) / float(n1))
-        sd2 = math.sqrt(p2 * (1.0 - p2) / float(n2))
-        sd1p = math.sqrt(ppool * (1.0 - ppool) / float(n1))
-        sd2p = math.sqrt(ppool * (1.0 - ppool) / float(n2))
-        sdiff = math.sqrt(sd1p * sd1p + sd2p * sd2p)
-
-        tval = math.fabs(p1 - p2) / sdiff
-        df = 100000    # to get Gaussian
-        x = df / (df + tval * tval)
-        P = self.betai(0.5 * df, 0.5, x)
-
-        self.dict['p1'] = p1
-        self.dict['p2'] = p2
-        self.dict['sd1'] = sd1
-        self.dict['sd2'] = sd2
-        self.dict['tval'] = tval
-        self.dict['P'] = P
-
-        self.dict['ir1'] = ir1
-        self.dict['ir2'] = ir2
-        self.dict['n1'] = n1
-        self.dict['n2'] = n2
-
-    def doRantestBinomial(self, n1, n2, ir1, ir2, icrit, nran):
-
-        p1 = float(ir1) / float(n1)
-        p2 = float(ir2) / float(n2)
-        dobs = p1 - p2
-
-        allobs = []
-        for i in range(0, n1):
-            if i < ir1:
-                allobs.append(1.0)
-            else:
-                allobs.append(0.0)
-        for i in range(0, n2):
-            if i < ir2:
-                allobs.append(1.0)
-            else:
-                allobs.append(0.0)
-
-        ng1 = 0
-        nl1 = 0
-        na1 = 0
-        ne1 = 0
-        ne2 = 0
-
-        randiff = []
-
-        for n in range(0, nran):
-
-            # Randomisation happens here
-            if sys.version_info[0] < 3:
-                iran = range(0,(n1 + n2))
-            else:
-                iran = list(range(0, n1 + n2))
-            random.shuffle(iran)
-
-            is2 = 0.0
-            for i in range(0, n2):
-                j = n1 + n2 - i - 1
-                is2 = is2 + allobs[iran[j]]
-            is1 = ir1 + ir2 - is2
-            xb1 = is1 / float(n1)    # mean
-            yb1 = is2 / float(n2)    # mean
-            dran = xb1 - yb1
-            randiff.append(float(is1))
-
-            # icrit=2
-            if dran >= dobs: ng1 = ng1 + 1
-            if dran <= dobs: nl1 = nl1 + 1
-            if dran == dobs: ne1 = ne1 + 1
-            if math.fabs(dran) >= math.fabs(dobs): na1 = na1 + 1
-            if math.fabs(dran) == math.fabs(dobs): ne2 = ne2 + 1
-
-        self.dict['pg1'] = float(ng1) / float(nran)
-        self.dict['pl1'] = float(nl1) / float(nran)
-        self.dict['pe1'] = float(ne1) / float(nran)
-        self.dict['pa1'] = float(na1) / float(nran)
-        self.dict['pe2'] = float(ne2) / float(nran)
-
-        self.dict['dobs'] = dobs    # check, also used for student test
-        self.dict['randiff'] = randiff
-
-        self.dict['ng1'] = ng1
-        self.dict['nl1'] = nl1
-        self.dict['na1'] = na1
-        self.dict['ne1'] = ne1
-        self.dict['ne2'] = ne2
-        self.dict['nran'] = nran
 
     def tTestContinuous(self, xobs, yobs, paired):
 
@@ -271,19 +200,18 @@ class Rantest(object):
             sdbar = sdd / math.sqrt(ny)
             tval = dbar / sdbar
             x = df / (df + tval * tval)
-            P = self.betai(0.5 * df, 0.5, x)
+            #P = self.betai(0.5 * df, 0.5, x)
+            P = incompleteBeta(x, 0.5 *df, 0.5)
    
-
-        
         else:    # if not paired
-            
             df = nx + ny - 2
             s = (sdx * sdx * (nx-1) + sdy * sdy * (ny-1)) / df
             sdiff = math.sqrt(s * (1.0 / nx + 1.0 / ny))
             adiff = math.fabs(xbar - ybar)
             tval = adiff / sdiff
             x = df / (df + tval * tval)
-            P = self.betai(0.5 * df, 0.5, x)
+            #P = self.betai(0.5 * df, 0.5, x)
+            P = incompleteBeta(x, 0.5 *df, 0.5)
 
         self.dict['xbar'] = xbar
         self.dict['varx'] = varx
@@ -303,7 +231,6 @@ class Rantest(object):
         self.dict['adiff'] = adiff
         self.dict['sdiff'] = sdiff
         self.dict['sdbar'] = sdbar
-
 
     def setContinuousData(self, in_data, nran, jset, paired):
         
@@ -433,9 +360,4 @@ class Rantest(object):
         self.dict['ne1'] = ne1
         self.dict['ne2'] = ne2
 
-    def __init__(self):
-        pass
-
-if __name__ == "__main__":
-
-    print (introd)
+# 444 lines
