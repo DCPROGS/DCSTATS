@@ -9,6 +9,7 @@ else:
     from tkinter.ttk import Separator
     
 from rantest import Rantest
+from rantest import RantestContinuous
 from data_screen import Data_Screen
 from PlotRandomDist import PlotRandomDist
 from ReadRandat import read_Data
@@ -194,7 +195,7 @@ class FrameRantestContinuous:
         'Calls Rantest and Hedges to calculate statistics.'
 
         jset = 1
-        rnt = Rantest()
+        rnt = RantestContinuous()
         xobs, yobs = rnt.setContinuousData(in_data, nran, jset, self.paired)
         rnt.tTestContinuous(xobs, yobs, self.paired)
         rnt.doRantestContinuous(xobs, yobs, self.paired, nran)
