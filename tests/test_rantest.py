@@ -26,8 +26,8 @@ def test_regression_rantest_continuos():
     are_paired = False
     rnt = RantestContinuous(T1, T2, are_paired)
     rnt.run_rantest(nran)
-    print(rnt)
-    assert 0 == 1
+    #print(rnt)
+    #assert 0 == 1
     
 
 def test_regression_rantest_binomial():
