@@ -1,8 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import random
-
 from rantest import RantestBinomial
 from rantest import RantestContinuous
 from test_statistics import isclose
@@ -13,52 +11,18 @@ def test_regression_rantest_continuos():
     T2 = [122, 130, 138, 142, 152, 154, 176]
     nran = 5000
     are_paired = True
-
     rnt = RantestContinuous(T1, T2, are_paired)
-    rnt.tTestContinuous()
     
-    print('n \t\t {0:d}      \t  {1:d}'.format(rnt.nx, rnt.ny) +
-        '\nMean \t\t %(xbar)f    \t  %(ybar)f \
-        \nSD \t\t %(sdx)f     \t  %(sdy)f \
-        \nSDM \t\t %(sex)f     \t  %(sey)f' %rnt.dict)
-    
-    assert isclose(rnt.dict['xbar'], 122.428571, rel_tol=0.00001)
-    assert isclose(rnt.dict['ybar'], 144.857143, rel_tol=0.00001)
-    assert isclose(rnt.dict['sdx'], 14.010200, rel_tol=0.00001)
-    assert isclose(rnt.dict['sdy'], 17.808505, rel_tol=0.00001)
-    assert isclose(rnt.dict['sex'], 5.295358, rel_tol=0.00001)
-    assert isclose(rnt.dict['sey'], 6.730982, rel_tol=0.00001)
+    assert isclose(rnt.xbar, 122.428571, rel_tol=0.00001)
+    assert isclose(rnt.ybar, 144.857143, rel_tol=0.00001)
+    assert isclose(rnt.sdx, 14.010200, rel_tol=0.00001)
+    assert isclose(rnt.sdy, 17.808505, rel_tol=0.00001)
+    assert isclose(rnt.sex, 5.295358, rel_tol=0.00001)
+    assert isclose(rnt.sey, 6.730982, rel_tol=0.00001)
         
-    rnt.doRantestContinuous(nran)
-    randiff = rnt.dict['randiff']
-    
-    if rnt.nx == rnt.ny and are_paired:
-    #result2 = (rnt.dbar, rnt.sdd, rnt.sed)
-        print('\n\n Mean difference (dbar) = \t %(dbar)f \
-            \n  s(d) = \t %(sdd)f \t s(dbar) = \t %(sed)f' %rnt.dict)
-            
-    if are_paired:
-    #result3 = (rnt.df, rnt.dbar, rnt.sdbar, rnt.tval, rnt.P)
-        print('\n  t(%(df)d)= \t %(dbar)f \t / \t%(sdbar)f \t = \t %(tval)f \
-            \n  two tail P =\t %(P)f' %rnt.dict)
-            
-    assert isclose(rnt.dict['tval'], -7.325473, rel_tol=0.000001)
-            
-    print('\n\n'+rnt.dict['RanPaired'])
-    print('\n\n   %(nran)d randomisations \
-        \n P values for difference between means \
-        \n  greater than or equal to observed: P = \t %(pg1)f \
-        \n  less than or equal to observed: P = \t %(pl1)f \
-        \n  greater than or equal in absolute value to observed: P = \t %(pa1)f \
-        \n  Number equal to observed = %(ne1)d (P= %(pe1)f) \
-        \n  Number equal in absolute value to observed = %(ne2)d (P= %(pe2)f)' %rnt.dict)
-        
-#    print('\n\nEffect size' +
-#        '\n  Hedges unbiased d = \t {0:.6f}'.format(rnt.hedges_d) +
-#        '\n  approximate 95%% confidence intervals ' +
-#        '\n  upper 95%% CI =\t {0:.6f}'.format(rnt.hedges_upperCI) +
-#        '\n  lower 95%% CI =\t {0:.6f}'.format(rnt.hedges_lowerCI))
-    
+    rnt.doRantestContinuous(nran)            
+    assert isclose(rnt.tval, -7.325473, rel_tol=0.000001)
+
 def test_regression_rantest_binomial():
     
     ir1, if1 = 3, 4

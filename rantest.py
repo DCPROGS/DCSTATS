@@ -152,12 +152,30 @@ class RantestContinuous(object):
         Y : observations in second trial, list of floats
         are_paired : are observations paired, boolean
         """
+        
         self.X, self.Y = X, Y
-        self.are_paired = are_paired
-        self.nx, self.ny = len(X), len(Y)
-        self.dict = {}
+        # calculate mean and variance of nx and ny
+        self.xbar, self.sdx, self.sex = self.__meanvar(self.X)
+        self.ybar, self.sdy, self.sey = self.__meanvar(self.Y)
 
-    def meanvar(self, X):
+        self.nx, self.ny = len(X), len(Y)
+        self.D = []
+        if are_paired and self.nx == self.ny:
+            self.df = self.nx - 1
+            self.are_paired = True
+            for i in range(self.nx):
+                self.D.append(self.X[i] - self.Y[i])    # differences for paired test
+            self.dbar, self.sdd, self.sed = self.__meanvar(self.D)
+            self.t_type = "Two-sample paired Student's t test"
+        else:
+            self.df = self.nx + self.ny - 2
+            self.t_type = "Two-sample unpaired Student's t test"
+            self.are_paired = False
+            
+        self.__rantest_done = False
+        self.__t_test()
+        
+    def __meanvar(self, X):
         n = len(X)
         sumx = X[0]
         sumxx = 0.0
@@ -168,108 +186,40 @@ class RantestContinuous(object):
         varx = sumxx /float(n - 1)
         sdx = math.sqrt(varx)
         sex = sdx / math.sqrt(n)
-        return xbar, varx, sdx, sex
+        return xbar, sdx, sex
 
-    def tTestContinuous(self):
-
-        df = 1
-        # calculate mean and variance of nx and ny
-        xbar, varx, sdx, sex = self.meanvar(self.X)
-        ybar, vary, sdy, sey = self.meanvar(self.Y)
-        
-        D = []
-        dbar = 0.0
-        vard = 0.0
-        sdd = 0.0
-        sed = 0.0
-        adiff = 0.0
-        sdiff = 0.0
-        sdbar = 0.0
-
-        if self.are_paired and self.nx == self.ny:
-            for i in range(0, self.nx):
-                D.append(self.X[i] - self.Y[i])    # differences for paired test
-            dbar, vard, sdd, sed = self.meanvar(D)
-            self.dict['tPaired'] = "Two-sample paired Student's t test"
-                
-        elif self.are_paired and self.nx != self.ny:
-            print ("Paired test is impossible if nx != ny")
-            self.are_paired = False
-            self.dict['tPaired'] = "Paired tickbox check but paired tests impossible, nx != ny.\n Two-sample unpaired Student's t test."
-        
-        else:
-            self.dict['tPaired'] = "Two-sample unpaired Student's t test"
-        
-       
+    def __t_test(self):
         if self.are_paired:               # And do a 2-sample paired t-test
-            
             df = self.nx - 1
-            sdbar = sdd / math.sqrt(self.ny)
-            tval = dbar / sdbar
-            x = df / (df + tval * tval)
-            #P = self.betai(0.5 * df, 0.5, x)
-            P = incompleteBeta(x, 0.5 *df, 0.5)
-   
+            self.sdbar = self.sdd / math.sqrt(self.ny)
+            self.tval = self.dbar / self.sdbar
+            x = self.df / (self.df + self.tval * self.tval)
+            self.P = incompleteBeta(x, 0.5 * self.df, 0.5)
         else:    # if not paired
-            df = self.nx + self.ny - 2
-            s = (sdx * sdx * (self.nx-1) + sdy * sdy * (self.ny-1)) / df
+            s = (self.sdx * self.sdx * (self.nx-1) + self.sdy * self.sdy * (self.ny-1)) / self.df
             sdiff = math.sqrt(s * (1.0 / self.nx + 1.0 / self.ny))
-            adiff = math.fabs(xbar - ybar)
-            tval = adiff / sdiff
-            x = df / (df + tval * tval)
-            #P = self.betai(0.5 * df, 0.5, x)
-            P = incompleteBeta(x, 0.5 *df, 0.5)
-
-        self.dict['xbar'] = xbar
-        self.dict['varx'] = varx
-        self.dict['sdx'] = sdx
-        self.dict['sex'] = sex
-        self.dict['ybar'] = ybar
-        self.dict['vary'] = vary
-        self.dict['sdy'] = sdy
-        self.dict['sey'] = sey
-        self.dict['dbar'] = dbar
-        self.dict['vard'] = vard
-        self.dict['sdd'] = sdd
-        self.dict['sed'] = sed
-        self.dict['P'] = P
-        self.dict['tval'] = tval
-        self.dict['df'] = df
-        self.dict['adiff'] = adiff
-        self.dict['sdiff'] = sdiff
-        self.dict['sdbar'] = sdbar
+            adiff = math.fabs(self.xbar - self.ybar)
+            self.tval = adiff / sdiff
+            x = self.df / (self.df + self.tval * self.tval)
+            self.P = incompleteBeta(x, 0.5 * self.df, 0.5)
 
     def doRantestContinuous(self, nran):
 
-        D = []
-        if self.are_paired and self.nx == self.ny:
-            for i in range(0, self.nx):
-                D.append(self.X[i] - self.Y[i])    # differences for paired test
-            self.dict['RanPaired'] = "Paired randomisation test."
-    
-        elif self.are_paired and self.nx != self.ny:
-            print ("Paired test is still impossible if nx != ny")
-            self.are_paired = False
-            self.dict['RanPaired'] = "Paired tickbox check but paired tests impossible, nx != ny.\n Doing unpaired randomisation test."
-        
-        else:
-            self.dict['RanPaired'] = "Unpaired randomisation test."
-
-        dobs = 0.0
+        self.dobs = 0.0
         allobs = []
-        randiff = []
+        self.randiff = []
         # for randomisation
-        ng1 = 0
-        nl1 = 0
-        na1 = 0
-        ne1 = 0
-        ne2 = 0
+        self.ng1 = 0
+        self.nl1 = 0
+        self.na1 = 0
+        self.ne1 = 0
+        self.ne2 = 0
 
         if self.are_paired:
-            dobs = self.dict['dbar']    # observed mean difference
+            self.dobs = self.dbar    # observed mean difference
             # put absolute differences into allobs() for paired test
             for i in range(0, self.nx):
-                allobs.append(math.fabs(D[i]))
+                allobs.append(math.fabs(self.D[i]))
             # start randomisation
             for n in range(0, nran):
                 sd = 0.0
@@ -280,17 +230,16 @@ class RantestContinuous(object):
                     else:
                         sd = sd + allobs[i]
                 dran = sd / float(self.nx)    # mean difference
-                randiff.append(dran)
-                if dran >= dobs: ng1 = ng1 + 1
-                if dran <= dobs: nl1 = nl1 + 1
-                if math.fabs(dran) >= math.fabs(dobs): na1 = na1 + 1
-                if dran == dobs: ne1 = ne1 + 1
-                if math.fabs(dran) == math.fabs(dobs): ne2 = ne2 + 1
+                self.randiff.append(dran)
+                if dran >= self.dobs: self.ng1 += 1
+                if dran <= self.dobs: self.nl1 += 1
+                if math.fabs(dran) >= math.fabs(self.dobs): self.na1 += 1
+                if dran == self.dobs: self.ne1 += 1
+                if math.fabs(dran) == math.fabs(self.dobs): self.ne2 += 1
                 # end of if(paired)
 
         else:    # if not paired
-
-            dobs = self.dict['xbar'] - self.dict['ybar']
+            self.dobs = self.xbar - self.ybar
             # Put all obs into one array for unpaired test
             k = 0
             stot = 0.0
@@ -320,27 +269,51 @@ class RantestContinuous(object):
                 yb1 = sy / float(self.ny)    # mean
                 dran = xb1 - yb1
 
-                randiff.append(dran)
-                if dran >= dobs: ng1 = ng1 + 1
-                if dran <= dobs: nl1 = nl1 + 1
-                if math.fabs(dran) >= math.fabs(dobs): na1 = na1 + 1
-                if dran == dobs: ne1 = ne1 + 1
-                if math.fabs(dran) == math.fabs(dobs): ne2 = ne2 + 1
+                self.randiff.append(dran)
+                if dran >= self.dobs: self.ng1 += 1
+                if dran <= self.dobs: self.nl1 += 1
+                if math.fabs(dran) >= math.fabs(self.dobs): self.na1 += 1
+                if dran == self.dobs: self.ne1 += 1
+                if math.fabs(dran) == math.fabs(self.dobs): self.ne2 += 1
 
-        #store results for output
-        self.dict['nran'] = nran
-        self.dict['dobs'] = dobs
-        self.dict['randiff'] = randiff
+        self.pg1 = self.ng1 / float(nran)
+        self.pl1 = self.nl1 / float(nran)
+        self.pe1 = self.ne1 / float(nran)
+        self.pa1 = self.na1 / float(nran)
+        self.pe2 = self.ne2 / float(nran)
+        self.nran = nran
+        self.__rantest_done = True
+        
+    def __repr__(self):
+        
+        repr_string = ('n \t\t {0:d}      \t  {1:d}'.format(self.nx, self.ny) +
+            '\nMean \t\t {0:.6f}    \t  {1:.6f}'.format(self.xbar, self.ybar) +
+            '\nSD \t\t {0:.6f}     \t  {1:.6f}'.format(self.sdx, self.sdy) +
+            '\nSDM \t\t {0:.6f}     \t  {1:.6f}'.format(self.sex, self.sey))
+        
+        if self.nx == self.ny and self.are_paired:
+            repr_string += ('\n\n Mean difference (dbar) = \t {0:.6f}'.format(self.dbar) +
+            '\n  s(d) = \t {0:.6f} \t s(dbar) = \t {1:.6f}'.format(self.sdd, self.sed) +
+            '\n  t({0:d})= \t dbar / s(dbar) \t = \t {1:.6f}'.format(self.df, self.tval) +
+            '\n  two tail P =\t {0:.6f}'.format(self.P))
+            
+        if self.__rantest_done:
+            repr_string += ('\n\n'+self.t_type +
+            '\n\n   {0:d} randomisations'.format(self.nran) +
+            '\n P values for difference between means ' +
+            '\n  greater than or equal to observed: P = \t {0:.6f}'.format(self.pg1) +
+            '\n  less than or equal to observed: P = \t {0:.6f}'.format(self.pl1) +
+            '\n  greater than or equal in absolute value to observed: P = \t {0:.6f}'.format(self.pa1) +
+            '\n  Number equal to observed = {0:d} (P= {1:.6f})'.format(self.ne1, self.pe1) +
+            '\n  Number equal in absolute value to observed = {0:d} (P= {1:.6f})'.format(self.ne2, self.pe2))
+            
+        return repr_string
+        
+#    print('\n\nEffect size' +
+#        '\n  Hedges unbiased d = \t {0:.6f}'.format(rnt.hedges_d) +
+#        '\n  approximate 95%% confidence intervals ' +
+#        '\n  upper 95%% CI =\t {0:.6f}'.format(rnt.hedges_upperCI) +
+#        '\n  lower 95%% CI =\t {0:.6f}'.format(rnt.hedges_lowerCI))
 
-        self.dict['pg1'] = ng1 / float(nran)
-        self.dict['pl1'] = nl1 / float(nran)
-        self.dict['pe1'] = ne1 / float(nran)
-        self.dict['pa1'] = na1 / float(nran)
-        self.dict['pe2'] = ne2 / float(nran)
-        self.dict['ng1'] = ng1
-        self.dict['nl1'] = nl1
-        self.dict['na1'] = na1
-        self.dict['ne1'] = ne1
-        self.dict['ne2'] = ne2
 
 # 444 lines
