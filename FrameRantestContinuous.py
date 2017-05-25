@@ -148,8 +148,7 @@ class FrameRantestContinuous:
     def getResult(self, X, Y, nran):
         'Calls Rantest and Hedges to calculate statistics.'
         rnt = RantestContinuous(X, Y, self.paired)
-        rnt.doRantestContinuous(nran)
-        #rnt.doRantestContinuous(in_data, nran, jset, self.paired)
+        rnt.run_rantest(nran)
         self.randiff = rnt.randiff
 
         #calculation of hedges d and approximate 95% confidence intervals

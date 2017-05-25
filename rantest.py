@@ -203,79 +203,42 @@ class RantestContinuous(object):
             x = self.df / (self.df + self.tval * self.tval)
             self.P = incompleteBeta(x, 0.5 * self.df, 0.5)
 
-    def doRantestContinuous(self, nran):
+    def run_rantest(self, nran):
 
-        self.dobs = 0.0
-        allobs = []
         self.randiff = []
-        # for randomisation
-        self.ng1 = 0
-        self.nl1 = 0
         self.na1 = 0
-        self.ne1 = 0
         self.ne2 = 0
-
         if self.are_paired:
-            self.dobs = self.dbar    # observed mean difference
-            # put absolute differences into allobs() for paired test
-            for i in range(0, self.nx):
-                allobs.append(math.fabs(self.D[i]))
-            # start randomisation
             for n in range(0, nran):
                 sd = 0.0
                 for i in range(0, self.nx):
                     u = random.random()
                     if u < 0.5:
-                        sd = sd - allobs[i]
+                        sd = sd - self.D[i]
                     else:
-                        sd = sd + allobs[i]
+                        sd = sd + self.D[i]
                 dran = sd / float(self.nx)    # mean difference
                 self.randiff.append(dran)
-                if dran >= self.dobs: self.ng1 += 1
-                if dran <= self.dobs: self.nl1 += 1
-                if math.fabs(dran) >= math.fabs(self.dobs): self.na1 += 1
-                if dran == self.dobs: self.ne1 += 1
-                if math.fabs(dran) == math.fabs(self.dobs): self.ne2 += 1
+                if math.fabs(dran) >= math.fabs(self.dbar): self.na1 += 1
+                if math.fabs(dran) == math.fabs(self.dbar): self.ne2 += 1
                 # end of if(paired)
 
         else:    # if not paired
-            self.dobs = self.xbar - self.ybar
-            # Put all obs into one array for unpaired test
-            k = 0
-            stot = 0.0
-            for i in range(0, self.nx):
-                k = k + 1
-                stot = stot + self.X[i]
-                allobs.append(self.X[i])
-            for i in range(0, self.ny):
-                k = k + 1
-                stot = stot + self.Y[i]
-                allobs.append(self.Y[i])
-
+            self.dbar = self.xbar - self.ybar
+            allobs = self.X + self.Y
+            stot = sum(self.X) + sum(self.Y)
             # start randomisation
             for n in range(0, nran):
-                if sys.version_info[0] < 3:
-                    iran = range(0,(self.nx + self.ny))
-                else:
-                    iran = list(range(0,(self.nx + self.ny)))
-                random.shuffle(iran)
-                sy = 0.0
-                for i in range(0, self.ny):
-                    j = self.nx + self.ny - i - 1
-                    sy = sy + allobs[iran[j]]
-
-                sx = stot - sy
-                xb1 = sx / float(self.nx)    # mean
-                yb1 = sy / float(self.ny)    # mean
-                dran = xb1 - yb1
-
+                random.shuffle(allobs)
+                sy = sum(allobs[self.nx : ])
+                dran = (stot - sy) / float(self.nx) - sy / float(self.ny)
                 self.randiff.append(dran)
-                if dran >= self.dobs: self.ng1 += 1
-                if dran <= self.dobs: self.nl1 += 1
-                if math.fabs(dran) >= math.fabs(self.dobs): self.na1 += 1
-                if dran == self.dobs: self.ne1 += 1
-                if math.fabs(dran) == math.fabs(self.dobs): self.ne2 += 1
-
+                if math.fabs(dran) >= math.fabs(self.dbar): self.na1 += 1
+                if math.fabs(dran) == math.fabs(self.dbar): self.ne2 += 1
+                
+        self.ng1 = len([i for i in self.randiff if i >= self.dbar])
+        self.ne1 = len([i for i in self.randiff if i == self.dbar])
+        self.nl1 = len([i for i in self.randiff if i <= self.dbar])
         self.pg1 = self.ng1 / float(nran)
         self.pl1 = self.nl1 / float(nran)
         self.pe1 = self.ne1 / float(nran)

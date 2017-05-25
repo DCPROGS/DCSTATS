@@ -20,8 +20,15 @@ def test_regression_rantest_continuos():
     assert isclose(rnt.sex, 5.295358, rel_tol=0.00001)
     assert isclose(rnt.sey, 6.730982, rel_tol=0.00001)
         
-    rnt.doRantestContinuous(nran)            
+    rnt.run_rantest(nran)            
     assert isclose(rnt.tval, -7.325473, rel_tol=0.000001)
+    
+    are_paired = False
+    rnt = RantestContinuous(T1, T2, are_paired)
+    rnt.run_rantest(nran)
+    print(rnt)
+    assert 0 == 1
+    
 
 def test_regression_rantest_binomial():
     
