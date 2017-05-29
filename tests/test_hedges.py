@@ -30,11 +30,12 @@ def test_gaussian_case():
     s2 = generate_sample (sample_size, m2, sig)
 
     h_testing = Hedges_d(s1, s2)
-    h_testing.hedges_d_unbiased()
+    print (h_testing.corection)
+    h_testing.hedges_d_unbiased()               #answer is in self.d
     approx_95CI_lower, approx_95CI_upper = h_testing.approx_CI()
     bs_95CI_lower, bs_95CI_upper = h_testing.bootstrap_CI(5000)
 
-    print ("h_testing.d, analytic = ", h_testing.d, (m2 - m1) / sig)
+    print ("h_testing.d, analytic, correction = ", h_testing.d, (m2 - m1) / sig, h_testing.corection)
     print ("lower: approx, bootstrap", approx_95CI_lower, bs_95CI_lower)
     print ("upper: approx, bootstrap", approx_95CI_upper, bs_95CI_upper)
 

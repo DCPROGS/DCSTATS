@@ -14,9 +14,11 @@ class Hedges_d:
         self.s1 = sample1
         self.s2 = sample2
         self.d = 0
+        self.correction = 1
         self.SE_d = 0
 
-    def approx_CI (self, paired):
+
+    def approx_CI (self, paired=False):
         # 95% CI = ES - 1.96 * SE_d to ES + 1.96 * SE_d
         # ES is effect size: Hedge's d (the unbiased form)
         # se is asymptotic standard error for the ffect size
@@ -86,10 +88,10 @@ class Hedges_d:
         #Hedges' g
         biased_d = (m2 - m1) / s_pooled
 
-        correction = 1 - 3 / (4 * (n1 + n2 - 2) - 1)
+        self.corection = 1 - 3 / (4 * (n1 + n2 - 2) - 1)
         
         #store answer
-        self.d = biased_d * correction
+        self.d = biased_d * self.corection
 
 
     def bootstrap_CI (self, repeats, bCA=False):
