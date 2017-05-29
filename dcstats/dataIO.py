@@ -1,9 +1,9 @@
 import os, sys
 import csv
-if sys.version_info[0] < 3:
-    import tkFileDialog
-else:
-    from tkinter import filedialog as tkFileDialog
+#if sys.version_info[0] < 3:
+#    import tkFileDialog
+#else:
+#    from tkinter import filedialog as tkFileDialog
 
 __author__="Remijigus Lape and Andrew Plested"
 __date__ ="$01-Dec-2009 16:16:16$"
@@ -15,43 +15,23 @@ __date__ ="$01-Dec-2009 16:16:16$"
 #
 #Note: this module is unsafe and not robust to bad input.
 
-def read_Data(file_type):
-    """"Asks for a tab delimited text file or excel tab-delim to use in randomization test.
-    file_type :string, can be txt or excel
-    """
+#def read_Data(file_type):
+#    """"Asks for a tab delimited text file or excel tab-delim to use in randomization test.
+#    file_type :string, can be txt or excel
+#    """
 
-    data_file_name = tkFileDialog.askopenfilename()
+#    data_file_name = tkFileDialog.askopenfilename()
 
-    #Convert file into lines of tab delimited text
-    lines_of_file = file_read(data_file_name, file_type)
+#    #Convert file into lines of tab delimited text
+#    lines_of_file = file_read(data_file_name, file_type)
 
     # Imagine taking a header here, with data titles?
 
     #Make lines into lists of floating point numbers
-    datalines = lines_into_traces(lines_of_file)
-    data1 = datalines[0]
-    data2 = datalines[1]
-
-#    n1 = len(data1)
-#    n2 = len(data2)
-#    nset = 1    # number of data sets
-
-    #standard construction of in_data
-#    in_data = []
-#    in_data.append(nset)
-#    for j in range(0, nset):
-#        in_data.append(n1)
-#        in_data.append(n2)
-#        titled = 'Set'
-#        titlex = 'Sample 1'
-#        titley = 'Sample 2'
-#        in_data.append(titled)
-#        in_data.append(titlex)
-#        in_data.append(titley)
-#        in_data.append(data1)
-#        in_data.append(data2)
-
-    return data1, data2, data_file_name
+#    datalines = lines_into_traces(lines_of_file)
+#    data1 = datalines[0]
+#    data2 = datalines[1]
+#    return data1, data2, data_file_name
 
 
 def file_read (data_file_name, file_type='txt'):

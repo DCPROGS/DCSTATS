@@ -5,7 +5,7 @@
 
 
 import math
-import statistics_EJ as s
+import dcstats.statistics_EJ as s
 
 __author__="remis"
 __date__ ="$30-Apr-2009 09:51:16$"

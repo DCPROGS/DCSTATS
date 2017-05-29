@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from rantest import RantestBinomial
-from rantest import RantestContinuous
+from dcstats.rantest import RantestBinomial
+from dcstats.rantest import RantestContinuous
 from test_statistics import isclose
 
 def test_regression_rantest_continuos():

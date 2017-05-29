@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import statistics_EJ as s
+import dcstats.statistics_EJ as s
 
 #from rantest import Rantest
 

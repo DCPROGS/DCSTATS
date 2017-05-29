@@ -6,7 +6,7 @@ import sys
 import math
 import random
 
-from statistics_EJ import incompleteBeta
+from dcstats.statistics_EJ import incompleteBeta
 
 # AP 091202 Minor corrections to spelling and spacing of introd.
 # AP 140418 more cosmetic changes for deposition

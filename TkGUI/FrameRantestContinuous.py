@@ -4,16 +4,19 @@ import sys
 if sys.version_info[0] < 3:
     from Tkinter import *
     from ttk import Separator
+    import tkFileDialog
 else:
     from tkinter import *
     from tkinter.ttk import Separator
+    from tkinter import filedialog as tkFileDialog
     
-from rantest import Rantest
-from rantest import RantestContinuous
-from data_screen import Data_Screen
-from PlotRandomDist import PlotRandomDist
-from ReadRandat import read_Data
-from Hedges import Hedges_d
+from dcstats import dataIO
+from dcstats.rantest import Rantest
+from dcstats.rantest import RantestContinuous
+from dcstats.Hedges import Hedges_d
+
+from TkGUI.data_screen import Data_Screen
+from TkGUI.PlotRandomDist import PlotRandomDist
 
 __author__="remis"
 __date__ ="$27-May-2009 12:45:34$"
@@ -79,7 +82,24 @@ class FrameRantestContinuous:
         self.b4.grid(row=27, padx=40, pady=10, column=0, sticky=E)
         self.b5 = Button(self.frame, text="Plot Distribution", state=DISABLED, command=self.callback5,highlightbackground="#dcdcdc")
         self.b5.grid(row=27, padx=40, pady=10, column=1, sticky=W)
-    
+        
+    def read_Data(self, file_type):
+        """"Asks for a tab delimited text file or excel tab-delim to use in randomization test.
+        file_type :string, can be txt or excel
+        """
+
+        data_file_name = tkFileDialog.askopenfilename()
+        #Convert file into lines of tab delimited text
+        lines_of_file = dataIO.file_read(data_file_name, file_type)
+
+        # Imagine taking a header here, with data titles?
+
+        #Make lines into lists of floating point numbers
+        datalines = dataIO.lines_into_traces(lines_of_file)
+        data1 = datalines[0]
+        data2 = datalines[1]
+        return data1, data2, data_file_name
+
 ### NEW BY AP
     def callback_paired(self):
         'Called when ""Paired Test?"" tickbox is checked'
@@ -100,7 +120,7 @@ class FrameRantestContinuous:
 ### NEW BY AP
     def callback2(self):
         'Called by TAKE DATA FROM FILE button'
-        self.X, self.Y, self.dfile = read_Data('txt')
+        self.X, self.Y, self.dfile = self.read_Data('txt')
         #dfile contains source data path and filename
         self.data_source = 'Data from ' + self.dfile
         self.e5.delete(0, END)
@@ -111,7 +131,7 @@ class FrameRantestContinuous:
 
     def callback3(self):
         'Called by TAKE DATA FROM excel button'
-        self.X, self.Y, self.dfile = read_Data('excel')
+        self.X, self.Y, self.dfile = self.read_Data('excel')
         #dfile contains source data path and filename
         self.data_source = 'Data from ' + self.dfile
         self.e5.delete(0, END)
