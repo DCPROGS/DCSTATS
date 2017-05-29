@@ -23,8 +23,8 @@ def test_gaussian_case():
     
     m1 = 1
     m2 = 2
-    sig = 0.5
-    #expect d_unbiased = 2
+    sig = 1
+    #expect d_unbiased = 1
     
     s1 = generate_sample (sample_size, m1, sig)
     s2 = generate_sample (sample_size, m2, sig)
@@ -34,9 +34,9 @@ def test_gaussian_case():
     approx_95CI_lower, approx_95CI_upper = h_testing.approx_CI()
     bs_95CI_lower, bs_95CI_upper = h_testing.bootstrap_CI(5000)
 
-    print ("h_testing.d = ", h_testing.d)
-    print (approx_95CI_lower, bs_95CI_lower)
-    print (approx_95CI_upper, bs_95CI_upper)
+    print ("h_testing.d, analytic = ", h_testing.d, (m2 - m1) / sig)
+    print ("lower: approx, bootstrap", approx_95CI_lower, bs_95CI_lower)
+    print ("upper: approx, bootstrap", approx_95CI_upper, bs_95CI_upper)
 
     assert close_enough(approx_95CI_lower, bs_95CI_lower, count_error)
     assert close_enough(approx_95CI_upper, bs_95CI_upper, count_error)
