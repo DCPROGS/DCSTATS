@@ -22,8 +22,9 @@ def test_gaussian_case():
     count_error = math.sqrt(sample_size)
     
     m1 = 1
-    m2 = 3
-    sig = 1.5
+    m2 = 2
+    sig = 0.5
+    #expect d_unbiased = 2
     
     s1 = generate_sample (sample_size, m1, sig)
     s2 = generate_sample (sample_size, m2, sig)
