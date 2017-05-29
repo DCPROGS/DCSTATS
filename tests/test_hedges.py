@@ -23,7 +23,7 @@ def test_gaussian_case():
     
     m1 = 1
     m2 = 3
-    sig = 2
+    sig = 1.5
     
     s1 = generate_sample (sample_size, m1, sig)
     s2 = generate_sample (sample_size, m2, sig)
