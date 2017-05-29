@@ -1,6 +1,6 @@
 #! /usr/bin/python
 
-from statistics_EJ import InverseStudentT
+from dcstats.statistics_EJ import InverseStudentT
 import unittest as ut
 
 class Test (ut.TestCase):

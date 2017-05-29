@@ -9,12 +9,10 @@ else:
     from tkinter.ttk import Separator
     
 from TkGUI.PlotRandomDist import PlotRandomDist
-#from rantest import Rantest
-from rantest import RantestBinomial
+from dcstats.rantest import RantestBinomial
 
 __author__="remis"
 __date__ ="$26-May-2009 22:51:40$"
-
 
 class FrameRantestBinomial:
     'GUI for randomisation test'
@@ -124,7 +122,6 @@ class FrameRantestBinomial:
 
 
 if __name__ == "__main__":
-    root=Tk()
-    
+    root=Tk()    
     frb = FrameRantestBinomial(root)
     root.mainloop()

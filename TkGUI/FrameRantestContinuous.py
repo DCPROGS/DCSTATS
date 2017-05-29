@@ -10,10 +10,10 @@ else:
     from tkinter.ttk import Separator
     from tkinter import filedialog as tkFileDialog
     
-import dataIO
-from rantest import Rantest
-from rantest import RantestContinuous
-from Hedges import Hedges_d
+from dcstats import dataIO
+from dcstats.rantest import Rantest
+from dcstats.rantest import RantestContinuous
+from dcstats.Hedges import Hedges_d
 
 from TkGUI.data_screen import Data_Screen
 from TkGUI.PlotRandomDist import PlotRandomDist
