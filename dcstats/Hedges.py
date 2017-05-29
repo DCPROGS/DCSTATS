@@ -88,10 +88,10 @@ class Hedges_d:
         #Hedges' g
         biased_d = (m2 - m1) / s_pooled
 
-        self.corection = 1 - 3 / (4 * (n1 + n2 - 2) - 1)
+        self.correction = 1.0 - 3.0 / (4 * (n1 + n2 - 2) - 1)
         
         #store answer
-        self.d = biased_d * self.corection
+        self.d = biased_d * self.correction
 
 
     def bootstrap_CI (self, repeats, bCA=False):
@@ -104,7 +104,7 @@ class Hedges_d:
         
         n1m = len (self.s1) - 1     #we only use these below - simplifies
         n2m = len (self.s2) - 1
-        correction = 1 - 3 / (4 * (n1m + n2m) - 1)
+        correction = 1.0 - 3.0 / (4 * (n1m + n2m) - 1)
         
         for n in range (repeats):
             
