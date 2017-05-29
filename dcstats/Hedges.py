@@ -51,9 +51,9 @@ class Hedges_d:
 
             print ("Degrees of Freedom: {:d} , t @ P_t-CDF = 0.975 : {:.2f} ".format(df, t))
                                      
-        lower95CI = self.d - t * self.SE_d
-        upper95CI = self.d + t * self.SE_d
-        return (lower95CI, upper95CI)
+        self.lower95CI = self.d - t * self.SE_d
+        self.upper95CI = self.d + t * self.SE_d
+        return (self.lower95CI, self.upper95CI)     #should refactor to avoid return
     
     def asymptotic_SE_d_unpaired (self):
         # Hedges 1981, via Nakagawa and Cuthill (2007) Biol. Rev., Table 3
@@ -128,11 +128,18 @@ class Hedges_d:
         
         hedges_d_bs.sort()  # put the values into rank order
         
-        lower95CI = hedges_d_bs[int(0.025 * repeats)] * correction
-        upper95CI = hedges_d_bs[int(0.975 * repeats)] * correction
-        return (lower95CI, upper95CI)
+        self.lower95CI = hedges_d_bs[int(0.025 * repeats)] * correction
+        self.upper95CI = hedges_d_bs[int(0.975 * repeats)] * correction
+        return (self.lower95CI, self.upper95CI)
         
-
+    def __repr__(self):
+        repr_string = ('\n\nEffect size' +
+        '\n  Hedges unbiased d = \t {0:.6f}'.format(self.d) +
+        '\n  approximate 95%% confidence intervals ' +
+        '\n  upper 95%% CI =\t {0:.6f}'.format(self.upper95CI) +
+        '\n  lower 95%% CI =\t {0:.6f}'.format(self.lower95CI))
+    
+        return repr_string
 
     def bias_corrected_bs_CI(self):
         pass

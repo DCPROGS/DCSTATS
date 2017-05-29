@@ -112,10 +112,10 @@ class FrameRantestContinuous:
 ### end of NEW BY AP
 
     def callback1(self):
-        'Called by GET DATA AND CALCULATE button.'
+        'Called by INPUT DATA MANUALLY button.'
         self.X, self.Y, self.nran = self.getData()
-        rnt = self.getResult(self.X, self.Y, self.nran)
-        self.showResult(rnt)
+        rnt,hedges = self.getResult(self.X, self.Y, self.nran)
+        self.showResult(rnt, hedges)
 
 ### NEW BY AP
     def callback2(self):
@@ -126,8 +126,8 @@ class FrameRantestContinuous:
         self.e5.delete(0, END)
         self.e5.insert(END, '5000') #reset to low value
         self.nran = int(self.e5.get())
-        rnt = self.getResult(self.X, self.Y, self.nran)
-        self.showResult(rnt)
+        rnt, hedges = self.getResult(self.X, self.Y, self.nran)
+        self.showResult(rnt, hedges)
 
     def callback3(self):
         'Called by TAKE DATA FROM excel button'
@@ -137,8 +137,8 @@ class FrameRantestContinuous:
         self.e5.delete(0, END)
         self.e5.insert(END, '5000')     #reset to low value
         self.nran = int(self.e5.get())
-        rnt = self.getResult(self.X, self.Y, self.nran)
-        self.showResult(rnt)
+        rnt, hedges = self.getResult(self.X, self.Y, self.nran)
+        self.showResult(rnt, hedges)
 
     def callback4(self):
         'Called by REPEAT button'
@@ -146,8 +146,8 @@ class FrameRantestContinuous:
         #dfile contains source data path and filename
         self.data_source = 'Data from ' + self.dfile       
         self.nran = int(self.e5.get())
-        rnt = self.getResult(self.X, self.Y, self.nran)
-        self.showResult(rnt)
+        rnt, hedges = self.getResult(self.X, self.Y, self.nran)
+        self.showResult(rnt, hedges)
 ### end of NEW BY AP
 
     def getData(self):
@@ -180,25 +180,22 @@ class FrameRantestContinuous:
         lowerCI, upperCI = hedges_calculation.bootstrap_CI(5000)
         #option to have bootstrap calculated CIs should go here
         
-        #store results
+        #store results/// NOT NEEDED ANY MORE tidy up later AP
         self.hedges_d = hedges_calculation.d
         self.hedges_lowerCI = lowerCI
         self.hedges_upperCI = upperCI    
-        return rnt
+        return rnt, hedges_calculation
     
-    def showResult(self, rnt):
+    def showResult(self, rnt, hedges):
         'Displays calculation results on main frame.'
         # AP 021209 : hard coded tabs ('\t') ease subsequent copy and paste of results
         # First line of output now specifies source file or manual entry
         self.txt.delete(1.0, END)
         self.txt.insert(END, self.data_source + '\n')
         self.txt.insert(END, rnt)
+        self.txt.insert(END, hedges)
         print(rnt)
-        print('\n\nEffect size' +
-            '\n  Hedges unbiased d = \t {0:.6f}'.format(self.hedges_d) +
-            '\n  approximate 95%% confidence intervals ' +
-            '\n  upper 95%% CI =\t {0:.6f}'.format(self.hedges_upperCI) +
-            '\n  lower 95%% CI =\t {0:.6f}'.format(self.hedges_lowerCI))
+        print(hedges)
         # results have been calculated, so 'Recalculate' and 'Plot distribution'
         # buttons become available
         self.b4.config(state=NORMAL)
