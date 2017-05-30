@@ -14,6 +14,7 @@ from dcstats import dataIO
 from dcstats.rantest import Rantest
 from dcstats.rantest import RantestContinuous
 from dcstats.Hedges import Hedges_d
+from dcstats.basic_stats import TTestContinuous
 
 from TkGUI.data_screen import Data_Screen
 from TkGUI.PlotRandomDist import PlotRandomDist
@@ -112,11 +113,10 @@ class FrameRantestContinuous:
 ### end of NEW BY AP
 
     def callback1(self):
-        'Called by INPUT DATA MANUALLY button.'
-        self.X, self.Y, self.nran = self.getData()
-        rnt,hedges = self.getResult(self.X, self.Y, self.nran)
-        self.showResult(rnt, hedges)
-
+        'Called by GET DATA AND CALCULATE button.'
+        self.X, self.Y = self.getData()
+        self.getResult()
+        
 ### NEW BY AP
     def callback2(self):
         'Called by TAKE DATA FROM FILE button'
@@ -125,9 +125,7 @@ class FrameRantestContinuous:
         self.data_source = 'Data from ' + self.dfile
         self.e5.delete(0, END)
         self.e5.insert(END, '5000') #reset to low value
-        self.nran = int(self.e5.get())
-        rnt, hedges = self.getResult(self.X, self.Y, self.nran)
-        self.showResult(rnt, hedges)
+        self.getResult()
 
     def callback3(self):
         'Called by TAKE DATA FROM excel button'
@@ -136,18 +134,15 @@ class FrameRantestContinuous:
         self.data_source = 'Data from ' + self.dfile
         self.e5.delete(0, END)
         self.e5.insert(END, '5000')     #reset to low value
-        self.nran = int(self.e5.get())
-        rnt, hedges = self.getResult(self.X, self.Y, self.nran)
-        self.showResult(rnt, hedges)
+        self.getResult()
 
     def callback4(self):
         'Called by REPEAT button'
         #self.indata and self.dfile should already be populated.
         #dfile contains source data path and filename
         self.data_source = 'Data from ' + self.dfile       
-        self.nran = int(self.e5.get())
-        rnt, hedges = self.getResult(self.X, self.Y, self.nran)
-        self.showResult(rnt, hedges)
+        self.getResult()
+
 ### end of NEW BY AP
 
     def getData(self):
@@ -162,18 +157,20 @@ class FrameRantestContinuous:
         data1 = dataScreen[0:n1]
         data2 = dataScreen[n1:n1+n2]
        #number of randomisations
-        nran = int(self.e5.get())
-        return data1, data2, nran
+        return data1, data2
 
-    def getResult(self, X, Y, nran):
+    def getResult(self):
         'Calls Rantest and Hedges to calculate statistics.'
-        rnt = RantestContinuous(X, Y, self.paired)
-        rnt.run_rantest(nran)
+        self.nran = int(self.e5.get())
+        ttc = TTestContinuous(self.X, self.Y, self.paired)
+        rnt = RantestContinuous(self.X, self.Y, self.paired)
+        rnt.run_rantest(self.nran)
+        self.meanToPlot = rnt.dbar
         self.randiff = rnt.randiff
 
         #calculation of hedges d and approximate 95% confidence intervals
         #not tested against known values yet AP 170518
-        hedges_calculation = Hedges_d(X, Y)
+        hedges_calculation = Hedges_d(self.X, self.Y)
         hedges_calculation.hedges_d_unbiased()
         #lowerCI, upperCI = hedges_calculation.approx_CI(self.paired)
         #paired needed for degrees of freedom
@@ -184,14 +181,16 @@ class FrameRantestContinuous:
         self.hedges_d = hedges_calculation.d
         self.hedges_lowerCI = lowerCI
         self.hedges_upperCI = upperCI    
-        return rnt, hedges_calculation
+        self.showResult(ttc, rnt, hedges_calculation)
     
-    def showResult(self, rnt, hedges):
+    def showResult(self, ttc, rnt, hedges):
         'Displays calculation results on main frame.'
         # AP 021209 : hard coded tabs ('\t') ease subsequent copy and paste of results
         # First line of output now specifies source file or manual entry
         self.txt.delete(1.0, END)
         self.txt.insert(END, self.data_source + '\n')
+        self.txt.insert(END, ttc)
+        print(ttc)
         self.txt.insert(END, rnt)
         self.txt.insert(END, hedges)
         print(rnt)

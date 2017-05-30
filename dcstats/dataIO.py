@@ -89,10 +89,10 @@ def lines_into_traces (lines):
 
 	## transpose lines into traces made from columns
 	for line in lines:
-		print (line)
+		#print (line)
 		for i in range (num_of_traces):
 			#NEW AP
-			print (line[i])
+			#print (line[i])
 			try:
 				traces[i].append (float(line[i]))
 			except:
