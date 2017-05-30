@@ -102,14 +102,14 @@ class RantestBinomial(Rantest):
         self.__rantest_done = True
         
     def __repr__(self):        
-        return ('\n\n {0:d} randomisations:'.format(self.nran) +
+        return ('\n\n Rantest:  {0:d} randomisations:'.format(self.nran) +
             '\n P values for difference between sets are:' +
             '\n  r1 greater than or equal to observed: P = {0:.6f}'.format(self.pg1) +
             '\n  r1 less than or equal to observed: P = {0:.6f}'.format(self.pl1) +
             '\n  r1 equal to observed: number = {0:d} (P = {1:.6f})'.format(self.ne1, self.pe1))
 
 
-class RantestContinuous(object):
+class RantestContinuous(Rantest):
     def __init__(self, X, Y, are_paired):
         """ 
         Parameters
@@ -120,20 +120,8 @@ class RantestContinuous(object):
         """
         
         self.X, self.Y = X, Y
-        self.are_paired = are_paired
-        # calculate mean and variance of nx and ny
-        self.xbar, self.sdx, self.sdmx = bs.mean(self.X), bs.sd(self.X), bs.sdm(self.X)
-        self.ybar, self.sdy, self.sdmy = bs.mean(self.Y), bs.sd(self.Y), bs.sdm(self.Y)
-
         self.nx, self.ny = len(X), len(Y)
-        self.D = []
-        if self.are_paired and self.nx == self.ny:
-            self.df = self.nx - 1
-            for i in range(self.nx):
-                self.D.append(self.X[i] - self.Y[i])    # differences for paired test
-            self.dbar, self.sdd, self.sdmd = bs.mean(self.D), bs.sd(self.D), bs.sdm(self.D)
-        else:
-            self.df = self.nx + self.ny - 2
+        self.are_paired = are_paired
             
     def run_rantest(self, nran):
 
@@ -141,6 +129,11 @@ class RantestContinuous(object):
         self.na1 = 0
         self.ne2 = 0
         if self.are_paired:
+            self.D = []
+            for i in range(self.nx):
+                self.D.append(self.X[i] - self.Y[i])    # differences for paired test
+            self.dbar = bs.mean(self.D)
+            
             for n in range(nran):
                 sd = 0.0
                 for i in range(0, self.nx):
@@ -156,7 +149,7 @@ class RantestContinuous(object):
                 # end of if(paired)
 
         else:    # if not paired
-            self.dbar = self.xbar - self.ybar
+            self.dbar = bs.mean(self.X) - bs.mean(self.Y)
             allobs = self.X + self.Y
             stot = sum(self.X) + sum(self.Y)
             # start randomisation
