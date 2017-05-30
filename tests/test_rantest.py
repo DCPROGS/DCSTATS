@@ -17,8 +17,8 @@ def test_regression_rantest_continuos():
     assert isclose(rnt.ybar, 144.857143, rel_tol=0.00001)
     assert isclose(rnt.sdx, 14.010200, rel_tol=0.00001)
     assert isclose(rnt.sdy, 17.808505, rel_tol=0.00001)
-    assert isclose(rnt.sex, 5.295358, rel_tol=0.00001)
-    assert isclose(rnt.sey, 6.730982, rel_tol=0.00001)
+    assert isclose(rnt.sdmx, 5.295358, rel_tol=0.00001)
+    assert isclose(rnt.sdmy, 6.730982, rel_tol=0.00001)
         
     rnt.run_rantest(nran)            
     assert isclose(rnt.tval, -7.325473, rel_tol=0.000001)
@@ -37,13 +37,6 @@ def test_regression_rantest_binomial():
     nran = 5000
     rnt = RantestBinomial(ir1, if1, ir2, if2)
     rnt.run_rantest(nran)
-    
-    assert isclose(rnt.p1, 0.428571, rel_tol=0.0001)
-    assert isclose(rnt.p2, 0.444444, rel_tol=0.0001)
-    assert isclose(rnt.sd1, 0.187044, rel_tol=0.0001)
-    assert isclose(rnt.sd2, 0.165635, rel_tol=0.0001)
-    assert isclose(rnt.tval, 0.063492, rel_tol=0.0001)
-    assert isclose(rnt.P, 0.949375, rel_tol=0.0001)
 
     assert (rnt.pg1 > 0.6) and (rnt.pg1 < 0.8)
     assert (rnt.pl1 > 0.6) and (rnt.pl1 < 0.8)

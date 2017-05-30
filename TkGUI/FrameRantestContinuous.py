@@ -169,6 +169,7 @@ class FrameRantestContinuous:
         'Calls Rantest and Hedges to calculate statistics.'
         rnt = RantestContinuous(X, Y, self.paired)
         rnt.run_rantest(nran)
+        self.meanToPlot = rnt.dbar
         self.randiff = rnt.randiff
 
         #calculation of hedges d and approximate 95% confidence intervals

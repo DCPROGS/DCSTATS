@@ -10,6 +10,7 @@ else:
     
 from TkGUI.PlotRandomDist import PlotRandomDist
 from dcstats.rantest import RantestBinomial
+from dcstats.basic_stats import TTestBinomial
 
 __author__="remis"
 __date__ ="$26-May-2009 22:51:40$"
@@ -92,8 +93,8 @@ class FrameRantestBinomial:
 
     def calback1(self):
         'Called by button CALCULATE.'
-        rnt = self.getResult()
-        self.showResult(rnt)
+        ttb, rnt = self.getResult()
+        self.showResult(ttb, rnt)
 
     def getResult(self):
         'Calls rantest to calculate statistics.'
@@ -105,23 +106,20 @@ class FrameRantestBinomial:
         if2 = int(e[3].get())
         nran = int(e[4].get())
 
+        ttb = TTestBinomial(ir1, if1, ir2, if2)
         rnt = RantestBinomial(ir1, if1, ir2, if2)
         rnt.run_rantest(nran)
         self.randis1 = rnt.randis1
         self.ir1 = rnt.ir1
-        return rnt
+        return ttb, rnt
 
-    def showResult(self, rnt):
+    def showResult(self, ttb, rnt):
         'Displays calculation results on main frame.'
         self.txt.delete(1.0, END)
+        self.txt.insert(END, ttb)
         self.txt.insert(END, rnt)
         
     def calback2(self):
         'Called by PLOT DISTRIBUTION button'
         PlotRandomDist(self.randis1,0,1,1, self.ir1)
 
-
-if __name__ == "__main__":
-    root=Tk()    
-    frb = FrameRantestBinomial(root)
-    root.mainloop()
