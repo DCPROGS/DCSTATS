@@ -6,7 +6,7 @@ from dcstats.statistics_EJ import InverseStudentT
 class Hedges_d:
     ### calculation of Hedges' d (Hedges' unbiased g)
     ### see Nakagawa and Cuthill (2007) Biol. Rev.
-    ### simple 95% confidence intervals
+    ### simple 95% confidence intervals 
     ### bootstrap to get better (non-parametric) confidence intervals
     
     def __init__(self, sample1, sample2):
