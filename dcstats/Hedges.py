@@ -135,9 +135,9 @@ class Hedges_d:
     def __repr__(self):
         repr_string = ('\n\nEffect size' +
         '\n  Hedges unbiased d = \t {0:.6f}'.format(self.d) +
-        '\n  approximate 95%% confidence intervals ' +
-        '\n  upper 95%% CI =\t {0:.6f}'.format(self.upper95CI) +
-        '\n  lower 95%% CI =\t {0:.6f}'.format(self.lower95CI))
+        '\n  approximate 95% confidence intervals ' +
+        '\n  upper 95% CI =\t {0:.6f}'.format(self.upper95CI) +
+        '\n  lower 95% CI =\t {0:.6f}'.format(self.lower95CI))
     
         return repr_string
 
