@@ -6,7 +6,6 @@ import sys
 import math
 import random
 
-from dcstats.statistics_EJ import incompleteBeta
 import dcstats.basic_stats as bs
 
 # AP 091202 Minor corrections to spelling and spacing of introd.
@@ -121,53 +120,35 @@ class RantestContinuous(object):
         """
         
         self.X, self.Y = X, Y
+        self.are_paired = are_paired
         # calculate mean and variance of nx and ny
         self.xbar, self.sdx, self.sdmx = bs.mean(self.X), bs.sd(self.X), bs.sdm(self.X)
         self.ybar, self.sdy, self.sdmy = bs.mean(self.Y), bs.sd(self.Y), bs.sdm(self.Y)
 
         self.nx, self.ny = len(X), len(Y)
         self.D = []
-        if are_paired and self.nx == self.ny:
+        if self.are_paired and self.nx == self.ny:
             self.df = self.nx - 1
-            self.are_paired = True
             for i in range(self.nx):
                 self.D.append(self.X[i] - self.Y[i])    # differences for paired test
             self.dbar, self.sdd, self.sdmd = bs.mean(self.D), bs.sd(self.D), bs.sdm(self.D)
-            self.t_type = "Two-sample paired Student's t test"
         else:
             self.df = self.nx + self.ny - 2
-            self.t_type = "Two-sample unpaired Student's t test"
-            self.are_paired = False
             
-        self.__rantest_done = False
-        self.__t_test()
-        
-    def __t_test(self):
-        if self.are_paired:               # And do a 2-sample paired t-test
-            self.sdbar = self.sdd / math.sqrt(self.ny)
-            self.tval = self.dbar / self.sdbar
-            self.P = bs.ttestPDF(self.tval, self.df)
-        else:    # if not paired
-            s = (self.sdx * self.sdx * (self.nx-1) + self.sdy * self.sdy * (self.ny-1)) / self.df
-            sdiff = math.sqrt(s * (1.0 / self.nx + 1.0 / self.ny))
-            adiff = math.fabs(self.xbar - self.ybar)
-            self.tval = adiff / sdiff
-            self.P = bs.ttestPDF(self.tval, self.df)
-
     def run_rantest(self, nran):
 
         self.randiff = []
         self.na1 = 0
         self.ne2 = 0
         if self.are_paired:
-            for n in range(0, nran):
+            for n in range(nran):
                 sd = 0.0
                 for i in range(0, self.nx):
                     u = random.random()
                     if u < 0.5:
-                        sd = sd - self.D[i]
+                        sd -= self.D[i]
                     else:
-                        sd = sd + self.D[i]
+                        sd += self.D[i]
                 dran = sd / float(self.nx)    # mean difference
                 self.randiff.append(dran)
                 if math.fabs(dran) >= math.fabs(self.dbar): self.na1 += 1
@@ -196,38 +177,13 @@ class RantestContinuous(object):
         self.pa1 = self.na1 / float(nran)
         self.pe2 = self.ne2 / float(nran)
         self.nran = nran
-        self.__rantest_done = True
         
     def __repr__(self):
-        
-        repr_string = ('n \t\t {0:d}      \t  {1:d}'.format(self.nx, self.ny) +
-            '\nMean \t\t {0:.6f}    \t  {1:.6f}'.format(self.xbar, self.ybar) +
-            '\nSD \t\t {0:.6f}     \t  {1:.6f}'.format(self.sdx, self.sdy) +
-            '\nSDM \t\t {0:.6f}     \t  {1:.6f}'.format(self.sdmx, self.sdmy))
-        
-        if self.nx == self.ny and self.are_paired:
-            repr_string += ('\n\n Mean difference (dbar) = \t {0:.6f}'.format(self.dbar) +
-            '\n  s(d) = \t {0:.6f} \t s(dbar) = \t {1:.6f}'.format(self.sdd, self.sdmd) +
-            '\n  t({0:d})= \t dbar / s(dbar) \t = \t {1:.6f}'.format(self.df, self.tval) +
-            '\n  two tail P =\t {0:.6f}'.format(self.P))
-            
-        if self.__rantest_done:
-            repr_string += ('\n\n'+self.t_type +
-            '\n\n   {0:d} randomisations'.format(self.nran) +
-            '\n P values for difference between means ' +
-            '\n  greater than or equal to observed: P = \t {0:.6f}'.format(self.pg1) +
-            '\n  less than or equal to observed: P = \t {0:.6f}'.format(self.pl1) +
-            '\n  greater than or equal in absolute value to observed: P = \t {0:.6f}'.format(self.pa1) +
-            '\n  Number equal to observed = {0:d} (P= {1:.6f})'.format(self.ne1, self.pe1) +
-            '\n  Number equal in absolute value to observed = {0:d} (P= {1:.6f})'.format(self.ne2, self.pe2))
-            
-        return repr_string
-        
-#    print('\n\nEffect size' +
-#        '\n  Hedges unbiased d = \t {0:.6f}'.format(rnt.hedges_d) +
-#        '\n  approximate 95%% confidence intervals ' +
-#        '\n  upper 95%% CI =\t {0:.6f}'.format(rnt.hedges_upperCI) +
-#        '\n  lower 95%% CI =\t {0:.6f}'.format(rnt.hedges_lowerCI))
+        return ('\n\n   Rantest:  {0:d} randomisations'.format(self.nran) +
+        '\n P values for difference between means ' +
+        '\n  greater than or equal to observed: P = \t {0:.6f}'.format(self.pg1) +
+        '\n  less than or equal to observed: P = \t {0:.6f}'.format(self.pl1) +
+        '\n  greater than or equal in absolute value to observed: P = \t {0:.6f}'.format(self.pa1) +
+        '\n  Number equal to observed = {0:d} (P= {1:.6f})'.format(self.ne1, self.pe1) +
+        '\n  Number equal in absolute value to observed = {0:d} (P= {1:.6f})'.format(self.ne2, self.pe2))
 
-
-# 444 lines

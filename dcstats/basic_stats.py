@@ -91,3 +91,68 @@ class TTestBinomial():
             '\n\n Two-sample unpaired test using Gaussian approximation to binomial:' +
             '\n standard normal deviate = {0:.6f}; two tail P = {1:.6f}.'.format(self.tval, self.P))
         return repr_string
+
+
+class TTestContinuous(object):
+    def __init__(self, X, Y, are_paired):
+        """ 
+        Parameters
+        ----------
+        X : observations in first trial, list of floats
+        Y : observations in second trial, list of floats
+        are_paired : are observations paired, boolean
+        """
+        
+        self.X, self.Y = X, Y
+        self.are_paired = are_paired
+        # calculate mean and variance of nx and ny
+        self.xbar, self.sdx, self.sdmx = mean(self.X), sd(self.X), sdm(self.X)
+        self.ybar, self.sdy, self.sdmy = mean(self.Y), sd(self.Y), sdm(self.Y)
+
+        self.nx, self.ny = len(X), len(Y)
+        self.D = []
+        if self.nx == self.ny:
+            self.df = self.nx - 1
+            for i in range(self.nx):
+                self.D.append(self.X[i] - self.Y[i])    # differences for paired test
+            self.dbar, self.sdd, self.sdmd = mean(self.D), sd(self.D), sdm(self.D)
+        else:
+            self.df = self.nx + self.ny - 2
+            self.are_paired = False
+            
+        self.__t_test()
+        
+    def __t_test(self):
+        if self.are_paired:               # And do a 2-sample paired t-test
+            self.sdbar = self.sdd / sqrt(self.ny)
+            self.tval = self.dbar / self.sdbar
+            self.P = ttestPDF(self.tval, self.df)
+        else:    # if not paired
+            s = (self.sdx * self.sdx * (self.nx-1) + self.sdy * self.sdy * (self.ny-1)) / self.df
+            sdiff = sqrt(s * (1.0 / self.nx + 1.0 / self.ny))
+            adiff = fabs(self.xbar - self.ybar)
+            self.tval = adiff / sdiff
+            self.P = ttestPDF(self.tval, self.df)
+
+    def __repr__(self):
+        
+        repr_string = ('n \t\t {0:d}      \t  {1:d}'.format(self.nx, self.ny) +
+            '\nMean \t\t {0:.6f}    \t  {1:.6f}'.format(self.xbar, self.ybar) +
+            '\nSD \t\t {0:.6f}     \t  {1:.6f}'.format(self.sdx, self.sdy) +
+            '\nSDM \t\t {0:.6f}     \t  {1:.6f}'.format(self.sdmx, self.sdmy))
+            
+        if self.nx == self.ny:
+            repr_string += ('\n\n Mean difference (dbar) = \t {0:.6f}'.format(self.dbar) +
+                '\n  s(d) = \t {0:.6f} \t s(dbar) = \t {1:.6f}'.format(self.sdd, self.sdmd))
+
+        if self.are_paired:
+            repr_string += ('\n\n Paired Student''s t-test:' +
+                '\n  t({0:d})= \t dbar / s(dbar) \t = \t {1:.6f}'.format(self.df, self.tval) +
+                '\n  two tail P =\t {0:.6f}'.format(self.P))
+
+        else:
+            repr_string += ('\n\n Two-sample unpaired Student''s t-test:' +
+                '\n t = \t {0:.6f}'.format(float(self.tval)) +
+                '\n two tail P = \t {0:.6f}'.format(self.P))
+            
+        return repr_string

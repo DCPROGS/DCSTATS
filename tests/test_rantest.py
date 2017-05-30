@@ -3,32 +3,25 @@
 
 from dcstats.rantest import RantestBinomial
 from dcstats.rantest import RantestContinuous
-from test_statistics import isclose
+#from test_statistics import isclose
 
 def test_regression_rantest_continuos():
     # Samples from treatment T1 and T2
     T1 = [100, 108, 119, 127, 132, 135, 136] #, 164]
     T2 = [122, 130, 138, 142, 152, 154, 176]
     nran = 5000
-    are_paired = True
-    rnt = RantestContinuous(T1, T2, are_paired)
-    
-    assert isclose(rnt.xbar, 122.428571, rel_tol=0.00001)
-    assert isclose(rnt.ybar, 144.857143, rel_tol=0.00001)
-    assert isclose(rnt.sdx, 14.010200, rel_tol=0.00001)
-    assert isclose(rnt.sdy, 17.808505, rel_tol=0.00001)
-    assert isclose(rnt.sdmx, 5.295358, rel_tol=0.00001)
-    assert isclose(rnt.sdmy, 6.730982, rel_tol=0.00001)
-        
-    rnt.run_rantest(nran)            
-    assert isclose(rnt.tval, -7.325473, rel_tol=0.000001)
-    
-    are_paired = False
-    rnt = RantestContinuous(T1, T2, are_paired)
+    rnt = RantestContinuous(T1, T2, True)    
     rnt.run_rantest(nran)
-    #print(rnt)
-    #assert 0 == 1
-    
+    assert rnt.pg1 == 1.0
+    assert (rnt.pa1 > 0.01) and (rnt.pa1 < 0.025)
+    assert (rnt.ne2 > 50) and (rnt.ne2 < 100)
+
+    rnt = RantestContinuous(T1, T2, False)
+    rnt.run_rantest(nran)    
+    assert (rnt.pg1 > 0.98) and (rnt.pg1 < 1.0)
+    assert (rnt.pa1 > 0.015) and (rnt.pa1 < 0.035)
+    assert (rnt.ne2 > 0) and (rnt.ne2 < 20)
+   
 
 def test_regression_rantest_binomial():
     

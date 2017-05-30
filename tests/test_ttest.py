@@ -5,7 +5,7 @@ from math import sqrt, fabs
 from test_statistics import isclose
 import dcstats.statistics_EJ as s
 from dcstats.basic_stats import mean, sd, sdm, ttestPDF
-from dcstats.basic_stats import TTestBinomial
+from dcstats.basic_stats import TTestBinomial, TTestContinuous
     
 def test_ttest_P_paired():
     D = [1, 2, 3]
@@ -54,3 +54,20 @@ def test_regression_ttest_binomial():
     assert isclose(ttb.sd2, 0.165635, rel_tol=0.0001)
     assert isclose(ttb.tval, 0.063492, rel_tol=0.0001)
     assert isclose(ttb.P, 0.949375, rel_tol=0.0001)
+
+def test_regression_ttest_continuos():
+    # Samples from treatment T1 and T2
+    T1 = [100, 108, 119, 127, 132, 135, 136] #, 164]
+    T2 = [122, 130, 138, 142, 152, 154, 176]
+    are_paired = True
+    ttc = TTestContinuous(T1, T2, are_paired)
+    
+    assert isclose(ttc.xbar, 122.428571, rel_tol=0.00001)
+    assert isclose(ttc.ybar, 144.857143, rel_tol=0.00001)
+    assert isclose(ttc.sdx, 14.010200, rel_tol=0.00001)
+    assert isclose(ttc.sdy, 17.808505, rel_tol=0.00001)
+    assert isclose(ttc.sdmx, 5.295358, rel_tol=0.00001)
+    assert isclose(ttc.sdmy, 6.730982, rel_tol=0.00001)
+        
+    assert isclose(ttc.tval, -7.325473, rel_tol=0.000001)
+    assert isclose(ttc.P, 0.000331, rel_tol=0.01)
