@@ -16,8 +16,8 @@ from dcstats.rantest import RantestContinuous
 from dcstats.Hedges import Hedges_d
 from dcstats.basic_stats import TTestContinuous
 
-from TkGUI.data_screen import Data_Screen
-from TkGUI.PlotRandomDist import PlotRandomDist
+from GUI.data_screen import Data_Screen
+from GUI.PlotRandomDist import PlotRandomDist
 
 __author__="remis"
 __date__ ="$27-May-2009 12:45:34$"

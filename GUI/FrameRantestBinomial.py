@@ -8,7 +8,7 @@ else:
     from tkinter import *
     from tkinter.ttk import Separator
     
-from TkGUI.PlotRandomDist import PlotRandomDist
+from GUI.PlotRandomDist import PlotRandomDist
 from dcstats.rantest import RantestBinomial
 from dcstats.basic_stats import TTestBinomial
 
