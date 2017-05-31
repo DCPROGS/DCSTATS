@@ -6,7 +6,7 @@ if sys.version_info[0] < 3:
 else:
     from tkinter import *
     
-from TkGUI.DistPlotParam import DistPlotParam
+from GUI.DistPlotParam import DistPlotParam
 
 __author__="remis"
 __date__ ="$24-May-2009 23:52:01$"
