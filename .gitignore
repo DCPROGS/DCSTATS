@@ -1,5 +1,5 @@
 *.pyc
-DC Stats for Mac.xcodeproj
+*.xcodeproj
 nbproject
 __pycache__
 .DS_Store
