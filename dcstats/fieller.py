@@ -1,8 +1,6 @@
 #!/usr/bin python
-
 """fieller.py -- To calculate Fieller''s theorem\
                Converted from FORTRAN version FIELLER.FOR"""
-
 
 import math
 import dcstats.statistics_EJ as s
@@ -10,12 +8,10 @@ import dcstats.statistics_EJ as s
 __author__="remis"
 __date__ ="$30-Apr-2009 09:51:16$"
 
-
 ## This wrapper is not used in this module.
-def calc_t(df, power):
-    """wrapper for function in statistics.EJ.py code"""
-        
-    return s.InverseStudentT(df, power)
+#def calc_t(df, power):
+#    """wrapper for function in statistics.EJ.py code"""        
+#    return s.InverseStudentT(df, power)
 
 class Fieller(object):
 
@@ -28,16 +24,22 @@ Fieller requires the t-statistic which can be provided from a table \
 or calculated from alpha and the degrees of freedom. \
 Alpha-level deviation is for two tailed distribution (e.g. 0.05 leaves 90% area)\n'
 
-    def __init__(self, a, b, sa, sb, r, tval):
+    def __init__(self, a, b, sa, sb, r, alpha, Ntot):
         self.a, self.b = a, b
         self.sa, self.sb = sa, sb
         self.r = r
-        self.tval = tval
+        self.Ntot = Ntot
+        self.alpha = alpha
+        self.__calculate_t()
         self.calcFieller()
+
+    def __calculate_t(self):
+        self.df = self.Ntot - 2
+        two_tail = 1 - float(self.alpha)
+        self.tval = s.InverseStudentT(self.df, two_tail)
 
     def calcFieller(self):
         'Fieller formula calculator.'
-
         va = self.sa * self.sa
         vb = self.sb * self.sb
         cov = self.r * self.sa * self.sb
@@ -76,14 +78,10 @@ Alpha-level deviation is for two tailed distribution (e.g. 0.05 leaves 90% area)
     def __repr__(self):
         return ('\nResult: ' +
             '\n Ratio (=a/b) = {0:.6f}'.format(self.ratio) +
-            '\n g = {0:.6f}'.format(self.g) +
-            '\n Confidence limits: lower {0:.6f}, upper {1:.6f}'.format(self.clower, self.cupper) +
+            '\n g = {0:.6f}; \n degree of freedom  = {1:d}; \n t(df, alpha) = {2:.6f}'.
+            format(self.g, int(self.df), self.tval) +
+            '\n\n Confidence limits: lower {0:.6f}, upper {1:.6f}'.format(self.clower, self.cupper) +
             '\n i.e deviations: lower {0:.6f}, upper {1:.6f}'.format(self.dlow, self.dhi) + 
             '\n Approximate SD of ratio = {0:.6f}'.format(self.appsd) +
             '\n Approximate CV of ratio (%) = {0:.6f}'.format(self.cvr) + 
             '\n Approximate limits: lower {0:.6f}, upper {0:.6f}'.format(self.applo, self.apphi))
-
-if __name__ == "__main__":
-
-    print (introd)
-

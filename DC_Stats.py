@@ -28,7 +28,6 @@ if __name__ == "__main__":
         app = DCP(master)
         master.mainloop()
     
-    finally:
-        print("pyqt5 and Tk modules are missing")
+
 
     
