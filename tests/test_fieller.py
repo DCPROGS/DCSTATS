@@ -2,15 +2,13 @@
 # -*- coding: utf-8 -*-
 
 from dcstats.fieller import Fieller
-import dcstats.statistics_EJ as s
 
 def isclose(a, b, rel_tol=1e-09, abs_tol=0.0):
     return abs(a-b) <= max(rel_tol * max(abs(a), abs(b)), abs_tol)
 
 def test_zero_input():
     # a, b, sa, sb, r, tval
-    f = Fieller(0, 1, 0, 0, 0, 0)
-
+    f = Fieller(0, 1, 0, 0, 0, 0, 0)
     expected_output = {
         'ratio' : 0.0,
         'clower': 0.0,
@@ -21,7 +19,6 @@ def test_zero_input():
         'applo' : 0.0,
         'apphi' : 0.0,
         'cvr'   : 0.0}
-        
     for key in expected_output :
         fieller_output = vars(f)[key]
         expected = expected_output[key]
@@ -33,12 +30,7 @@ def test_regression_fieller():
     r = 0 # Correlation coefficient (a,b)
     alpha = 0.05 # alpha
     n = 12 # Total number of observations na + nb
-    
-    df = n - 2
-    two_tail = 1 - float(alpha)
-    tval = s.InverseStudentT(int(df), two_tail )
-    
-    flr = Fieller(a, b, sa, sb, r, tval)
+    flr = Fieller(a, b, sa, sb, r, alpha, n)
     print(flr)
     
     assert isclose(flr.ratio, 2.00000, rel_tol=0.0001)

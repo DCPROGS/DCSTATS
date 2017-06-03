@@ -37,6 +37,26 @@ def sdm(X):
     """   
     return sd(X) / sqrt(len(X))
 
+def ttest_independent(X, Y):
+    """Calculate t-value and probability for un-paired t-test."""
+    df = len(X) + len(Y) - 2
+    xbar, sdx = mean(X), sd(X)
+    ybar, sdy = mean(Y), sd(Y)
+    tval = (xbar - ybar) / sqrt(sdx**2 / len(X) + sdy**2 / len(Y))
+    P = ttestPDF(fabs(tval), df)
+    return tval, P, df
+
+def ttest_paired(X, Y):
+    """Calculate t-value and probability for paired t-test."""
+    D = []
+    if len(X) == len(Y):
+        for i in range(len(X)):
+            D.append(X[i] - Y[i])    # differences for paired test
+    df = len(D) - 1
+    tval = mean(D) / sdm(D)
+    P = ttestPDF(tval, df)
+    return tval, P, df
+
 def ttestPDF(tval, df):
     """
     Calculate two-tailed t-test P-value.
@@ -105,43 +125,30 @@ class TTestContinuous(object):
         
         self.X, self.Y = X, Y
         self.are_paired = are_paired
-        # calculate mean and variance of nx and ny
-        self.xbar, self.sdx, self.sdmx = mean(self.X), sd(self.X), sdm(self.X)
-        self.ybar, self.sdy, self.sdmy = mean(self.Y), sd(self.Y), sdm(self.Y)
-
-        self.nx, self.ny = len(X), len(Y)
         self.D = []
-        if self.nx == self.ny:
-            self.df = self.nx - 1
-            for i in range(self.nx):
+        if len(self.X) == len(self.Y):
+            for i in range(len(self.X)):
                 self.D.append(self.X[i] - self.Y[i])    # differences for paired test
             self.dbar, self.sdd, self.sdmd = mean(self.D), sd(self.D), sdm(self.D)
         else:
-            self.df = self.nx + self.ny - 2
+            self.dbar = fabs(self.xbar - self.ybar)
             self.are_paired = False
-            
         self.__t_test()
         
     def __t_test(self):
         if self.are_paired:               # And do a 2-sample paired t-test
-            self.sdbar = self.sdd / sqrt(self.ny)
-            self.tval = self.dbar / self.sdbar
-            self.P = ttestPDF(self.tval, self.df)
+            self.tval, self.P, self.df = ttest_paired(self.X, self.Y)
         else:    # if not paired
-            s = (self.sdx * self.sdx * (self.nx-1) + self.sdy * self.sdy * (self.ny-1)) / self.df
-            sdiff = sqrt(s * (1.0 / self.nx + 1.0 / self.ny))
-            adiff = fabs(self.xbar - self.ybar)
-            self.tval = adiff / sdiff
-            self.P = ttestPDF(self.tval, self.df)
+            self.tval, self.P, self.df = ttest_independent(self.X, self.Y)
 
     def __repr__(self):
         
-        repr_string = ('n \t\t {0:d}      \t  {1:d}'.format(self.nx, self.ny) +
-            '\nMean \t\t {0:.6f}    \t  {1:.6f}'.format(self.xbar, self.ybar) +
-            '\nSD \t\t {0:.6f}     \t  {1:.6f}'.format(self.sdx, self.sdy) +
-            '\nSDM \t\t {0:.6f}     \t  {1:.6f}'.format(self.sdmx, self.sdmy))
+        repr_string = ('n \t\t {0:d}      \t  {1:d}'.format(len(self.X), len(self.Y)) +
+            '\nMean \t\t {0:.6f}    \t  {1:.6f}'.format(mean(self.X), mean(self.Y)) +
+            '\nSD \t\t {0:.6f}     \t  {1:.6f}'.format(sd(self.X), sd(self.Y)) +
+            '\nSDM \t\t {0:.6f}     \t  {1:.6f}'.format(sdm(self.X), sdm(self.Y)))
             
-        if self.nx == self.ny:
+        if len(self.X) == len(self.Y):
             repr_string += ('\n\n Mean difference (dbar) = \t {0:.6f}'.format(self.dbar) +
                 '\n  s(d) = \t {0:.6f} \t s(dbar) = \t {1:.6f}'.format(self.sdd, self.sdmd))
 

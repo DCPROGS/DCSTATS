@@ -5,7 +5,7 @@ from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 
 from dcstats import dataIO
-from dcstats.fieller import Fieller, calc_t
+from dcstats.fieller import Fieller
 from dcstats.rantest import RantestBinomial
 from dcstats.basic_stats import TTestBinomial
 from dcstats.rantest import RantestContinuous
@@ -129,8 +129,7 @@ class rantestQT(QDialog):
         self.tb4txt.append("RESULT WILL BE DISPLAYED HERE")
         tab_layout.addWidget(self.tb4txt)
         #self.connect(self.tb4b1, SIGNAL("clicked()"), self.callback2)
-        self.tb4b1.clicked.connect(self.callback2)
-        
+        self.tb4b1.clicked.connect(self.callback2)       
         return tab_layout
 
     def callback2(self):
@@ -141,14 +140,12 @@ class rantestQT(QDialog):
         sb = float(self.tb4e4.text())
         r = float(self.tb4e5.text())
         alpha = float(self.tb4e6.text())
-        df = float(self.tb4e7.text())
+        Ntot = float(self.tb4e7.text())
         self.tb4txt.clear()
 #        log = PrintLog(self.tb4txt) #, sys.stdout)
         #Call Fieller to calculate statistics.
-        tval = calc_t(int(df), 1 - float(alpha))
-        flr = Fieller(a, b, sa, sb, r, tval)
+        flr = Fieller(a, b, sa, sb, r, alpha, Ntot)
         self.tb4txt.append(str(flr))
-        #dcstats.fieller_printout(a,b, sa, sb, r, tval, output=log)
 #######   TAB 4: FIELLER. END  #############
 
 #######   TAB 3: RANTEST FOR BINARY DATA. START  #############
