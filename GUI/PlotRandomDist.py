@@ -86,12 +86,12 @@ class PlotRandomDist(object):
     def createFrame(self, xaxis, freq, ymax1, mean, xAxisTitle):
         'Crreates frame for plot'
 
-        root = tk.Tk()
+        root = Tk()
         root.title("Frequency distribution")
         root.resizable(width='FALSE', height='FALSE')    # should make window not resizable
         cwidth = 400
         cheight = 350
-        c = tk.Canvas(root, width=cwidth, height=cheight, bg= 'white')
+        c = Canvas(root, width=cwidth, height=cheight, bg= 'white')
         c.grid(row=0, column=0, columnspan=2)
 
         xMinPix = int(cwidth * 15 / 100)
@@ -143,9 +143,9 @@ class PlotRandomDist(object):
         c.create_line(xArr+5, yMinPix+10, xArr-5, yMinPix+10, width=2, fill="blue")
 
 
-        b1 = tk.Button(root, text="REPLOT", command=self.callback1) #, state=tk.DISABLED)
+        b1 = Button(root, text="REPLOT", command=self.callback1) #, state=tk.DISABLED)
         b1.grid(row=1, column=0)
-        b2 = tk.Button(root, text="Save ASCII", command=self.callback2, state=tk.DISABLED)
+        b2 = Button(root, text="Save ASCII", command=self.callback2, state=DISABLED)
         b2.grid(row=1, column=1)
 
         self.root = root
