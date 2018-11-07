@@ -14,9 +14,9 @@ from GUI.FrameRantestBinomial import FrameRantestBinomial
 __author__="remis"
 __date__ ="$30-Apr-2009 14:51:10$"
 
-# OSX Notes 141206
+# OSX Notes
     # -----------------
-    # usr/bin/python is 2.7.6 in Yosemite (10.10) and uses Tcl 8.5 (64-bit and thus can be retina).
+    # 141206 usr/bin/python is 2.7.6 in Yosemite (10.10) and uses Tcl 8.5 (64-bit and thus can be retina).
     # This environment is used if DC_Stats.py is launched from an Automator Script
     # DC_stats does not need numpy etc so can use native Python from Apple
     # by contrast Tcl 8.4 is 32-bit and non-retina - used by 2.7.1 which is the default on
@@ -30,11 +30,12 @@ __date__ ="$30-Apr-2009 14:51:10$"
 
 class DCP:
     def __init__(self, master):
+        self.master = master
         frame = Frame(master)
         frame.config(background="#dcdcdc") #well, it has to be, right?
         #frame.pack()
-        self.master.title('DC Stats for Mac v. 0.5')    #   Main frame title
-        self.master.config(background="#dcdcdc")
+        master.title('DC Stats for Mac v. 0.5')    #   Main frame title
+        master.config(background="#dcdcdc")
         #master.geometry('450x480')
         menubar = Menu(master)
         
@@ -62,7 +63,7 @@ class DCP:
         b4.pack()
         
         Label(lframe, text="", background="#dcdcdc").pack()
-        picture = PhotoImage(file="TkGUI/dca2.gif")
+        picture = PhotoImage(file="GUI/dca2.gif")
         dcpic = Label(lframe, image=picture, pady=8)
         dcpic.image = picture
         dcpic.pack(fill=X)
@@ -87,20 +88,19 @@ class DCP:
             except:
                 system('''/usr/bin/osascript -e 'tell app "Finder" to set frontmost of process "Python2.7" to true' ''')
 
-def _play_gif(self, frame, w, interval):
-    # animates the GIF by rotating through
-    # the GIF animation frames
-    # modified from http://pyinmyeye.blogspot.de/2012/08/tkinter-animated-labels-demo.html
-    try:
-        opt = "GIF -index {}".format(w.frame)
-        w.image.configure(format=opt)
+    def _play_gif(self, frame, w, interval):
+        # animates the GIF by rotating through
+        # the GIF animation frames
+        # modified from http://pyinmyeye.blogspot.de/2012/08/tkinter-animated-labels-demo.html
+        try:
+            opt = "GIF -index {}".format(w.frame)
+            w.image.configure(format=opt)
         except TclError:
             w.frame = 0
             self._play_gif(frame, w, interval)
             return
         
         w.frame += 1
-        
         frame.after(interval, self._play_gif, frame, w, interval)
     
     def on_fieller(self):
@@ -114,7 +114,7 @@ def _play_gif(self, frame, w, interval):
     def on_rantest_continuous(self):
         rc = Toplevel(self.master)
         FrameRantestContinuous(rc)
-    
+
     def on_help():
         pass
 
