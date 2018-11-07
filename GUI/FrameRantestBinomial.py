@@ -67,7 +67,7 @@ class FrameRantestBinomial:
         e.append(e4)
 
         #Label(frame, text="").grid(row=23, column=0, columnspan=2)
-        Label(frame, text="Number of randomisations:", background="#dcdcdc").grid(row=24, column=1, columnspan=2, pady=5, sticky=E)
+        Label(frame, text="Number of randomisations:", background="#dcdcdc").grid(row=24, column=0, columnspan=3, pady=5)
 
         e5 = Entry(frame, justify=CENTER, width=15)
         e5.grid(row=24, column=3, pady=5, sticky=W)
