@@ -14,7 +14,7 @@ from GUI.FrameRantestBinomial import FrameRantestBinomial
 __author__="remis"
 __date__ ="$30-Apr-2009 14:51:10$"
 
-# OSX Notes 6/12/14
+# OSX Notes 141206
     # -----------------
     # usr/bin/python is 2.7.6 in Yosemite (10.10) and uses Tcl 8.5 (64-bit and thus can be retina).
     # This environment is used if DC_Stats.py is launched from an Automator Script
@@ -25,13 +25,16 @@ __date__ ="$30-Apr-2009 14:51:10$"
     # https://www.python.org/download/mac/tcltk/ for details
     # http://stackoverflow.com/questions/1405913/
 
+    #181017 downloaded Python 2.7.15 and used that.
+    #fixed some Tk mistakes
+
 class DCP:
     def __init__(self, master):
         frame = Frame(master)
         frame.config(background="#dcdcdc") #well, it has to be, right?
         #frame.pack()
-        master.title('DC Stats for Mac v. 0.4')    #   Main frame title
-        master.config(background="#dcdcdc")
+        self.master.title('DC Stats for Mac v. 0.5')    #   Main frame title
+        self.master.config(background="#dcdcdc")
         #master.geometry('450x480')
         menubar = Menu(master)
         
@@ -101,15 +104,15 @@ def _play_gif(self, frame, w, interval):
         frame.after(interval, self._play_gif, frame, w, interval)
     
     def on_fieller(self):
-        f = Toplevel(master)
+        f = Toplevel(self.master)
         FrameFieller(f)
 
-def on_rantest_binomial(self):
-    rb = Toplevel(master)
-    FrameRantestBinomial(rb)
-    
+    def on_rantest_binomial(self):
+        rb = Toplevel(self.master)
+        FrameRantestBinomial(rb)
+
     def on_rantest_continuous(self):
-        rc = Toplevel(master)
+        rc = Toplevel(self.master)
         FrameRantestContinuous(rc)
     
     def on_help():
