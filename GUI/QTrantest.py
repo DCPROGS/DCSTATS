@@ -257,19 +257,22 @@ class rantestQT(QDialog):
 
     def callback1(self):
         """Called by TAKE DATA FROM FILE button in Tab2"""
-        filename, filt = QFileDialog.getOpenFileName(self,
-            "Open Data File...", self.path, "Text Data Files (*.txt)")
-        self.path = os.path.split(str(filename))[0]
+        try:
+            filename, filt = QFileDialog.getOpenFileName(self,
+                "Open Data File...", self.path, "Text Data Files (*.txt)")
+            self.path = os.path.split(str(filename))[0]
         
-        lines_of_file = dataIO.file_read(filename, 'txt')
-        datalines = dataIO.lines_into_traces(lines_of_file)
-        self.X = datalines[0]
-        self.Y = datalines[1]
+            lines_of_file = dataIO.file_read(filename, 'txt')
+            datalines = dataIO.lines_into_traces(lines_of_file)
+            self.X = datalines[0]
+            self.Y = datalines[1]
         
-        self.tb2txt.clear()
-        self.tb2txt.append('Data loaded from a text file: ' + filename + '\n')
-        ttc = TTestContinuous(self.X, self.Y, self.paired)
-        self.tb2txt.append(str(ttc))
+            self.tb2txt.clear()
+            self.tb2txt.append('Data loaded from a text file: ' + filename + '\n')
+            ttc = TTestContinuous(self.X, self.Y, self.paired)
+            self.tb2txt.append(str(ttc))
+        except:
+            pass
                 
     def callback4(self):
         """Called by RUN TEST button in Tab2."""
