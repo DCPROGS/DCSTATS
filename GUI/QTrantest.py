@@ -258,21 +258,33 @@ class rantestQT(QDialog):
     def callback1(self):
         """Called by TAKE DATA FROM FILE button in Tab2"""
         try:
-            filename, filt = QFileDialog.getOpenFileName(self,
+            self.filename, filt = QFileDialog.getOpenFileName(self,
                 "Open Data File...", self.path, "Text Data Files (*.txt)")
-            self.path = os.path.split(str(filename))[0]
+            self.path = os.path.split(str(self.filename))[0]
         
-            lines_of_file = dataIO.file_read(filename, 'txt')
+            lines_of_file = dataIO.file_read(self.filename, 'txt')
             datalines = dataIO.lines_into_traces(lines_of_file)
             self.X = datalines[0]
             self.Y = datalines[1]
-        
-            self.tb2txt.clear()
-            self.tb2txt.append('Data loaded from a text file: ' + filename + '\n')
-            ttc = TTestContinuous(self.X, self.Y, self.paired)
-            self.tb2txt.append(str(ttc))
+            self.get_basic_statistics()
         except:
             pass
+       
+    def get_basic_statistics(self):
+        # Calculate and display basic statistics
+        self.tb2txt.clear()
+        self.tb2txt.append('Data loaded from a text file: ' + self.filename + '\n')
+        ttc = TTestContinuous(self.X, self.Y, self.paired)
+        self.tb2txt.append(str(ttc))
+        #calculation of hedges d and approximate 95% confidence intervals
+        #not tested against known values yet AP 170518
+        hedges_calculation = Hedges_d(self.X, self.Y)
+        hedges_calculation.hedges_d_unbiased()
+        #lowerCI, upperCI = hedges_calculation.approx_CI(self.paired)
+        #paired needed for degrees of freedom
+        lowerCI, upperCI = hedges_calculation.bootstrap_CI(5000)
+        #option to have bootstrap calculated CIs should go here
+        self.tb2txt.append(str(hedges_calculation))
                 
     def callback4(self):
         """Called by RUN TEST button in Tab2."""
