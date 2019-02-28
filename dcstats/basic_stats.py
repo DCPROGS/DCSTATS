@@ -37,6 +37,27 @@ def sdm(X):
     """   
     return sd(X) / sqrt(len(X))
 
+def ci95lower(X):
+    """ Calculate 95% confidence interval (lower) for the mean.
+        Parameters
+        ----------
+        X : a list of values
+    """ 
+    z = 1.96 # z*-value from the standard normal distribution for 95% confidence level
+    #TODO: allow calculation for desired confidence level
+    return mean(X) - z * sdm(X) 
+
+def ci95upper(X):
+    """ Calculate 95% confidence intervals (upper) for the mean.
+        Parameters
+        ----------
+        X : a list of values
+    """ 
+    z = 1.96 # z*-value from the standard normal distribution for 95% confidence level
+    #TODO: allow calculation for desired confidence level
+    return mean(X) + z * sdm(X) 
+
+
 def ttest_independent(X, Y):
     """Calculate t-value and probability for un-paired t-test."""
     df = len(X) + len(Y) - 2
@@ -131,7 +152,7 @@ class TTestContinuous(object):
                 self.D.append(self.X[i] - self.Y[i])    # differences for paired test
             self.dbar, self.sdd, self.sdmd = mean(self.D), sd(self.D), sdm(self.D)
         else:
-            self.dbar = fabs(self.xbar - self.ybar)
+            self.dbar = fabs(mean(self.X) - mean(self.Y))
             self.are_paired = False
         self.__t_test()
         
@@ -146,7 +167,10 @@ class TTestContinuous(object):
         repr_string = ('n \t\t {0:d}      \t  {1:d}'.format(len(self.X), len(self.Y)) +
             '\nMean \t\t {0:.6f}    \t  {1:.6f}'.format(mean(self.X), mean(self.Y)) +
             '\nSD \t\t {0:.6f}     \t  {1:.6f}'.format(sd(self.X), sd(self.Y)) +
-            '\nSDM \t\t {0:.6f}     \t  {1:.6f}'.format(sdm(self.X), sdm(self.Y)))
+            '\nSDM \t\t {0:.6f}     \t  {1:.6f}'.format(sdm(self.X), sdm(self.Y)) +
+            '\n95% confidence intervals:' +
+            '\nlower \t\t {0:.6f}    \t  {1:.6f}'.format(ci95lower(self.X), ci95lower(self.Y)) +
+            '\nupper \t\t {0:.6f}    \t  {1:.6f}'.format(ci95upper(self.X), ci95upper(self.Y)))
             
         if len(self.X) == len(self.Y):
             repr_string += ('\n\n Mean difference (dbar) = \t {0:.6f}'.format(self.dbar) +
