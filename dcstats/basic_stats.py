@@ -184,6 +184,6 @@ class TTestContinuous(object):
         else:
             repr_string += ('\n\n Two-sample unpaired Student''s t-test:' +
                 '\n t = \t {0:.6f}'.format(float(self.tval)) +
-                '\n two tail P = \t {0:.6f}'.format(self.P))
+                '\n two tail P = \t {0:.3E}'.format(self.P))
             
         return repr_string
