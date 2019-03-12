@@ -5,6 +5,7 @@
 import sys
 import math
 import random
+import numpy as np
 
 import dcstats.basic_stats as bs
 
@@ -15,24 +16,22 @@ import dcstats.basic_stats as bs
 __author__="Remis Lape"
 __date__ ="$01-May-2009 17:42:28$"
 
-class Rantest(object):
+RTINTROD = '\nRANTEST: performs a randomisation test to compare two \
+independent samples. According to the null hypothesis\n \
+of no-difference, each outcome would have been the same \
+regardless of which group the individual happened to\n \
+be allocated. Therefore all N=n1+n2 observations are \
+pooled and, as in the actual experiment, divided at random\n \
+into groups of size n1 and n2. The fraction \
+of randomisations that gives rise to a difference between the groups\n \
+at least as large as that observed \
+gives the P value.\
+\n In the binomial case, in which the measurement is the \
+fraction of ''successes'' in each sample (say r1 out of n1, and\n \
+r2 out of n2) a ''success'' is given a \
+score of 1, ''failure'' = 0.\n'
 
-    introd = "  RANTEST performs a randomisation test to compare two " +\
-    "independent samples.  According to the null hypothesis of " +\
-    "no-difference, each outcome would have been the same " +\
-    "regardless of which group the individual happened to " +\
-    "be allocated to.  Therefore all N = n1 + n2 observations are " +\
-    "pooled and, as in the actual experiment, divided at " +\
-    "random into groups of size n1 and n2.  The fraction " +\
-    "of randomisations that gives rise to a difference " +\
-    "between the groups at least as large as that observed " +\
-    "gives the P value.\n" +\
-    "  In the binomial case, in which the measurement is the " +\
-    "fraction of 'successes' in each sample (say r1 out " +\
-    "of n1, and r2 out of n2) a 'success' is given a " +\
-    "score of 1, 'failure' scores 0.\n"
-
-    criterion =  " Randomisation test on binomial data could be done\
+RTCRITERION = " Randomisation test on binomial data could be done\
     using as criterion: (1) number of successes in set 1 (r1)\
     or (2) difference between the p=r/n values.\
     Both criteria give the same one-tail P value.\
@@ -47,11 +46,8 @@ class Rantest(object):
     of the observations to groups of size n1 and n2 produce and\
     absolute value of (p1-p2) at least as big as that observed."
 
-    def __init__(self):
-        pass
 
-class RantestBinomial(Rantest):
-    
+class RantestBinomial():
     def __init__(self, ir1, if1, ir2, if2):
         """ 
         Parameters
@@ -70,7 +66,6 @@ class RantestBinomial(Rantest):
         self.p1 = float(self.ir1) / float(self.n1) # prob of success in first trial
         self.p2 = float(self.ir2) / float(self.n2) # prob of success in second trial
         
-
     def run_rantest(self, nran):
         self.nran = nran
         self.dobs = self.p1 - self.p2
@@ -109,74 +104,42 @@ class RantestBinomial(Rantest):
             '\n  r1 equal to observed: number = {0:d} (P = {1:.6f})'.format(self.ne1, self.pe1))
 
 
-class RantestContinuous(Rantest):
-    def __init__(self, X, Y, are_paired):
+class RantestContinuous():
+    def __init__(self, X, Y, are_paired=False):
         """ 
         Parameters
         ----------
         X : observations in first trial, list of floats
         Y : observations in second trial, list of floats
         are_paired : are observations paired, boolean
-        """
-        
+        """   
         self.X, self.Y = X, Y
         self.nx, self.ny = len(X), len(Y)
         self.are_paired = are_paired
+        random.seed(1984)
+        np.random.seed(1984)
             
     def run_rantest(self, nran):
-
-        self.randiff = []
-        self.na1 = 0
-        self.ne2 = 0
+        self.nran = nran
+        self.randiff = np.zeros(nran)
         if self.are_paired:
-            self.D = []
-            for i in range(self.nx):
-                self.D.append(self.X[i] - self.Y[i])    # differences for paired test
-            self.dbar = bs.mean(self.D)
-            
-            for n in range(nran):
-                sd = 0.0
-                for i in range(0, self.nx):
-                    u = random.random()
-                    if u < 0.5:
-                        sd -= self.D[i]
-                    else:
-                        sd += self.D[i]
-                dran = sd / float(self.nx)    # mean difference
-                self.randiff.append(dran)
-                if math.fabs(dran) >= math.fabs(self.dbar): self.na1 += 1
-                if math.fabs(dran) == math.fabs(self.dbar): self.ne2 += 1
-                # end of if(paired)
-
+            self.D = np.array(self.X) - np.array(self.Y)
+            self.dbar = np.mean(self.D)
+            for i in range(nran):
+                ones = np.ones(self.nx)
+                ones[np.random.random(self.nx) < 0.5] *= -1             
+                self.randiff[i] = np.sum(self.D * ones) / float(self.nx) # mean difference
         else:    # if not paired
-            self.dbar = bs.mean(self.X) - bs.mean(self.Y)
-            allobs = self.X + self.Y
-            stot = sum(self.X) + sum(self.Y)
-            # start randomisation
-            for n in range(0, nran):
+            self.dbar = np.mean(self.X) - np.mean(self.Y)
+            allobs = np.concatenate([self.X, self.Y])
+            for i in range(0, nran):
                 random.shuffle(allobs)
                 sy = sum(allobs[self.nx : ])
-                dran = (stot - sy) / float(self.nx) - sy / float(self.ny)
-                self.randiff.append(dran)
-                if math.fabs(dran) >= math.fabs(self.dbar): self.na1 += 1
-                if math.fabs(dran) == math.fabs(self.dbar): self.ne2 += 1
-                
-        self.ng1 = len([i for i in self.randiff if i >= self.dbar])
-        self.ne1 = len([i for i in self.randiff if i == self.dbar])
-        self.nl1 = len([i for i in self.randiff if i <= self.dbar])
-        self.pg1 = self.ng1 / float(nran)
-        self.pl1 = self.nl1 / float(nran)
-        self.pe1 = self.ne1 / float(nran)
-        self.pa1 = self.na1 / float(nran)
-        self.pe2 = self.ne2 / float(nran)
-        self.nran = nran
+                self.randiff[i] = (sum(allobs) - sy) / float(self.nx) - sy / float(self.ny)
+        self.n2tail = self.randiff[np.fabs(self.randiff) >= math.fabs(self.dbar)].size
+        self.p2tail = self.n2tail / float(self.nran)
         
     def __repr__(self):
-        return ('\n\n   Rantest:  {0:d} randomisations'.format(self.nran) +
-        '\n P values for difference between means ' +
-        '\n  greater than or equal to observed: P = \t {0:.6f}'.format(self.pg1) +
-        '\n  less than or equal to observed: P = \t {0:.6f}'.format(self.pl1) +
-        '\n  greater than or equal in absolute value to observed: P = \t {0:.6f}'.format(self.pa1) +
-        '\n  Number equal to observed = {0:d} (P= {1:.6f})'.format(self.ne1, self.pe1) +
-        '\n  Number equal in absolute value to observed = {0:d} (P= {1:.6f})'.format(self.ne2, self.pe2))
-
+        return ('\nRantest:  {0:d} randomisations'.format(self.nran) +
+        '\nTwo-tailed P = {0:.3e}'.format(self.p2tail) + 
+        '\t(greater than or equal in absolute value to observed)')

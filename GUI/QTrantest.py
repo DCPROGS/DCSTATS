@@ -6,29 +6,13 @@ from PyQt5.QtWidgets import *
 
 from dcstats import dataIO
 from dcstats.fieller import Fieller
-from dcstats.rantest import RantestBinomial
+import dcstats.rantest as rantest
 from dcstats.basic_stats import TTestBinomial
-from dcstats.rantest import RantestContinuous
 from dcstats.Hedges import Hedges_d
 from dcstats.basic_stats import TTestContinuous
 
 __author__="remis"
 __date__ ="$03-Jan-2010 15:26:00$"
-
-intro_randomisation = '\n RANTEST: performs a randomisation test to compare two \
-independent samples. According to the null hypothesis\n \
-of no-difference, each outcome would have been the same \
-regardless of which group the individual happened to\n \
-be allocated. Therefore all N=n1+n2 observations are \
-pooled and, as in the actual experiment, divided at random\n \
-into groups of size n1 and n2. The fraction \
-of randomisations that gives rise to a difference between the groups\n \
-at least as large as that observed \
-gives the P value.\
-\n In the binomial case, in which the measurement is the \
-fraction of ''successes'' in each sample (say r1 out of n1, and\n \
-r2 out of n2) a ''success'' is given a \
-score of 1, ''failure'' = 0.\n'
 
 class rantestQT(QDialog):
     def __init__(self, parent=None):
@@ -151,7 +135,7 @@ class rantestQT(QDialog):
 #######   TAB 3: RANTEST FOR BINARY DATA. START  #############
     def ranbin_layout(self, tab_layout):
         """ """
-        tab_layout.addWidget(QLabel(intro_randomisation))
+        tab_layout.addWidget(QLabel(rantest.RTINTROD))
         tab_layout.addWidget(QLabel("Sample 1"))
         layout1 = QHBoxLayout()
         layout1.addWidget(QLabel("Successes:"))
@@ -206,7 +190,7 @@ class rantestQT(QDialog):
         self.tb3txt.clear()
         
         ttb = TTestBinomial(ir1, if1, ir2, if2)
-        rnt = RantestBinomial(ir1, if1, ir2, if2)
+        rnt = rantest.RantestBinomial(ir1, if1, ir2, if2)
         rnt.run_rantest(nran)
         self.tb3txt.append(str(ttb))
         self.tb3txt.append(str(rnt))
@@ -216,7 +200,7 @@ class rantestQT(QDialog):
 #######   TAB 2: RANTEST FOR CONTINUOSLY VARIABLY DATA. START  #############
     def rancont_layout(self, tab_layout):
         """Create Tab2 layout."""
-        tab_layout.addWidget(QLabel(intro_randomisation))
+        tab_layout.addWidget(QLabel(rantest.RTINTROD))
 
         self.tb2b1 = QPushButton("Get data")
         b_layout = QHBoxLayout()
@@ -288,7 +272,7 @@ class rantestQT(QDialog):
                 
     def callback4(self):
         """Called by RUN TEST button in Tab2."""
-        rnt = RantestContinuous(self.X, self.Y, self.paired)
+        rnt = rantest.RantestContinuous(self.X, self.Y, self.paired)
         rnt.run_rantest(self.nran)
         self.tb2txt.append(str(rnt))
 
