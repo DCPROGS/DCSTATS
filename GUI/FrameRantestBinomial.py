@@ -9,7 +9,8 @@ else:
     from tkinter.ttk import Separator
     
 from GUI.PlotRandomDist import PlotRandomDist
-from dcstats.rantest import RantestBinomial
+import dcstats.rantest as rantest
+#from dcstats.rantest import RantestBinomial
 from dcstats.basic_stats import TTestBinomial
 
 __author__="remis"
@@ -30,7 +31,7 @@ class FrameRantestBinomial:
         frame.config(background="#dcdcdc") #well, it has to be, right?
         #frame.geometry('480x700')
 
-        message = Message(frame, width=420, text="\n"+RantestBinomial.introd, font=("Helvetica", 12), background="#dcdcdc")
+        message = Message(frame, width=420, text="\n"+rantest.RTINTROD, font=("Helvetica", 12), background="#dcdcdc")
         message.grid(row=0, column=0, rowspan=15, columnspan=4)
         s = Separator(frame, orient=HORIZONTAL)
         s.grid (columnspan=4, sticky=EW)
@@ -107,7 +108,7 @@ class FrameRantestBinomial:
         nran = int(e[4].get())
 
         ttb = TTestBinomial(ir1, if1, ir2, if2)
-        rnt = RantestBinomial(ir1, if1, ir2, if2)
+        rnt = rantest.RantestBinomial(ir1, if1, ir2, if2)
         rnt.run_rantest(nran)
         self.randis1 = rnt.randis1
         self.ir1 = rnt.ir1

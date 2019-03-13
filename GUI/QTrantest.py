@@ -31,39 +31,25 @@ class rantestQT(QDialog):
 
         self.nran = 5000
         self.paired = 0
-        self.rancon_data = []
-        self.rancon_data_source = ''
         self.path = ""
 
         ####### Tabs ##########
-        movie_screen = self.movie_screen()
         tab1_layout = QVBoxLayout(tab1)
         tab1_layout.addWidget(QLabel("<p align=center><b>Welcome to DC_PyPs: "
         "Statistics!</b></p>"))
-        tab1_layout.addWidget(movie_screen)
+        tab1_layout.addWidget(self.movie_screen())
         tab1_layout.addWidget(QLabel("<p align=center><b>To continue select a "
         "statistical test from visible tabs.</b></p>"))
-
-        tab2_layout = QVBoxLayout(tab2)
-        tab2_layout = self.rancont_layout(tab2_layout)
-
-        tab3_layout = QVBoxLayout(tab3)
-        tab3_layout = self.ranbin_layout(tab3_layout)
-
-        tab4_layout = QVBoxLayout(tab4)
-        tab4_layout = self.fieller_layout(tab4_layout)
+        self.rancont_layout(QVBoxLayout(tab2))
+        self.ranbin_layout(QVBoxLayout(tab3))
+        self.fieller_layout(QVBoxLayout(tab4))
 
         ##### Finalise main window ######
         vbox = QVBoxLayout()
         vbox.addWidget(tab_widget)
         quitButton = QPushButton("&QUIT")
-        #self.connect(quitButton, SIGNAL("clicked()"), self, SLOT("close()"))
         quitButton.clicked.connect(self.close)
-        b_layout = QHBoxLayout()
-        b_layout.addStretch()
-        b_layout.addWidget(quitButton)
-        b_layout.addStretch()
-        vbox.addLayout(b_layout)
+        vbox.addLayout(self.single_button(quitButton))
         self.setLayout(vbox)
         self.setWindowTitle("DC_PyPs: Statistics")
 
@@ -103,16 +89,10 @@ class rantestQT(QDialog):
         tab_layout.addLayout(grid)
 
         self.tb4b1 = QPushButton("Calculate")
-        b_layout = QHBoxLayout()
-        b_layout.addStretch()
-        b_layout.addWidget(self.tb4b1)
-        b_layout.addStretch()
-        tab_layout.addLayout(b_layout)
-
+        tab_layout.addLayout(self.single_button(self.tb4b1))
         self.tb4txt = QTextBrowser()
         self.tb4txt.append("RESULT WILL BE DISPLAYED HERE")
         tab_layout.addWidget(self.tb4txt)
-        #self.connect(self.tb4b1, SIGNAL("clicked()"), self.callback2)
         self.tb4b1.clicked.connect(self.callback2)       
         return tab_layout
 
@@ -166,16 +146,10 @@ class rantestQT(QDialog):
         tab_layout.addLayout(layout3)
         
         self.tb3b1 = QPushButton("Calculate")
-        b_layout = QHBoxLayout()
-        b_layout.addStretch()
-        b_layout.addWidget(self.tb3b1)
-        b_layout.addStretch()
-        tab_layout.addLayout(b_layout)
-
+        tab_layout.addLayout(self.single_button(self.tb3b1))
         self.tb3txt = QTextBrowser()
         self.tb3txt.append("RESULT WILL BE DISPLAYED HERE")
         tab_layout.addWidget(self.tb3txt)
-        #self.connect(self.tb3b1, SIGNAL("clicked()"), self.callback3)
         self.tb3b1.clicked.connect(self.callback3)
 
         return tab_layout
@@ -186,12 +160,12 @@ class rantestQT(QDialog):
         if1 = int(self.tb3e2.text())
         ir2 = int(self.tb3e3.text())
         if2 = int(self.tb3e4.text())
-        nran = int(self.tb3e5.text())
+        self.nran = int(self.tb3e5.text())
         self.tb3txt.clear()
         
         ttb = TTestBinomial(ir1, if1, ir2, if2)
         rnt = rantest.RantestBinomial(ir1, if1, ir2, if2)
-        rnt.run_rantest(nran)
+        rnt.run_rantest(self.nran)
         self.tb3txt.append(str(ttb))
         self.tb3txt.append(str(rnt))
         
@@ -203,12 +177,7 @@ class rantestQT(QDialog):
         tab_layout.addWidget(QLabel(rantest.RTINTROD))
 
         self.tb2b1 = QPushButton("Get data")
-        b_layout = QHBoxLayout()
-        b_layout.addStretch()
-        b_layout.addWidget(self.tb2b1)
-        b_layout.addStretch()
-        tab_layout.addLayout(b_layout)
-
+        tab_layout.addLayout(self.single_button(self.tb2b1))
         layout1 = QHBoxLayout()
         layout1.addWidget(QLabel("Number of randomisations:"))
         self.tb2e5 = QLineEdit(str(self.nran))
@@ -216,26 +185,15 @@ class rantestQT(QDialog):
         self.tb2c1 = QCheckBox("&Paired test?")
         layout1.addWidget(self.tb2c1)
         tab_layout.addLayout(layout1)
-
         self.tb2b2 = QPushButton("Run test")
-        b_layout = QHBoxLayout()
-        b_layout.addStretch()
-        b_layout.addWidget(self.tb2b2)
-        b_layout.addStretch()
-        tab_layout.addLayout(b_layout)
+        tab_layout.addLayout(self.single_button(self.tb2b2))
 
         self.tb2txt = QTextBrowser()
         self.tb2txt.append("RESULT WILL BE DISPLAYED HERE")
         tab_layout.addWidget(self.tb2txt)
-        #self.tb2b3 = QPushButton("Plot distribution")
-        #tab_layout.addWidget(self.tb2b3)
-        #self.connect(self.tb2e5, SIGNAL("editingFinished()"), self.ran_changed)
         self.tb2e5.editingFinished.connect(self.ran_changed)
-        #self.connect(self.tb2c1, SIGNAL("stateChanged(int)"), self.ran_changed)
         self.tb2c1.stateChanged.connect(self.ran_changed)
-        #self.connect(self.tb2b1, SIGNAL("clicked()"), self.callback1)
         self.tb2b1.clicked.connect(self.callback1)
-        #self.connect(self.tb2b2, SIGNAL("clicked()"), self.callback4)
         self.tb2b2.clicked.connect(self.callback4)
         return tab_layout
 
@@ -281,8 +239,15 @@ class rantestQT(QDialog):
             self.paired = 1
         else:
             self.paired = 0
-        self.nran = int(self.tb2e5.text())
+        self.nran = int(self.tb2e5.text()) 
 #######   TAB 2: RANTEST FOR CONTINUOSLY VARIABLY DATA. START  #############
+
+    def single_button(self, bt):
+        b_layout = QHBoxLayout()
+        b_layout.addStretch()
+        b_layout.addWidget(bt)
+        b_layout.addStretch()
+        return b_layout
 
 #######   TAB 1: WELCOME!  START   ############
     def movie_screen(self):
@@ -298,18 +263,3 @@ class rantestQT(QDialog):
         movie.start()
         return movie_screen
 #######   TAB 1: WELCOME!  END   ############
-
-
-#class PrintLog:
-#    """
-#    Write stdout to a QTextEdit.
-#    out1 = QTextEdit, QTextBrowser, etc.
-#    out2 = sys.stdout, file, etc.
-#    """
-#    def __init__(self, out1, out2=None):
-#        self.out1 = out1
-#        self.out2 = out2
-#    def write(self, text):
-#        self.out1.append(text.rstrip('\n'))
-#        if self.out2:
-#            self.out2.write(text)
