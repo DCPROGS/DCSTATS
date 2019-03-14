@@ -1,5 +1,6 @@
 #! /usr/bin/python
 import os
+import pandas as pd
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
@@ -176,7 +177,7 @@ class rantestQT(QDialog):
         """Create Tab2 layout."""
         tab_layout.addWidget(QLabel(rantest.RTINTROD))
 
-        self.tb2b1 = QPushButton("Get data")
+        self.tb2b1 = QPushButton("Get data from Excel file")
         tab_layout.addLayout(self.single_button(self.tb2b1))
         layout1 = QHBoxLayout()
         layout1.addWidget(QLabel("Number of randomisations:"))
@@ -201,16 +202,20 @@ class rantestQT(QDialog):
         """Called by TAKE DATA FROM FILE button in Tab2"""
         try:
             self.filename, filt = QFileDialog.getOpenFileName(self,
-                "Open Data File...", self.path, "Text Data Files (*.txt)")
+                "Open Data File...", self.path, "MS Excel Files (*.xlsx)")
             self.path = os.path.split(str(self.filename))[0]
-        
-            lines_of_file = dataIO.file_read(self.filename, 'txt')
-            datalines = dataIO.lines_into_traces(lines_of_file)
-            self.X = datalines[0]
-            self.Y = datalines[1]
-            self.get_basic_statistics()
+            #TODO: allow loading from other format files
+            self.load_data_from_Excel()
         except:
             pass
+
+    def load_data_from_Excel(self):
+        #TODO: currently loads only firs two columns. Allow multiple column load.
+        xl = pd.ExcelFile(self.filename)
+        dt = xl.parse(0)
+        self.X = dt.iloc[:,0].dropna().values.tolist()
+        self.Y = dt.iloc[:,1].dropna().values.tolist()
+        self.get_basic_statistics()
        
     def get_basic_statistics(self):
         # Calculate and display basic statistics
