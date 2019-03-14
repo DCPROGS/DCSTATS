@@ -12,17 +12,13 @@ def test_regression_rantest_continuos():
     nran = 5000
     rnt = RantestContinuous(T1, T2, True)    
     rnt.run_rantest(nran)
-    assert rnt.pg1 == 1.0
-    assert (rnt.pa1 > 0.01) and (rnt.pa1 < 0.025)
-    assert (rnt.ne2 > 50) and (rnt.ne2 < 100)
-
+    assert (rnt.p2tail == 0.018)
+    assert (rnt.n2tail == 90)
     rnt = RantestContinuous(T1, T2, False)
     rnt.run_rantest(nran)    
-    assert (rnt.pg1 > 0.98) and (rnt.pg1 < 1.0)
-    assert (rnt.pa1 > 0.015) and (rnt.pa1 < 0.035)
-    assert (rnt.ne2 > 0) and (rnt.ne2 < 20)
+    assert (rnt.p2tail == 0.0178)
+    assert (rnt.n2tail == 89)
    
-
 def test_regression_rantest_binomial():
     
     ir1, if1 = 3, 4
