@@ -57,51 +57,33 @@ class RantestBinomial():
         ir2 : number of successes in second trial, int
         if2 : number of failures in second trial, int       
         """
-        self.ir1 = ir1
-        self.if1 = if1
-        self.ir2 = ir2
-        self.if2 = if2
+        self.ir1, self.if1 = ir1, if1
+        self.ir2, self.if2 = ir2, if2
+        self.ir = ir1 + ir2
         self.n1 = ir1 + if1 # tot number of tests in first trial 
         self.n2 = ir2 + if2 # tot number of tests in second trial
-        self.p1 = float(self.ir1) / float(self.n1) # prob of success in first trial
-        self.p2 = float(self.ir2) / float(self.n2) # prob of success in second trial
+        self.ntot = self.n1 + self.n2
+        self.dobs = ir1 / float(self.n1) - ir2 / float(self.n2)
+        random.seed(1984)
         
     def run_rantest(self, nran):
         self.nran = nran
-        self.dobs = self.p1 - self.p2
-        allobs = [1]*self.ir1 + [0]*self.if1 + [1]*self.ir2 + [0]*self.if2
-        self.randiff = []
-        self.randis1 = []
-        for n in range(0, self.nran):
-            # this if is needed for Python backward compatibility 
-            if sys.version_info[0] < 3: 
-                iran = range(0,(self.n1 + self.n2))
-            else:
-                iran = list(range(0, self.n1 + self.n2))
-            random.shuffle(iran)
-            
-            # number of success in randomised second trial
-            is2 = [allobs[i] for i in iran[self.n1:]].count(1)
-            is1 = self.ir1 + self.ir2 - is2 # number of success in randomised first trial
-            dran = is1 / float(self.n1) - is2 / float(self.n2) # difference between means
-            self.randis1.append(float(is1))
-            self.randiff.append(float(dran))
-            
-        self.ng1 = len([i for i in self.randiff if i >= self.dobs])
-        self.ne1 = len([i for i in self.randiff if i == self.dobs])
-        self.nl1 = len([i for i in self.randiff if i <= self.dobs])
-
-        self.pg1 = float(self.ng1) / float(self.nran)
-        self.pl1 = float(self.nl1) / float(self.nran)
-        self.pe1 = float(self.ne1) / float(self.nran)
-        self.__rantest_done = True
+        self.randiff = np.zeros(nran) # difference between means
+        allobs = [1]*self.ir + [0]*(self.ntot - self.ir)
+        for k in range(0, self.nran):
+            random.shuffle(allobs)
+            is2 = sum(allobs[self.n1:])
+            self.randiff[k] = (self.ir - is2) / float(self.n1) - is2 / float(self.n2)
+        self.ng1 = self.randiff[self.randiff >= self.dobs].size
+        self.ne1 = self.randiff[self.randiff == self.dobs].size
+        self.nl1 = self.randiff[self.randiff <= self.dobs].size
         
     def __repr__(self):        
         return ('\n\n Rantest:  {0:d} randomisations:'.format(self.nran) +
             '\n P values for difference between sets are:' +
-            '\n  r1 greater than or equal to observed: P = {0:.6f}'.format(self.pg1) +
-            '\n  r1 less than or equal to observed: P = {0:.6f}'.format(self.pl1) +
-            '\n  r1 equal to observed: number = {0:d} (P = {1:.6f})'.format(self.ne1, self.pe1))
+            '\n  r1 greater than or equal to observed: P = {0:.6f}'.format(self.ng1 / float(self.nran)) +
+            '\n  r1 less than or equal to observed: P = {0:.6f}'.format(self.nl1 / float(self.nran)) +
+            '\n  r1 equal to observed: number = {0:d} (P = {1:.6f})'.format(self.ne1, self.ne1 / float(self.nran)))
 
 
 class RantestContinuous():
