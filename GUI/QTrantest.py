@@ -186,7 +186,7 @@ class rantestQT(QDialog):
         self.tb2c1 = QCheckBox("&Paired test?")
         layout1.addWidget(self.tb2c1)
         tab_layout.addLayout(layout1)
-        self.tb2b2 = QPushButton("Run test")
+        self.tb2b2 = QPushButton("Run randomisation test")
         tab_layout.addLayout(self.single_button(self.tb2b2))
 
         self.tb2txt = QTextBrowser()
@@ -206,9 +206,10 @@ class rantestQT(QDialog):
             self.path = os.path.split(str(self.filename))[0]
             #TODO: allow loading from other format files
             self.load_data_from_Excel()
+            self.get_basic_statistics()
         except:
             pass
-
+        
     def load_data_from_Excel(self):
         #TODO: currently loads only firs two columns. Allow multiple column load.
         xl = pd.ExcelFile(self.filename)
@@ -218,29 +219,38 @@ class rantestQT(QDialog):
         dt = xl.parse(xlssheet)
         self.X = dt.iloc[:,0].dropna().values.tolist()
         self.Y = dt.iloc[:,1].dropna().values.tolist()
-        self.get_basic_statistics()
        
     def get_basic_statistics(self):
-        # Calculate and display basic statistics
+        # Display basic statistics
         self.tb2txt.clear()
-        self.tb2txt.append('Data loaded from a text file: ' + self.filename + '\n')
-        ttc = TTestContinuous(self.X, self.Y, self.paired)
-        self.tb2txt.append(str(ttc))
+        self.tb2txt.append('Data loaded from a file: ' + self.filename + '\n')
+        self.tb2txt.append(self.calculate_ttest_hedges(self.X, self.Y, self.paired))
+
+    def calculate_ttest_hedges(self, X, Y, are_paired=False):
+        # Calculate basic statistics
+        # TODO: ready to move out of GUI
+        ttc = TTestContinuous(X, Y, are_paired)
         #calculation of hedges d and approximate 95% confidence intervals
         #not tested against known values yet AP 170518
-        hedges_calculation = Hedges_d(self.X, self.Y)
+        hedges_calculation = Hedges_d(X, Y)
         hedges_calculation.hedges_d_unbiased()
         #lowerCI, upperCI = hedges_calculation.approx_CI(self.paired)
         #paired needed for degrees of freedom
         lowerCI, upperCI = hedges_calculation.bootstrap_CI(5000)
         #option to have bootstrap calculated CIs should go here
-        self.tb2txt.append(str(hedges_calculation))
-                
+        return str(ttc) + str(hedges_calculation)
+
+    def calculate_rantest_continuous(self, nran, X, Y, are_paired=False):
+        # Run randomisation test
+        # TODO: ready to move out of GUI
+        rnt = rantest.RantestContinuous(X, Y, are_paired)
+        rnt.run_rantest(nran)
+        return str(rnt)
+
     def callback4(self):
         """Called by RUN TEST button in Tab2."""
-        rnt = rantest.RantestContinuous(self.X, self.Y, self.paired)
-        rnt.run_rantest(self.nran)
-        self.tb2txt.append(str(rnt))
+        self.tb2txt.append(self.calculate_rantest_continuous(
+            self.nran, self.X, self.Y, self.paired))
 
     def ran_changed(self):
         if self.tb2c1.isChecked():
@@ -315,3 +325,4 @@ def ok_cancel_button(parent):
     #self.connect(buttonBox, SIGNAL("rejected()"),
     #     self, SLOT("reject()"))
     return buttonBox
+
