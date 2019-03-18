@@ -15,6 +15,96 @@ from dcstats.basic_stats import TTestContinuous
 __author__="remis"
 __date__ ="$03-Jan-2010 15:26:00$"
 
+class RandomisationContTab(QWidget):
+    def __init__(self, parent=None):
+        QWidget.__init__(self, parent)
+        layout = QVBoxLayout(self)
+        layout.addWidget(QLabel(rantest.RTINTROD))
+
+        self.nran = 5000
+        self.paired = 0
+        self.path = ""
+
+        bt1 = QPushButton("Get data from Excel file")
+        layout.addLayout(single_button(bt1))
+        layout1 = QHBoxLayout()
+        layout1.addWidget(QLabel("Number of randomisations:"))
+        self.ed1 = QLineEdit(str(self.nran))
+        layout1.addWidget(self.ed1)
+        self.ch1 = QCheckBox("&Paired test?")
+        layout1.addWidget(self.ch1)
+        layout.addLayout(layout1)
+        bt2 = QPushButton("Run randomisation test")
+        layout.addLayout(single_button(bt2))
+        self.txtBx = QTextBrowser()
+        self.txtBx.append("RESULT WILL BE DISPLAYED HERE")
+        layout.addWidget(self.txtBx)
+        self.ed1.editingFinished.connect(self.ran_changed)
+        self.ch1.stateChanged.connect(self.ran_changed)
+        bt1.clicked.connect(self.open_file)
+        bt2.clicked.connect(self.run_rantest)
+
+    def ran_changed(self):
+        if self.ch1.isChecked():
+            self.paired = 1
+        else:
+            self.paired = 0
+        self.nran = int(self.ed1.text()) 
+
+    def open_file(self):
+        """Called by TAKE DATA FROM FILE button in Tab2"""
+        try:
+            self.filename, filt = QFileDialog.getOpenFileName(self,
+                "Open Data File...", self.path, "MS Excel Files (*.xlsx)")
+            self.path = os.path.split(str(self.filename))[0]
+            #TODO: allow loading from other format files
+            self.load_data_from_Excel()
+            self.get_basic_statistics()
+        except:
+            pass
+
+    def load_data_from_Excel(self):
+        #TODO: currently loads only firs two columns. Allow multiple column load.
+        xl = pd.ExcelFile(self.filename)
+        dialog = ExcelSheetDlg(xl.sheet_names, self)
+        if dialog.exec_():
+            xlssheet = dialog.returnSheet()
+        dt = xl.parse(xlssheet)
+        self.X = dt.iloc[:,0].dropna().values.tolist()
+        self.Y = dt.iloc[:,1].dropna().values.tolist()
+       
+    def get_basic_statistics(self):
+        # Display basic statistics
+        self.txtBx.clear()
+        self.txtBx.append('Data loaded from a file: ' + self.filename + '\n')
+        self.txtBx.append(self.calculate_ttest_hedges(self.X, self.Y, self.paired))
+
+    def calculate_ttest_hedges(self, X, Y, are_paired=False):
+        # Calculate basic statistics
+        # TODO: ready to move out of GUI
+        ttc = TTestContinuous(X, Y, are_paired)
+        #calculation of hedges d and approximate 95% confidence intervals
+        #not tested against known values yet AP 170518
+        hedges_calculation = Hedges_d(X, Y)
+        hedges_calculation.hedges_d_unbiased()
+        #lowerCI, upperCI = hedges_calculation.approx_CI(self.paired)
+        #paired needed for degrees of freedom
+        lowerCI, upperCI = hedges_calculation.bootstrap_CI(5000)
+        #option to have bootstrap calculated CIs should go here
+        return str(ttc) + str(hedges_calculation)
+
+    def calculate_rantest_continuous(self, nran, X, Y, are_paired=False):
+        # Run randomisation test
+        # TODO: ready to move out of GUI
+        rnt = rantest.RantestContinuous(X, Y, are_paired)
+        rnt.run_rantest(nran)
+        return str(rnt)
+
+    def run_rantest(self):
+        """Called by RUN TEST button in Tab2."""
+        self.txtBx.append(self.calculate_rantest_continuous(
+            self.nran, self.X, self.Y, self.paired))
+
 class rantestQT(QDialog):
     def __init__(self, parent=None):
         super(rantestQT, self).__init__(parent)
@@ -22,17 +112,12 @@ class rantestQT(QDialog):
         tab_widget = QTabWidget()
         tab1 = QWidget()
         tab1.setStyleSheet("QWidget { background-color: %s }"% "white")
-        tab2 = QWidget()
         tab3 = QWidget()
         tab4 = QWidget()
         tab_widget.addTab(tab1, "Wellcome!")
-        tab_widget.addTab(tab2, "Rantest: continuous")
+        tab_widget.addTab(RandomisationContTab(), "Rantest: continuous")
         tab_widget.addTab(tab3, "Rantest: binary")
         tab_widget.addTab(tab4, "Fieller")
-
-        self.nran = 5000
-        self.paired = 0
-        self.path = ""
 
         ####### Tabs ##########
         tab1_layout = QVBoxLayout(tab1)
@@ -41,7 +126,6 @@ class rantestQT(QDialog):
         tab1_layout.addWidget(self.movie_screen())
         tab1_layout.addWidget(QLabel("<p align=center><b>To continue select a "
         "statistical test from visible tabs.</b></p>"))
-        self.rancont_layout(QVBoxLayout(tab2))
         self.ranbin_layout(QVBoxLayout(tab3))
         self.fieller_layout(QVBoxLayout(tab4))
 
@@ -172,94 +256,6 @@ class rantestQT(QDialog):
         
 #######   TAB 3: RANTEST FOR BINARY DATA. END  #############
 
-#######   TAB 2: RANTEST FOR CONTINUOSLY VARIABLY DATA. START  #############
-    def rancont_layout(self, tab_layout):
-        """Create Tab2 layout."""
-        tab_layout.addWidget(QLabel(rantest.RTINTROD))
-
-        self.tb2b1 = QPushButton("Get data from Excel file")
-        tab_layout.addLayout(self.single_button(self.tb2b1))
-        layout1 = QHBoxLayout()
-        layout1.addWidget(QLabel("Number of randomisations:"))
-        self.tb2e5 = QLineEdit(str(self.nran))
-        layout1.addWidget(self.tb2e5)
-        self.tb2c1 = QCheckBox("&Paired test?")
-        layout1.addWidget(self.tb2c1)
-        tab_layout.addLayout(layout1)
-        self.tb2b2 = QPushButton("Run randomisation test")
-        tab_layout.addLayout(self.single_button(self.tb2b2))
-
-        self.tb2txt = QTextBrowser()
-        self.tb2txt.append("RESULT WILL BE DISPLAYED HERE")
-        tab_layout.addWidget(self.tb2txt)
-        self.tb2e5.editingFinished.connect(self.ran_changed)
-        self.tb2c1.stateChanged.connect(self.ran_changed)
-        self.tb2b1.clicked.connect(self.callback1)
-        self.tb2b2.clicked.connect(self.callback4)
-        return tab_layout
-
-    def callback1(self):
-        """Called by TAKE DATA FROM FILE button in Tab2"""
-        try:
-            self.filename, filt = QFileDialog.getOpenFileName(self,
-                "Open Data File...", self.path, "MS Excel Files (*.xlsx)")
-            self.path = os.path.split(str(self.filename))[0]
-            #TODO: allow loading from other format files
-            self.load_data_from_Excel()
-            self.get_basic_statistics()
-        except:
-            pass
-        
-    def load_data_from_Excel(self):
-        #TODO: currently loads only firs two columns. Allow multiple column load.
-        xl = pd.ExcelFile(self.filename)
-        dialog = ExcelSheetDlg(xl.sheet_names, self)
-        if dialog.exec_():
-            xlssheet = dialog.returnSheet()
-        dt = xl.parse(xlssheet)
-        self.X = dt.iloc[:,0].dropna().values.tolist()
-        self.Y = dt.iloc[:,1].dropna().values.tolist()
-       
-    def get_basic_statistics(self):
-        # Display basic statistics
-        self.tb2txt.clear()
-        self.tb2txt.append('Data loaded from a file: ' + self.filename + '\n')
-        self.tb2txt.append(self.calculate_ttest_hedges(self.X, self.Y, self.paired))
-
-    def calculate_ttest_hedges(self, X, Y, are_paired=False):
-        # Calculate basic statistics
-        # TODO: ready to move out of GUI
-        ttc = TTestContinuous(X, Y, are_paired)
-        #calculation of hedges d and approximate 95% confidence intervals
-        #not tested against known values yet AP 170518
-        hedges_calculation = Hedges_d(X, Y)
-        hedges_calculation.hedges_d_unbiased()
-        #lowerCI, upperCI = hedges_calculation.approx_CI(self.paired)
-        #paired needed for degrees of freedom
-        lowerCI, upperCI = hedges_calculation.bootstrap_CI(5000)
-        #option to have bootstrap calculated CIs should go here
-        return str(ttc) + str(hedges_calculation)
-
-    def calculate_rantest_continuous(self, nran, X, Y, are_paired=False):
-        # Run randomisation test
-        # TODO: ready to move out of GUI
-        rnt = rantest.RantestContinuous(X, Y, are_paired)
-        rnt.run_rantest(nran)
-        return str(rnt)
-
-    def callback4(self):
-        """Called by RUN TEST button in Tab2."""
-        self.tb2txt.append(self.calculate_rantest_continuous(
-            self.nran, self.X, self.Y, self.paired))
-
-    def ran_changed(self):
-        if self.tb2c1.isChecked():
-            self.paired = 1
-        else:
-            self.paired = 0
-        self.nran = int(self.tb2e5.text()) 
-#######   TAB 2: RANTEST FOR CONTINUOSLY VARIABLY DATA. START  #############
-
     def single_button(self, bt):
         b_layout = QHBoxLayout()
         b_layout.addStretch()
@@ -325,4 +321,11 @@ def ok_cancel_button(parent):
     #self.connect(buttonBox, SIGNAL("rejected()"),
     #     self, SLOT("reject()"))
     return buttonBox
+
+def single_button(bt):
+    b_layout = QHBoxLayout()
+    b_layout.addStretch()
+    b_layout.addWidget(bt)
+    b_layout.addStretch()
+    return b_layout
 
