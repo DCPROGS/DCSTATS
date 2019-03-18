@@ -69,11 +69,13 @@ class RantestBinomial():
     def run_rantest(self, nran):
         self.nran = nran
         self.randiff = np.zeros(nran) # difference between means
+        self.randis1 = np.zeros(nran) # number of success in randomised first trial
         allobs = [1]*self.ir + [0]*(self.ntot - self.ir)
         for k in range(0, self.nran):
             random.shuffle(allobs)
             is2 = sum(allobs[self.n1:])
             self.randiff[k] = (self.ir - is2) / float(self.n1) - is2 / float(self.n2)
+            self.randis1[k] = self.ir - is2
         self.ng1 = self.randiff[self.randiff >= self.dobs].size
         self.ne1 = self.randiff[self.randiff == self.dobs].size
         self.nl1 = self.randiff[self.randiff <= self.dobs].size
@@ -119,9 +121,13 @@ class RantestContinuous():
                 sy = sum(allobs[self.nx : ])
                 self.randiff[i] = (sum(allobs) - sy) / float(self.nx) - sy / float(self.ny)
         self.n2tail = self.randiff[np.fabs(self.randiff) >= math.fabs(self.dbar)].size
+        self.nequal = self.randiff[np.fabs(self.randiff) == math.fabs(self.dbar)].size
         self.p2tail = self.n2tail / float(self.nran)
+        self.pequal = self.nequal / float(self.nran)
         
     def __repr__(self):
         return ('\nRantest:  {0:d} randomisations'.format(self.nran) +
         '\nTwo-tailed P = {0:.3e}'.format(self.p2tail) + 
-        '\t(greater than or equal in absolute value to observed)')
+        '\t(greater than or equal in absolute value to observed)' +
+        '\nPequal = {0:.3e}'.format(self.pequal) +
+        '\t(equal in absolute value to observed)')
