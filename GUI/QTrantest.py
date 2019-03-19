@@ -38,10 +38,6 @@ class RantestQT(QDialog):
         tab_widget.addTab(RandomisationContTab(self.results), "Rantest: continuous")
         tab_widget.addTab(RandomisationBinTab(self.results), "Rantest: binary")
 
-        #tab3 = QWidget()
-        #tab_widget.addTab(tab3, "Rantest: binary")
-        #self.ranbin_layout(QVBoxLayout(tab3))
-
         tab4 = QWidget()
         tab_widget.addTab(tab4, "Fieller")
         self.fieller_layout(QVBoxLayout(tab4))
@@ -100,61 +96,6 @@ class RantestQT(QDialog):
         flr = Fieller(a, b, sa, sb, r, alpha, Ntot)
         self.results.append(str(flr))
 #######   TAB 4: FIELLER. END  #############
-
-#######   TAB 3: RANTEST FOR BINARY DATA. START  #############
-    def ranbin_layout(self, tab_layout):
-        """ """
-        tab_layout.addWidget(QLabel(rantest.RTINTROD))
-        tab_layout.addWidget(QLabel("Sample 1"))
-        layout1 = QHBoxLayout()
-        layout1.addWidget(QLabel("Successes:"))
-        self.tb3e1 = QLineEdit("3")
-        layout1.addWidget(self.tb3e1)
-        layout1.addWidget(QLabel("Failures:"))
-        self.tb3e2 = QLineEdit("4")
-        layout1.addWidget(self.tb3e2)
-        layout1.addStretch()
-        tab_layout.addLayout(layout1)
-
-        tab_layout.addWidget(QLabel("Sample 2"))
-        layout2 = QHBoxLayout()
-        layout2.addWidget(QLabel("Successes:"))
-        self.tb3e3 = QLineEdit("4")
-        layout2.addWidget(self.tb3e3)
-        layout2.addWidget(QLabel("Failures:"))
-        self.tb3e4 = QLineEdit("5")
-        layout2.addWidget(self.tb3e4)
-        layout2.addStretch()
-        tab_layout.addLayout(layout2)
-
-        layout3 = QHBoxLayout()
-        layout3.addWidget(QLabel("Number of randomisations:"))
-        self.tb3e5 = QLineEdit("5000")
-        layout3.addWidget(self.tb3e5)
-        layout3.addStretch()
-        tab_layout.addLayout(layout3)
-        
-        self.tb3b1 = QPushButton("Calculate")
-        tab_layout.addLayout(self.single_button(self.tb3b1))
-        self.tb3b1.clicked.connect(self.callback3)
-
-        return tab_layout
-
-    def callback3(self):
-        """Called by button CALCULATE."""
-        ir1 = int(self.tb3e1.text())
-        if1 = int(self.tb3e2.text())
-        ir2 = int(self.tb3e3.text())
-        if2 = int(self.tb3e4.text())
-        self.nran = int(self.tb3e5.text())
-        
-        ttb = TTestBinomial(ir1, if1, ir2, if2)
-        rnt = rantest.RantestBinomial(ir1, if1, ir2, if2)
-        rnt.run_rantest(self.nran)
-        self.results.append(str(ttb))
-        self.results.append(str(rnt))
-        
-#######   TAB 3: RANTEST FOR BINARY DATA. END  #############
 
     def single_button(self, bt):
         b_layout = QHBoxLayout()
