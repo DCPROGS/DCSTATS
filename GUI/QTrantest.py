@@ -4,15 +4,14 @@ import sys
 import socket
 import datetime
 import pandas as pd
+
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 
+from dcstats import rantest
 from dcstats import helpers
 from dcstats import dataIO
-from dcstats.fieller import Fieller
-import dcstats.rantest as rantest
-from dcstats.basic_stats import TTestBinomial
 
 __author__="remis"
 __date__ ="$03-Jan-2010 15:26:00$"
@@ -32,28 +31,26 @@ class RantestQT(QDialog):
         main_box.addLayout(right_box)
         self.setLayout(main_box)
         
-
-        ####### Tabs ##########
         tab_widget = QTabWidget()
         tab_widget.addTab(RandomisationContTab(self.results), "Rantest: continuous")
         tab_widget.addTab(RandomisationBinTab(self.results), "Rantest: binary")
-
-        tab4 = QWidget()
-        tab_widget.addTab(tab4, "Fieller")
-        self.fieller_layout(QVBoxLayout(tab4))
-
-        ##### Finalise main window ######
+        tab_widget.addTab(FiellerTab(self.results), "Fieller")
         tab_widget.setFixedWidth(600)
         right_box.addWidget(tab_widget)
+        
         right_box.addWidget(WelcomeScreen())
-
         quitButton = QPushButton("&QUIT")
         quitButton.clicked.connect(self.close)
         right_box.addLayout(single_button(quitButton))       
 
-#######   TAB 4: FIELLER. START  #############
-    def fieller_layout(self, tab_layout):
-        'Prepare layout for Tab 4. Fieller theorema.'
+
+class FiellerTab(QWidget):
+    def __init__(self, log, parent=None):
+        QWidget.__init__(self, parent)
+        layout = QVBoxLayout(self)
+        self.log = log
+
+        # Prepare layout for Fieller tab.
         grid = QGridLayout()
         grid.addWidget(QLabel("Nominator:"), 0, 0)
         grid.addWidget(QLabel("SD of Nominator:"), 1, 0)
@@ -62,48 +59,36 @@ class RantestQT(QDialog):
         grid.addWidget(QLabel("Correlation coefficient (nom,denom):"), 4, 0)
         grid.addWidget(QLabel("Alpha:"), 5, 0)
         grid.addWidget(QLabel("Total number of observations (Na + Nb):"), 6, 0)
-        self.tb4e1 = QLineEdit("14")
-        grid.addWidget(self.tb4e1, 0, 1)
-        self.tb4e2 = QLineEdit("3")
-        grid.addWidget(self.tb4e2, 1, 1)
-        self.tb4e3 = QLineEdit("7")
-        grid.addWidget(self.tb4e3, 2, 1)
-        self.tb4e4 = QLineEdit("2")
-        grid.addWidget(self.tb4e4, 3, 1)
-        self.tb4e5 = QLineEdit("0")
-        grid.addWidget(self.tb4e5, 4, 1)
-        self.tb4e6 = QLineEdit("0.05")
-        grid.addWidget(self.tb4e6, 5, 1)
-        self.tb4e7 = QLineEdit("12")
-        grid.addWidget(self.tb4e7, 6, 1)
-        tab_layout.addLayout(grid)
+        self.ed1 = QLineEdit("14")
+        grid.addWidget(self.ed1, 0, 1)
+        self.ed2 = QLineEdit("3")
+        grid.addWidget(self.ed2, 1, 1)
+        self.ed3 = QLineEdit("7")
+        grid.addWidget(self.ed3, 2, 1)
+        self.ed4 = QLineEdit("2")
+        grid.addWidget(self.ed4, 3, 1)
+        self.ed5 = QLineEdit("0")
+        grid.addWidget(self.ed5, 4, 1)
+        self.ed6 = QLineEdit("0.05")
+        grid.addWidget(self.ed6, 5, 1)
+        self.ed7 = QLineEdit("12")
+        grid.addWidget(self.ed7, 6, 1)
+        layout.addLayout(grid)
 
-        self.tb4b1 = QPushButton("Calculate SD and confidence limits for a ratio")
-        tab_layout.addLayout(self.single_button(self.tb4b1))
-        self.tb4b1.clicked.connect(self.callback2)       
-        return tab_layout
+        self.bt1 = QPushButton("Calculate SD and confidence limits for a ratio")
+        layout.addLayout(single_button(self.bt1))
+        self.bt1.clicked.connect(self.calculate_fieller)       
 
-    def callback2(self):
+    def calculate_fieller(self):
         'Called by CALCULATE button in Tab4.'
-        a = float(self.tb4e1.text())
-        b = float(self.tb4e3.text())
-        sa = float(self.tb4e2.text())
-        sb = float(self.tb4e4.text())
-        r = float(self.tb4e5.text())
-        alpha = float(self.tb4e6.text())
-        Ntot = float(self.tb4e7.text())
-        #Call Fieller to calculate statistics.
-        flr = Fieller(a, b, sa, sb, r, alpha, Ntot)
-        self.results.append(str(flr))
-#######   TAB 4: FIELLER. END  #############
-
-    def single_button(self, bt):
-        b_layout = QHBoxLayout()
-        b_layout.addStretch()
-        b_layout.addWidget(bt)
-        b_layout.addStretch()
-        return b_layout
-
+        a = float(self.ed1.text())
+        b = float(self.ed3.text())
+        sa = float(self.ed2.text())
+        sb = float(self.ed4.text())
+        r = float(self.ed5.text())
+        alpha = float(self.ed6.text())
+        Ntot = float(self.ed7.text())
+        self.log.append(helpers.calculate_fieller(a, b, sa, sb, r, alpha, Ntot))
 
 class RandomisationBinTab(QWidget):
     def __init__(self, log, parent=None):
@@ -215,13 +200,10 @@ class RandomisationContTab(QWidget):
             self.nran, self.X, self.Y, self.paired))
 
 
-
 class WelcomeScreen(QWidget):
     """"""
     def __init__(self, parent=None):
         super(WelcomeScreen, self).__init__(parent)
-
-        #plot_area = QWidget()
         self.setFixedHeight(400)
         self.setStyleSheet("QWidget { background-color: %s }"% "white")
         self.layout = QVBoxLayout(self)
@@ -230,7 +212,6 @@ class WelcomeScreen(QWidget):
         self.layout.addWidget(self.movie_screen())
         self.layout.addWidget(QLabel("<p align=center><b>To continue select a "
         "statistical test from visible tabs.</b></p>"))
-        #tab_widget.addTab(plot_area, "Wellcome!")
 
     def movie_screen(self):
         """Set up the gif movie screen."""
@@ -244,6 +225,7 @@ class WelcomeScreen(QWidget):
         movie_screen.setMovie(movie)
         movie.start()
         return movie_screen
+
 
 class ExcelSheetDlg(QDialog):
     """
