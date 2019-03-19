@@ -93,18 +93,6 @@ class RantestQT(QDialog):
 
         ####### Tabs ##########
         tab_widget = QTabWidget()
-
-        plot_area = QWidget()
-        plot_area.setFixedHeight(400)
-        plot_area.setStyleSheet("QWidget { background-color: %s }"% "white")
-        plot_area_layout = QVBoxLayout(plot_area)
-        plot_area_layout.addWidget(QLabel("<p align=center><b>Welcome to DC_PyPs: "
-        "Statistics!</b></p>"))
-        plot_area_layout.addWidget(self.movie_screen())
-        plot_area_layout.addWidget(QLabel("<p align=center><b>To continue select a "
-        "statistical test from visible tabs.</b></p>"))
-        #tab_widget.addTab(plot_area, "Wellcome!")
-        
         tab_widget.addTab(RandomisationContTab(self.results), "Rantest: continuous")
 
         tab3 = QWidget()
@@ -116,18 +104,13 @@ class RantestQT(QDialog):
         self.fieller_layout(QVBoxLayout(tab4))
 
         ##### Finalise main window ######
-        
-        
         tab_widget.setFixedWidth(600)
         right_box.addWidget(tab_widget)
-        right_box.addWidget(plot_area)
+        right_box.addWidget(WelcomeScreen())
 
         quitButton = QPushButton("&QUIT")
         quitButton.clicked.connect(self.close)
-        right_box.addLayout(self.single_button(quitButton))
-        #self.setLayout(vbox)
-
-        
+        right_box.addLayout(self.single_button(quitButton))       
 
 #######   TAB 4: FIELLER. START  #############
     def fieller_layout(self, tab_layout):
@@ -158,8 +141,6 @@ class RantestQT(QDialog):
 
         self.tb4b1 = QPushButton("Calculate SD and confidence limits for a ratio")
         tab_layout.addLayout(self.single_button(self.tb4b1))
-        #self.tb4txt = ResultBox()
-        #tab_layout.addWidget(self.tb4txt)
         self.tb4b1.clicked.connect(self.callback2)       
         return tab_layout
 
@@ -212,8 +193,6 @@ class RantestQT(QDialog):
         
         self.tb3b1 = QPushButton("Calculate")
         tab_layout.addLayout(self.single_button(self.tb3b1))
-        #self.tb3txt = ResultBox()
-        #tab_layout.addWidget(self.tb3txt)
         self.tb3b1.clicked.connect(self.callback3)
 
         return tab_layout
@@ -241,7 +220,23 @@ class RantestQT(QDialog):
         b_layout.addStretch()
         return b_layout
 
-#######   TAB 1: WELCOME!  START   ############
+
+class WelcomeScreen(QWidget):
+    """"""
+    def __init__(self, parent=None):
+        super(WelcomeScreen, self).__init__(parent)
+
+        #plot_area = QWidget()
+        self.setFixedHeight(400)
+        self.setStyleSheet("QWidget { background-color: %s }"% "white")
+        self.layout = QVBoxLayout(self)
+        self.layout.addWidget(QLabel("<p align=center><b>Welcome to DC_PyPs: "
+            "Statistics!</b></p>"))
+        self.layout.addWidget(self.movie_screen())
+        self.layout.addWidget(QLabel("<p align=center><b>To continue select a "
+        "statistical test from visible tabs.</b></p>"))
+        #tab_widget.addTab(plot_area, "Wellcome!")
+
     def movie_screen(self):
         """Set up the gif movie screen."""
         movie_screen = QLabel()
@@ -254,8 +249,6 @@ class RantestQT(QDialog):
         movie_screen.setMovie(movie)
         movie.start()
         return movie_screen
-#######   TAB 1: WELCOME!  END   ############
-
 
 class ExcelSheetDlg(QDialog):
     """
@@ -301,11 +294,6 @@ def ok_cancel_button(parent):
     buttonBox.button(QDialogButtonBox.Ok).setDefault(True)
     buttonBox.accepted.connect(parent.accept)
     buttonBox.rejected.connect(parent.reject)
-    # Following is for pyqt4
-    #self.connect(buttonBox, SIGNAL("accepted()"),
-    #     self, SLOT("accept()"))
-    #self.connect(buttonBox, SIGNAL("rejected()"),
-    #     self, SLOT("reject()"))
     return buttonBox
 
 def single_button(bt):
