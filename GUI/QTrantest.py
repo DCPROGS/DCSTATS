@@ -18,9 +18,10 @@ __author__="remis"
 __date__ ="$03-Jan-2010 15:26:00$"
 
 class RandomisationContTab(QWidget):
-    def __init__(self, parent=None):
+    def __init__(self, log, parent=None):
         QWidget.__init__(self, parent)
         layout = QVBoxLayout(self)
+        self.log = log
         layout.addWidget(QLabel(rantest.RTINTROD))
 
         self.nran = 5000
@@ -38,8 +39,6 @@ class RandomisationContTab(QWidget):
         layout.addLayout(layout1)
         bt2 = QPushButton("Run randomisation test")
         layout.addLayout(single_button(bt2))
-        self.txtBx = ResultBox()
-        layout.addWidget(self.txtBx)
 
         self.ed1.editingFinished.connect(self.ran_changed)
         self.ch1.stateChanged.connect(self.ran_changed)
@@ -67,58 +66,72 @@ class RandomisationContTab(QWidget):
 
     def get_basic_statistics(self):
         # Display basic statistics
-        self.txtBx.append('\nData loaded from a file: ' + self.filename + '\n')
-        self.txtBx.append(helpers.calculate_ttest_hedges(self.X, self.Y, self.paired))
+        self.log.append('\nData loaded from a file: ' + self.filename + '\n')
+        self.log.append(helpers.calculate_ttest_hedges(self.X, self.Y, self.paired))
 
     def run_rantest(self):
         """Called by RUN TEST button in Tab2."""
-        self.txtBx.append(helpers.calculate_rantest_continuous(
+        self.log.append(helpers.calculate_rantest_continuous(
             self.nran, self.X, self.Y, self.paired))
 
 class RantestQT(QDialog):
     def __init__(self, parent=None):
         super(RantestQT, self).__init__(parent)
-        self.resize(400, 600)
-        tab_widget = QTabWidget()
-        tab1 = QWidget()
-        tab1.setStyleSheet("QWidget { background-color: %s }"% "white")
-        tab3 = QWidget()
-        tab4 = QWidget()
-        tab_widget.addTab(tab1, "Wellcome!")
-        tab_widget.addTab(RandomisationContTab(), "Rantest: continuous")
-        tab_widget.addTab(tab3, "Rantest: binary")
-        tab_widget.addTab(tab4, "Fieller")
+        #self.resize(400, 600)
+
+        main_box = QHBoxLayout()
+        # Left side: Result text box
+        self.results = ResultBox()
+        self.results.setFixedWidth(500)
+        main_box.addWidget(self.results)
+        
+        # Right side: controls and plot
+        right_box = QVBoxLayout()
+        main_box.addLayout(right_box)
+        self.setLayout(main_box)
+        self.setWindowTitle("DC_PyPs: Statistics")
 
         ####### Tabs ##########
-        tab1_layout = QVBoxLayout(tab1)
-        tab1_layout.addWidget(QLabel("<p align=center><b>Welcome to DC_PyPs: "
+        tab_widget = QTabWidget()
+
+        plot_area = QWidget()
+        plot_area.setFixedHeight(400)
+        plot_area.setStyleSheet("QWidget { background-color: %s }"% "white")
+        plot_area_layout = QVBoxLayout(plot_area)
+        plot_area_layout.addWidget(QLabel("<p align=center><b>Welcome to DC_PyPs: "
         "Statistics!</b></p>"))
-        tab1_layout.addWidget(self.movie_screen())
-        tab1_layout.addWidget(QLabel("<p align=center><b>To continue select a "
+        plot_area_layout.addWidget(self.movie_screen())
+        plot_area_layout.addWidget(QLabel("<p align=center><b>To continue select a "
         "statistical test from visible tabs.</b></p>"))
+        #tab_widget.addTab(plot_area, "Wellcome!")
+        
+        tab_widget.addTab(RandomisationContTab(self.results), "Rantest: continuous")
+
+        tab3 = QWidget()
+        tab_widget.addTab(tab3, "Rantest: binary")
         self.ranbin_layout(QVBoxLayout(tab3))
+
+        tab4 = QWidget()
+        tab_widget.addTab(tab4, "Fieller")
         self.fieller_layout(QVBoxLayout(tab4))
 
         ##### Finalise main window ######
-        vbox = QVBoxLayout()
-        vbox.addWidget(tab_widget)
+        
+        
+        tab_widget.setFixedWidth(600)
+        right_box.addWidget(tab_widget)
+        right_box.addWidget(plot_area)
+
         quitButton = QPushButton("&QUIT")
         quitButton.clicked.connect(self.close)
-        vbox.addLayout(self.single_button(quitButton))
-        self.setLayout(vbox)
-        self.setWindowTitle("DC_PyPs: Statistics")
+        right_box.addLayout(self.single_button(quitButton))
+        #self.setLayout(vbox)
+
+        
 
 #######   TAB 4: FIELLER. START  #############
     def fieller_layout(self, tab_layout):
         'Prepare layout for Tab 4. Fieller theorema.'
-        intro_fieller = ("FIELLER: calculates confidence limits for a ratio " +
-            "according Fieller''s theorem." +
-            "\nCalculates approximate SD of the ratio r=a/b, given " +
-            "the SD of a (numerator) \nand of b (denominator), " +
-            "and the correlation coefficient between a, b (zero if they are " +
-            "independent). \n")
-        tab_layout.addWidget(QLabel(intro_fieller))
-
         grid = QGridLayout()
         grid.addWidget(QLabel("Nominator:"), 0, 0)
         grid.addWidget(QLabel("SD of Nominator:"), 1, 0)
@@ -143,10 +156,10 @@ class RantestQT(QDialog):
         grid.addWidget(self.tb4e7, 6, 1)
         tab_layout.addLayout(grid)
 
-        self.tb4b1 = QPushButton("Calculate")
+        self.tb4b1 = QPushButton("Calculate SD and confidence limits for a ratio")
         tab_layout.addLayout(self.single_button(self.tb4b1))
-        self.tb4txt = ResultBox()
-        tab_layout.addWidget(self.tb4txt)
+        #self.tb4txt = ResultBox()
+        #tab_layout.addWidget(self.tb4txt)
         self.tb4b1.clicked.connect(self.callback2)       
         return tab_layout
 
@@ -161,7 +174,7 @@ class RantestQT(QDialog):
         Ntot = float(self.tb4e7.text())
         #Call Fieller to calculate statistics.
         flr = Fieller(a, b, sa, sb, r, alpha, Ntot)
-        self.tb4txt.append(str(flr))
+        self.results.append(str(flr))
 #######   TAB 4: FIELLER. END  #############
 
 #######   TAB 3: RANTEST FOR BINARY DATA. START  #############
@@ -199,8 +212,8 @@ class RantestQT(QDialog):
         
         self.tb3b1 = QPushButton("Calculate")
         tab_layout.addLayout(self.single_button(self.tb3b1))
-        self.tb3txt = ResultBox()
-        tab_layout.addWidget(self.tb3txt)
+        #self.tb3txt = ResultBox()
+        #tab_layout.addWidget(self.tb3txt)
         self.tb3b1.clicked.connect(self.callback3)
 
         return tab_layout
@@ -216,8 +229,8 @@ class RantestQT(QDialog):
         ttb = TTestBinomial(ir1, if1, ir2, if2)
         rnt = rantest.RantestBinomial(ir1, if1, ir2, if2)
         rnt.run_rantest(self.nran)
-        self.tb3txt.append(str(ttb))
-        self.tb3txt.append(str(rnt))
+        self.results.append(str(ttb))
+        self.results.append(str(rnt))
         
 #######   TAB 3: RANTEST FOR BINARY DATA. END  #############
 
@@ -313,4 +326,3 @@ def load_two_samples_from_excel_with_pandas(filename):
     X = dt.iloc[:,0].dropna().values.tolist()
     Y = dt.iloc[:,1].dropna().values.tolist()
     return X, Y
-
