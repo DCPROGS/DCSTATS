@@ -16,20 +16,17 @@ import dcstats.basic_stats as bs
 __author__="Remis Lape"
 __date__ ="$01-May-2009 17:42:28$"
 
-RTINTROD = '\nRANTEST: performs a randomisation test to compare two \
-independent samples. According to the null hypothesis\n \
-of no-difference, each outcome would have been the same \
-regardless of which group the individual happened to\n \
-be allocated. Therefore all N=n1+n2 observations are \
-pooled and, as in the actual experiment, divided at random\n \
-into groups of size n1 and n2. The fraction \
-of randomisations that gives rise to a difference between the groups\n \
-at least as large as that observed \
-gives the P value.\
-\n In the binomial case, in which the measurement is the \
-fraction of ''successes'' in each sample (say r1 out of n1, and\n \
-r2 out of n2) a ''success'' is given a \
-score of 1, ''failure'' = 0.\n'
+RTINTROD = "\nRANTEST: performs a randomisation test to compare two \
+independent samples.\n\
+According to the null hypothesis of no-difference, each outcome would \n\
+have been the same regardless of which group the individual happened to\n\
+be allocated. Therefore all N=n1+n2 observations are pooled and, as in\n \
+the actual experiment, divided at random into groups of size n1 and n2.\n \
+The fraction of randomisations that gives rise to a difference between\n \
+the groups at least as large as that observed gives the P value.\n\
+In the binomial case, in which the measurement is the fraction of 'successes'\n\
+in each sample (say r1 out of n1, and r2 out of n2) a ''success'' is given\n\
+a score of 1, ''failure'' = 0.\n"
 
 RTCRITERION = " Randomisation test on binomial data could be done\
     using as criterion: (1) number of successes in set 1 (r1)\

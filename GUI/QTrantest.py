@@ -88,6 +88,7 @@ class FiellerTab(QWidget):
         r = float(self.ed5.text())
         alpha = float(self.ed6.text())
         Ntot = float(self.ed7.text())
+        self.log.separate()
         self.log.append(helpers.calculate_fieller(a, b, sa, sb, r, alpha, Ntot))
 
 class RandomisationBinTab(QWidget):
@@ -138,6 +139,7 @@ class RandomisationBinTab(QWidget):
         ir2 = int(self.ed3.text())
         if2 = int(self.ed4.text())
         self.nran = int(self.ed5.text())
+        self.log.separate()
         self.log.append(helpers.calculate_rantest_binary(
             self.nran, ir1, if1, ir2, if2))
 
@@ -191,6 +193,7 @@ class RandomisationContTab(QWidget):
 
     def get_basic_statistics(self):
         # Display basic statistics
+        self.log.separate()
         self.log.append('\nData loaded from a file: ' + self.filename + '\n')
         self.log.append(helpers.calculate_ttest_hedges(self.X, self.Y, self.paired))
 
@@ -266,6 +269,9 @@ class ResultBox(QTextBrowser):
         self.append(sys.version)
         self.append("Date and time of analysis: " + str(datetime.datetime.now())[:19])
         self.append("Machine: {0};   System: {1}".format(socket.gethostname(), sys.platform))
+
+    def separate(self):
+        self.append('*' * 10)
 
 def ok_cancel_button(parent):
     buttonBox = QDialogButtonBox(QDialogButtonBox.Ok|QDialogButtonBox.Cancel)
