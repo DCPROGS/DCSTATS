@@ -1,16 +1,18 @@
 #! /usr/bin/python
 import os
+import sys
+import socket
+import datetime
 import pandas as pd
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 
+from dcstats import helpers
 from dcstats import dataIO
 from dcstats.fieller import Fieller
 import dcstats.rantest as rantest
 from dcstats.basic_stats import TTestBinomial
-from dcstats.Hedges import Hedges_d
-from dcstats.basic_stats import TTestContinuous
 
 __author__="remis"
 __date__ ="$03-Jan-2010 15:26:00$"
@@ -36,9 +38,9 @@ class RandomisationContTab(QWidget):
         layout.addLayout(layout1)
         bt2 = QPushButton("Run randomisation test")
         layout.addLayout(single_button(bt2))
-        self.txtBx = QTextBrowser()
-        self.txtBx.append("RESULT WILL BE DISPLAYED HERE")
+        self.txtBx = ResultBox()
         layout.addWidget(self.txtBx)
+
         self.ed1.editingFinished.connect(self.ran_changed)
         self.ch1.stateChanged.connect(self.ran_changed)
         bt1.clicked.connect(self.open_file)
@@ -58,56 +60,24 @@ class RandomisationContTab(QWidget):
                 "Open Data File...", self.path, "MS Excel Files (*.xlsx)")
             self.path = os.path.split(str(self.filename))[0]
             #TODO: allow loading from other format files
-            self.load_data_from_Excel()
+            self.X, self.Y = load_two_samples_from_excel_with_pandas(self.filename)
             self.get_basic_statistics()
         except:
             pass
 
-    def load_data_from_Excel(self):
-        #TODO: currently loads only firs two columns. Allow multiple column load.
-        xl = pd.ExcelFile(self.filename)
-        dialog = ExcelSheetDlg(xl.sheet_names, self)
-        if dialog.exec_():
-            xlssheet = dialog.returnSheet()
-        dt = xl.parse(xlssheet)
-        self.X = dt.iloc[:,0].dropna().values.tolist()
-        self.Y = dt.iloc[:,1].dropna().values.tolist()
-       
     def get_basic_statistics(self):
         # Display basic statistics
-        self.txtBx.clear()
-        self.txtBx.append('Data loaded from a file: ' + self.filename + '\n')
-        self.txtBx.append(self.calculate_ttest_hedges(self.X, self.Y, self.paired))
-
-    def calculate_ttest_hedges(self, X, Y, are_paired=False):
-        # Calculate basic statistics
-        # TODO: ready to move out of GUI
-        ttc = TTestContinuous(X, Y, are_paired)
-        #calculation of hedges d and approximate 95% confidence intervals
-        #not tested against known values yet AP 170518
-        hedges_calculation = Hedges_d(X, Y)
-        hedges_calculation.hedges_d_unbiased()
-        #lowerCI, upperCI = hedges_calculation.approx_CI(self.paired)
-        #paired needed for degrees of freedom
-        lowerCI, upperCI = hedges_calculation.bootstrap_CI(5000)
-        #option to have bootstrap calculated CIs should go here
-        return str(ttc) + str(hedges_calculation)
-
-    def calculate_rantest_continuous(self, nran, X, Y, are_paired=False):
-        # Run randomisation test
-        # TODO: ready to move out of GUI
-        rnt = rantest.RantestContinuous(X, Y, are_paired)
-        rnt.run_rantest(nran)
-        return str(rnt)
+        self.txtBx.append('\nData loaded from a file: ' + self.filename + '\n')
+        self.txtBx.append(helpers.calculate_ttest_hedges(self.X, self.Y, self.paired))
 
     def run_rantest(self):
         """Called by RUN TEST button in Tab2."""
-        self.txtBx.append(self.calculate_rantest_continuous(
+        self.txtBx.append(helpers.calculate_rantest_continuous(
             self.nran, self.X, self.Y, self.paired))
 
-class rantestQT(QDialog):
+class RantestQT(QDialog):
     def __init__(self, parent=None):
-        super(rantestQT, self).__init__(parent)
+        super(RantestQT, self).__init__(parent)
         self.resize(400, 600)
         tab_widget = QTabWidget()
         tab1 = QWidget()
@@ -175,8 +145,7 @@ class rantestQT(QDialog):
 
         self.tb4b1 = QPushButton("Calculate")
         tab_layout.addLayout(self.single_button(self.tb4b1))
-        self.tb4txt = QTextBrowser()
-        self.tb4txt.append("RESULT WILL BE DISPLAYED HERE")
+        self.tb4txt = ResultBox()
         tab_layout.addWidget(self.tb4txt)
         self.tb4b1.clicked.connect(self.callback2)       
         return tab_layout
@@ -190,8 +159,6 @@ class rantestQT(QDialog):
         r = float(self.tb4e5.text())
         alpha = float(self.tb4e6.text())
         Ntot = float(self.tb4e7.text())
-        self.tb4txt.clear()
-#        log = PrintLog(self.tb4txt) #, sys.stdout)
         #Call Fieller to calculate statistics.
         flr = Fieller(a, b, sa, sb, r, alpha, Ntot)
         self.tb4txt.append(str(flr))
@@ -232,8 +199,7 @@ class rantestQT(QDialog):
         
         self.tb3b1 = QPushButton("Calculate")
         tab_layout.addLayout(self.single_button(self.tb3b1))
-        self.tb3txt = QTextBrowser()
-        self.tb3txt.append("RESULT WILL BE DISPLAYED HERE")
+        self.tb3txt = ResultBox()
         tab_layout.addWidget(self.tb3txt)
         self.tb3b1.clicked.connect(self.callback3)
 
@@ -246,7 +212,6 @@ class rantestQT(QDialog):
         ir2 = int(self.tb3e3.text())
         if2 = int(self.tb3e4.text())
         self.nran = int(self.tb3e5.text())
-        self.tb3txt.clear()
         
         ttb = TTestBinomial(ir1, if1, ir2, if2)
         rnt = rantest.RantestBinomial(ir1, if1, ir2, if2)
@@ -310,6 +275,14 @@ class ExcelSheetDlg(QDialog):
         """
         return self.sheet
 
+class ResultBox(QTextBrowser):
+    def __init__(self, parent=None):
+        super(ResultBox, self).__init__(parent)
+        self.append("DC-stats")
+        self.append(sys.version)
+        self.append("Date and time of analysis: " + str(datetime.datetime.now())[:19])
+        self.append("Machine: {0};   System: {1}".format(socket.gethostname(), sys.platform))
+
 def ok_cancel_button(parent):
     buttonBox = QDialogButtonBox(QDialogButtonBox.Ok|QDialogButtonBox.Cancel)
     buttonBox.button(QDialogButtonBox.Ok).setDefault(True)
@@ -328,4 +301,16 @@ def single_button(bt):
     b_layout.addWidget(bt)
     b_layout.addStretch()
     return b_layout
+
+def load_two_samples_from_excel_with_pandas(filename):
+    #TODO: currently loads only firs two columns. Allow multiple column load.
+    # TODO: consider moving out of this class
+    xl = pd.ExcelFile(filename)
+    dialog = ExcelSheetDlg(xl.sheet_names) #self
+    if dialog.exec_():
+        xlssheet = dialog.returnSheet()
+    dt = xl.parse(xlssheet)
+    X = dt.iloc[:,0].dropna().values.tolist()
+    Y = dt.iloc[:,1].dropna().values.tolist()
+    return X, Y
 
