@@ -12,7 +12,7 @@ def calculate_ttest_hedges(X, Y, are_paired=False):
     hedges_calculation.hedges_d_unbiased()
     #lowerCI, upperCI = hedges_calculation.approx_CI(self.paired)
     #paired needed for degrees of freedom
-    lowerCI, upperCI = hedges_calculation.bootstrap_CI(5000)
+    hedges_calculation.bootstrap_CI(5000)
     #option to have bootstrap calculated CIs should go here
     return str(ttc) + str(hedges_calculation)
 

@@ -76,10 +76,10 @@ Alpha-level deviation is for two tailed distribution (e.g. 0.05 leaves 90% area)
                 self.cvr = 100.0 * self.appsd / self.ratio
 
     def __repr__(self):
-        return ('\nResult: ' +
+        return ('\n Fieller calculation result: ' +
             '\n Ratio (=a/b) = {0:.6f}'.format(self.ratio) +
-            '\n g = {0:.6f}; \n degree of freedom  = {1:d}; \n t(df, alpha) = {2:.6f}'.
-            format(self.g, int(self.df), self.tval) +
+            '\n g = {0:.6f};\n alpha = {1:.2f};\n degree of freedom  = {2:d};\n t(df, alpha) = {3:.6f}'.
+            format(self.g, self.alpha, int(self.df), self.tval) +
             '\n\n Confidence limits: lower {0:.6f}, upper {1:.6f}'.format(self.clower, self.cupper) +
             '\n i.e deviations: lower {0:.6f}, upper {1:.6f}'.format(self.dlow, self.dhi) + 
             '\n Approximate SD of ratio = {0:.6f}'.format(self.appsd) +
