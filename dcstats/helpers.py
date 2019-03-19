@@ -1,6 +1,6 @@
 import dcstats.rantest as rantest
 from dcstats.Hedges import Hedges_d
-from dcstats.basic_stats import TTestContinuous
+from dcstats.basic_stats import TTestContinuous, TTestBinomial
 
 def calculate_ttest_hedges(X, Y, are_paired=False):
     """ Run Student's two-tailed t-test for a difference between two samples
@@ -22,3 +22,11 @@ def calculate_rantest_continuous(nran, X, Y, are_paired=False):
     rnt = rantest.RantestContinuous(X, Y, are_paired)
     rnt.run_rantest(nran)
     return str(rnt)
+
+
+def calculate_rantest_binary(nran, ir1, if1, ir2, if2):
+    """ Run randomisation test and return result as string. """
+    ttb = TTestBinomial(ir1, if1, ir2, if2)
+    rnt = rantest.RantestBinomial(ir1, if1, ir2, if2)
+    rnt.run_rantest(nran)
+    return str(ttb) + str(rnt)

@@ -17,87 +17,30 @@ from dcstats.basic_stats import TTestBinomial
 __author__="remis"
 __date__ ="$03-Jan-2010 15:26:00$"
 
-class RandomisationContTab(QWidget):
-    def __init__(self, log, parent=None):
-        QWidget.__init__(self, parent)
-        layout = QVBoxLayout(self)
-        self.log = log
-        layout.addWidget(QLabel(rantest.RTINTROD))
-
-        self.nran = 5000
-        self.paired = 0
-        self.path = ""
-
-        bt1 = QPushButton("Get data from Excel file")
-        layout.addLayout(single_button(bt1))
-        layout1 = QHBoxLayout()
-        layout1.addWidget(QLabel("Number of randomisations:"))
-        self.ed1 = QLineEdit(str(self.nran))
-        layout1.addWidget(self.ed1)
-        self.ch1 = QCheckBox("&Paired test?")
-        layout1.addWidget(self.ch1)
-        layout.addLayout(layout1)
-        bt2 = QPushButton("Run randomisation test")
-        layout.addLayout(single_button(bt2))
-
-        self.ed1.editingFinished.connect(self.ran_changed)
-        self.ch1.stateChanged.connect(self.ran_changed)
-        bt1.clicked.connect(self.open_file)
-        bt2.clicked.connect(self.run_rantest)
-
-    def ran_changed(self):
-        if self.ch1.isChecked():
-            self.paired = 1
-        else:
-            self.paired = 0
-        self.nran = int(self.ed1.text()) 
-
-    def open_file(self):
-        """Called by TAKE DATA FROM FILE button in Tab2"""
-        try:
-            self.filename, filt = QFileDialog.getOpenFileName(self,
-                "Open Data File...", self.path, "MS Excel Files (*.xlsx)")
-            self.path = os.path.split(str(self.filename))[0]
-            #TODO: allow loading from other format files
-            self.X, self.Y = load_two_samples_from_excel_with_pandas(self.filename)
-            self.get_basic_statistics()
-        except:
-            pass
-
-    def get_basic_statistics(self):
-        # Display basic statistics
-        self.log.append('\nData loaded from a file: ' + self.filename + '\n')
-        self.log.append(helpers.calculate_ttest_hedges(self.X, self.Y, self.paired))
-
-    def run_rantest(self):
-        """Called by RUN TEST button in Tab2."""
-        self.log.append(helpers.calculate_rantest_continuous(
-            self.nran, self.X, self.Y, self.paired))
 
 class RantestQT(QDialog):
     def __init__(self, parent=None):
         super(RantestQT, self).__init__(parent)
-        #self.resize(400, 600)
+        self.setWindowTitle("DC_PyPs: Statistics")
 
         main_box = QHBoxLayout()
         # Left side: Result text box
         self.results = ResultBox()
-        self.results.setFixedWidth(500)
-        main_box.addWidget(self.results)
-        
+        main_box.addWidget(self.results)       
         # Right side: controls and plot
         right_box = QVBoxLayout()
         main_box.addLayout(right_box)
         self.setLayout(main_box)
-        self.setWindowTitle("DC_PyPs: Statistics")
+        
 
         ####### Tabs ##########
         tab_widget = QTabWidget()
         tab_widget.addTab(RandomisationContTab(self.results), "Rantest: continuous")
+        tab_widget.addTab(RandomisationBinTab(self.results), "Rantest: binary")
 
-        tab3 = QWidget()
-        tab_widget.addTab(tab3, "Rantest: binary")
-        self.ranbin_layout(QVBoxLayout(tab3))
+        #tab3 = QWidget()
+        #tab_widget.addTab(tab3, "Rantest: binary")
+        #self.ranbin_layout(QVBoxLayout(tab3))
 
         tab4 = QWidget()
         tab_widget.addTab(tab4, "Fieller")
@@ -110,7 +53,7 @@ class RantestQT(QDialog):
 
         quitButton = QPushButton("&QUIT")
         quitButton.clicked.connect(self.close)
-        right_box.addLayout(self.single_button(quitButton))       
+        right_box.addLayout(single_button(quitButton))       
 
 #######   TAB 4: FIELLER. START  #############
     def fieller_layout(self, tab_layout):
@@ -221,6 +164,117 @@ class RantestQT(QDialog):
         return b_layout
 
 
+class RandomisationBinTab(QWidget):
+    def __init__(self, log, parent=None):
+        QWidget.__init__(self, parent)
+        layout = QVBoxLayout(self)
+        self.log = log
+        layout.addWidget(QLabel(rantest.RTINTROD))
+        self.nran = 5000
+
+        layout.addWidget(QLabel("Sample 1"))
+        layout1 = QHBoxLayout()
+        layout1.addWidget(QLabel("Successes:"))
+        self.ed1 = QLineEdit("3")
+        layout1.addWidget(self.ed1)
+        layout1.addWidget(QLabel("Failures:"))
+        self.ed2 = QLineEdit("4")
+        layout1.addWidget(self.ed2)
+        layout1.addStretch()
+        layout.addLayout(layout1)
+
+        layout.addWidget(QLabel("Sample 2"))
+        layout2 = QHBoxLayout()
+        layout2.addWidget(QLabel("Successes:"))
+        self.ed3 = QLineEdit("4")
+        layout2.addWidget(self.ed3)
+        layout2.addWidget(QLabel("Failures:"))
+        self.ed4 = QLineEdit("5")
+        layout2.addWidget(self.ed4)
+        layout2.addStretch()
+        layout.addLayout(layout2)
+
+        layout3 = QHBoxLayout()
+        layout3.addWidget(QLabel("Number of randomisations:"))
+        self.ed5 = QLineEdit("5000")
+        layout3.addWidget(self.ed5)
+        layout3.addStretch()
+        layout.addLayout(layout3)
+        
+        self.bt1 = QPushButton("Calculate")
+        layout.addLayout(single_button(self.bt1))
+        self.bt1.clicked.connect(self.run_rantest_bin)
+
+    def run_rantest_bin(self):
+        """Called by button CALCULATE."""
+        ir1 = int(self.ed1.text())
+        if1 = int(self.ed2.text())
+        ir2 = int(self.ed3.text())
+        if2 = int(self.ed4.text())
+        self.nran = int(self.ed5.text())
+        self.log.append(helpers.calculate_rantest_binary(
+            self.nran, ir1, if1, ir2, if2))
+
+
+class RandomisationContTab(QWidget):
+    def __init__(self, log, parent=None):
+        QWidget.__init__(self, parent)
+        layout = QVBoxLayout(self)
+        self.log = log
+        layout.addWidget(QLabel(rantest.RTINTROD))
+
+        self.nran = 5000
+        self.paired = 0
+        self.path = ""
+
+        bt1 = QPushButton("Get data from Excel file")
+        layout.addLayout(single_button(bt1))
+        layout1 = QHBoxLayout()
+        layout1.addWidget(QLabel("Number of randomisations:"))
+        self.ed1 = QLineEdit(str(self.nran))
+        layout1.addWidget(self.ed1)
+        self.ch1 = QCheckBox("&Paired test?")
+        layout1.addWidget(self.ch1)
+        layout.addLayout(layout1)
+        bt2 = QPushButton("Run randomisation test")
+        layout.addLayout(single_button(bt2))
+
+        self.ed1.editingFinished.connect(self.ran_changed)
+        self.ch1.stateChanged.connect(self.ran_changed)
+        bt1.clicked.connect(self.open_file)
+        bt2.clicked.connect(self.run_rantest)
+
+    def ran_changed(self):
+        if self.ch1.isChecked():
+            self.paired = 1
+        else:
+            self.paired = 0
+        self.nran = int(self.ed1.text()) 
+
+    def open_file(self):
+        """Called by TAKE DATA FROM FILE button in Tab2"""
+        try:
+            self.filename, filt = QFileDialog.getOpenFileName(self,
+                "Open Data File...", self.path, "MS Excel Files (*.xlsx)")
+            self.path = os.path.split(str(self.filename))[0]
+            #TODO: allow loading from other format files
+            self.X, self.Y = load_two_samples_from_excel_with_pandas(self.filename)
+            self.get_basic_statistics()
+        except:
+            pass
+
+    def get_basic_statistics(self):
+        # Display basic statistics
+        self.log.append('\nData loaded from a file: ' + self.filename + '\n')
+        self.log.append(helpers.calculate_ttest_hedges(self.X, self.Y, self.paired))
+
+    def run_rantest(self):
+        """Called by RUN TEST button in Tab2."""
+        self.log.append(helpers.calculate_rantest_continuous(
+            self.nran, self.X, self.Y, self.paired))
+
+
+
 class WelcomeScreen(QWidget):
     """"""
     def __init__(self, parent=None):
@@ -284,6 +338,7 @@ class ExcelSheetDlg(QDialog):
 class ResultBox(QTextBrowser):
     def __init__(self, parent=None):
         super(ResultBox, self).__init__(parent)
+        self.setFixedWidth(500)
         self.append("DC-stats")
         self.append(sys.version)
         self.append("Date and time of analysis: " + str(datetime.datetime.now())[:19])
