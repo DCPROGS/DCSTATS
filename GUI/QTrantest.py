@@ -4,10 +4,15 @@ import sys
 import socket
 import datetime
 import pandas as pd
+import numpy as np
 
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
+
+from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
+import matplotlib.pyplot as plt
+from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
 
 from dcstats import rantest
 from dcstats import helpers
@@ -27,22 +32,43 @@ class RantestQT(QDialog):
         self.results = ResultBox()
         main_box.addWidget(self.results)       
         # Right side: controls and plot
+
+        self.plot_area = QVBoxLayout()
+        self.plot_area.addWidget(WelcomeScreen())
+        
+        self.tab_widget = QTabWidget()
+        self.tab_widget.addTab(RandomisationContTab(self.results, self.plot_area), 
+                          "Rantest: continuous")
+        self.tab_widget.addTab(RandomisationBinTab(self.results), "Rantest: binary")
+        self.tab_widget.addTab(FiellerTab(self.results), "Fieller")
+        self.tab_widget.setFixedWidth(600)
+        self.tab_widget.currentChanged.connect(self.tab_changed)
+
         right_box = QVBoxLayout()
-        main_box.addLayout(right_box)
-        self.setLayout(main_box)
-        
-        tab_widget = QTabWidget()
-        tab_widget.addTab(RandomisationContTab(self.results), "Rantest: continuous")
-        tab_widget.addTab(RandomisationBinTab(self.results), "Rantest: binary")
-        tab_widget.addTab(FiellerTab(self.results), "Fieller")
-        tab_widget.setFixedWidth(600)
-        right_box.addWidget(tab_widget)
-        
-        right_box.addWidget(WelcomeScreen())
+        right_box.addWidget(self.tab_widget)
+        right_box.addLayout(self.plot_area)
         quitButton = QPushButton("&QUIT")
         quitButton.clicked.connect(self.close)
-        right_box.addLayout(single_button(quitButton))       
+        right_box.addLayout(single_button(quitButton))
+        main_box.addLayout(right_box)
+        self.setLayout(main_box)
 
+    def tab_changed(self):
+        item = self.plot_area.takeAt(0).widget()
+        self.plot_area.removeWidget(item)
+        item.deleteLater()
+        self.plot_area.addWidget(WelcomeScreen())
+        
+
+class PlotCanvas(FigureCanvas):
+    """"""
+    def __init__(self, parent=None):
+        self.figure = plt.figure()
+        FigureCanvas.__init__(self, self.figure)
+        self.setFixedHeight(400)
+        self.setFixedWidth(600)
+
+        
 
 class FiellerTab(QWidget):
     def __init__(self, log, parent=None):
@@ -145,10 +171,11 @@ class RandomisationBinTab(QWidget):
 
 
 class RandomisationContTab(QWidget):
-    def __init__(self, log, parent=None):
+    def __init__(self, log, plot_area, parent=None):
         QWidget.__init__(self, parent)
         layout = QVBoxLayout(self)
         self.log = log
+        self.plot_area = plot_area
         layout.addWidget(QLabel(rantest.RTINTROD))
 
         self.nran = 5000
@@ -196,11 +223,37 @@ class RandomisationContTab(QWidget):
         self.log.separate()
         self.log.append('\nData loaded from a file: ' + self.filename + '\n')
         self.log.append(helpers.calculate_ttest_hedges(self.X, self.Y, self.paired))
-
+        
     def run_rantest(self):
         """Called by RUN TEST button in Tab2."""
-        self.log.append(helpers.calculate_rantest_continuous(
-            self.nran, self.X, self.Y, self.paired))
+        randiff, txt = helpers.calculate_rantest_continuous(
+            self.nran, self.X, self.Y, self.paired)
+        self.log.append(txt)
+
+        item = self.plot_area.takeAt(0).widget()
+        self.plot_area.removeWidget(item)
+        item.deleteLater()
+        
+        
+        pc = PlotCanvas()
+        ax = pc.figure.add_subplot(111)
+        #ax.plot(data)
+
+        ax.hist(randiff, bins=20)
+        #ax.axvline(x=obsdif, color='r')
+        #ax.axvline(x=-obsdif, color='r')
+        lo95lim = np.percentile(randiff, 2.5)
+        hi95lim = np.percentile(randiff, 97.5)
+        ax.axvline(x=lo95lim, color='k', linestyle='--')
+        ax.axvline(x=hi95lim, color='k', linestyle='--')
+        ax.set_xlabel('difference between means')
+        ax.set_ylabel('frequency')
+        #print('RED solid line: observed difference')
+        #print('BLACK dashed line: 2.5% limits')
+        plt.tight_layout()
+
+        self.plot_area.addWidget(pc)
+        #plt.show()
 
 
 class WelcomeScreen(QWidget):

@@ -22,7 +22,7 @@ def calculate_rantest_continuous(nran, X, Y, are_paired=False):
     """ Run randomisation test and return result as string. """
     rnt = rantest.RantestContinuous(X, Y, are_paired)
     rnt.run_rantest(nran)
-    return str(rnt)
+    return rnt.randiff, str(rnt)
 
 
 def calculate_rantest_binary(nran, ir1, if1, ir2, if2):
