@@ -8,6 +8,7 @@ import random
 import numpy as np
 
 import dcstats.basic_stats as bs
+from dcstats.Hedges import Hedges_d
 
 # AP 091202 Minor corrections to spelling and spacing of introd.
 # AP 140418 more cosmetic changes for deposition
@@ -99,6 +100,21 @@ class RantestContinuous():
         self.are_paired = are_paired
         random.seed(1984)
         np.random.seed(1984)
+
+    def describe_data(self):
+        """ Run Student's two-tailed t-test for a difference between two samples
+        and calculate Hedges effect size. Return results as string. """
+        ttc = bs.TTestContinuous(self.X, self.Y, self.are_paired)
+        #calculation of hedges d and approximate 95% confidence intervals
+        #not tested against known values yet AP 170518
+        hedges_calculation = Hedges_d(self.X, self.Y)
+        hedges_calculation.hedges_d_unbiased()
+        #lowerCI, upperCI = hedges_calculation.approx_CI(self.paired)
+        #paired needed for degrees of freedom
+        hedges_calculation.bootstrap_CI(5000)
+        #option to have bootstrap calculated CIs should go here
+        return str(ttc) + str(hedges_calculation)
+
             
     def run_rantest(self, nran):
         self.nran = nran
@@ -121,6 +137,8 @@ class RantestContinuous():
         self.nequal = self.randiff[np.fabs(self.randiff) == math.fabs(self.dbar)].size
         self.p2tail = self.n2tail / float(self.nran)
         self.pequal = self.nequal / float(self.nran)
+        self.lo95lim = np.percentile(self.randiff, 2.5)
+        self.hi95lim = np.percentile(self.randiff, 97.5)
         
     def __repr__(self):
         return ('\nRantest:  {0:d} randomisations'.format(self.nran) +

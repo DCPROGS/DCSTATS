@@ -15,8 +15,9 @@ import matplotlib.pyplot as plt
 from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
 
 from dcstats import rantest
-from dcstats import helpers
 from dcstats import dataIO
+from dcstats.fieller import Fieller
+from dcstats.basic_stats import TTestBinomial
 
 __author__="remis"
 __date__ ="$03-Jan-2010 15:26:00$"
@@ -38,7 +39,7 @@ class RantestQT(QDialog):
         
         self.tab_widget = QTabWidget()
         self.tab_widget.addTab(RandomisationContTab(self.results, self.plot_area), 
-                          "Rantest: continuous")
+                          "Rantest: two-sample")
         self.tab_widget.addTab(RandomisationBinTab(self.results), "Rantest: binary")
         self.tab_widget.addTab(FiellerTab(self.results), "Fieller")
         self.tab_widget.setFixedWidth(600)
@@ -58,16 +59,6 @@ class RantestQT(QDialog):
         self.plot_area.removeWidget(item)
         item.deleteLater()
         self.plot_area.addWidget(WelcomeScreen())
-        
-
-class PlotCanvas(FigureCanvas):
-    """"""
-    def __init__(self, parent=None):
-        self.figure = plt.figure()
-        FigureCanvas.__init__(self, self.figure)
-        self.setFixedHeight(400)
-        self.setFixedWidth(600)
-
         
 
 class FiellerTab(QWidget):
@@ -115,7 +106,7 @@ class FiellerTab(QWidget):
         alpha = float(self.ed6.text())
         Ntot = float(self.ed7.text())
         self.log.separate()
-        self.log.append(helpers.calculate_fieller(a, b, sa, sb, r, alpha, Ntot))
+        self.log.append(str(Fieller(a, b, sa, sb, r, alpha, Ntot)))
 
 class RandomisationBinTab(QWidget):
     def __init__(self, log, parent=None):
@@ -166,8 +157,10 @@ class RandomisationBinTab(QWidget):
         if2 = int(self.ed4.text())
         self.nran = int(self.ed5.text())
         self.log.separate()
-        self.log.append(helpers.calculate_rantest_binary(
-            self.nran, ir1, if1, ir2, if2))
+        ttb = TTestBinomial(ir1, if1, ir2, if2)
+        rnt = rantest.RantestBinomial(ir1, if1, ir2, if2)
+        rnt.run_rantest(self.nran)
+        self.log.append(str(ttb) + str(rnt))
 
 
 class RandomisationContTab(QWidget):
@@ -214,46 +207,73 @@ class RandomisationContTab(QWidget):
             self.path = os.path.split(str(self.filename))[0]
             #TODO: allow loading from other format files
             self.X, self.Y = load_two_samples_from_excel_with_pandas(self.filename)
-            self.get_basic_statistics()
+            self.initiate_rantest()
         except:
             pass
-
-    def get_basic_statistics(self):
+        
+    def initiate_rantest(self):
         # Display basic statistics
         self.log.separate()
         self.log.append('\nData loaded from a file: ' + self.filename + '\n')
-        self.log.append(helpers.calculate_ttest_hedges(self.X, self.Y, self.paired))
-        
-    def run_rantest(self):
-        """Called by RUN TEST button in Tab2."""
-        randiff, txt = helpers.calculate_rantest_continuous(
-            self.nran, self.X, self.Y, self.paired)
-        self.log.append(txt)
+        self.rnt = rantest.RantestContinuous(self.X, self.Y, self.paired)
+        self.log.append(self.rnt.describe_data())
 
         item = self.plot_area.takeAt(0).widget()
         self.plot_area.removeWidget(item)
         item.deleteLater()
-        
-        
-        pc = PlotCanvas()
-        ax = pc.figure.add_subplot(111)
-        #ax.plot(data)
+        self.pc = PlotCanvas()
+        self.pc.add_boxplot(self.X, self.Y)
+        self.plot_area.addWidget(self.pc)
 
-        ax.hist(randiff, bins=20)
-        #ax.axvline(x=obsdif, color='r')
-        #ax.axvline(x=-obsdif, color='r')
-        lo95lim = np.percentile(randiff, 2.5)
-        hi95lim = np.percentile(randiff, 97.5)
-        ax.axvline(x=lo95lim, color='k', linestyle='--')
-        ax.axvline(x=hi95lim, color='k', linestyle='--')
-        ax.set_xlabel('difference between means')
-        ax.set_ylabel('frequency')
-        #print('RED solid line: observed difference')
-        #print('BLACK dashed line: 2.5% limits')
+    def run_rantest(self):
+        """Called by RUN TEST button in Tab2."""
+        self.rnt.run_rantest(self.nran)
+        self.log.append(str(self.rnt))
+        self.pc.add_randhisto(self.rnt.randiff, self.rnt.dbar, 
+                              self.rnt.lo95lim, self.rnt.hi95lim)
+        
+
+class PlotCanvas(FigureCanvas):
+    """"""
+    def __init__(self, parent=None):
+        self.figure = plt.figure()
+        FigureCanvas.__init__(self, self.figure)
+        self.setFixedHeight(400)
+        self.setFixedWidth(600)
+
+        self.ax1 = self.figure.add_subplot(1, 2, 1)
+        self.ax2 = self.figure.add_subplot(1, 2, 2)
+
+    def add_boxplot(self, X, Y, sample_names=None):
+        if sample_names is None:
+            names = ['sample 1', 'sample 2']
+        else:
+            names = sample_names
+        self.ax1.clear()
+        self.ax1.boxplot((X, Y))
+        # Add some random "jitter" to the x-axis
+        x = np.random.normal(1, 0.04, size=len(X))
+        self.ax1.plot(x, X, '.', alpha=0.4)
+        y = np.random.normal(2, 0.04, size=len(Y))
+        self.ax1.plot(y, Y, '.', alpha=0.4)
+        plt.setp(self.ax1, xticks=[1, 2], xticklabels=names);
+        self.ax1.set_ylabel('measurment values')
         plt.tight_layout()
+        self.draw()
 
-        self.plot_area.addWidget(pc)
-        #plt.show()
+    def add_randhisto(self, randiff, dbar, lo95lim, hi95lim):
+        self.ax2.clear()
+        self.ax2.hist(randiff, bins=20)
+        self.ax2.axvline(x=dbar, color='r', label='observed difference')
+        self.ax2.axvline(x=-dbar, color='r')
+        self.ax2.axvline(x=lo95lim, color='k', linestyle='--', label='2.5% limits')
+        self.ax2.axvline(x=hi95lim, color='k', linestyle='--')
+        self.ax2.set_xlabel('difference between means')
+        self.ax2.set_ylabel('frequency')
+        self.ax2.legend(bbox_to_anchor=(0., 1.02, 1., .102), loc=3,
+                        borderaxespad=0.)
+        plt.tight_layout()
+        self.draw()
 
 
 class WelcomeScreen(QWidget):
