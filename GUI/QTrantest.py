@@ -168,6 +168,7 @@ class RandomisationBatchTab(QWidget):
     def __init__(self, log, parent=None):
         QWidget.__init__(self, parent)
         layout = QVBoxLayout(self)
+        layout.addWidget(QLabel(rantest.RTINTROD))
         self.log = log
         self.nran = 5000
         self.path = ""
@@ -177,16 +178,16 @@ class RandomisationBatchTab(QWidget):
         layout1 = QHBoxLayout()
         layout1.addWidget(QLabel("Number of randomisations:"))
         self.ed1 = QLineEdit(str(self.nran))
-        self.ed1.editingFinished.connect(self.ran_changed)
+#        self.ed1.editingFinished.connect(self.ran_changed)
         layout1.addWidget(self.ed1)
         layout.addLayout(layout1)
         bt2 = QPushButton("Run randomisation test")
         layout.addLayout(single_button(bt2))
         bt1.clicked.connect(self.open_file)
-        #bt2.clicked.connect(self.run_rantest)
+        bt2.clicked.connect(self.run_rantest)
 
-    def ran_changed(self):
-        self.nran = int(self.ed1.text()) 
+#    def ran_changed(self):
+#        self.nran = int(self.ed1.text()) 
 
     def open_file(self):
         """Called by TAKE DATA FROM FILE button in Tab2"""
@@ -195,10 +196,23 @@ class RandomisationBatchTab(QWidget):
                 "Open Data File...", self.path, "MS Excel Files (*.xlsx)")
             self.path = os.path.split(str(self.filename))[0]
             #TODO: allow loading from other format files
-            multi = load_multi_samples_from_excel_with_pandas(self.filename)
-            #self.initiate_rantest()
+            df = load_multi_samples_from_excel_with_pandas(self.filename)
+            
         except:
             pass
+        self.initiate_rantest(df)
+
+    def initiate_rantest(self, df):
+        # Display basic statistics
+        self.log.separate()
+        self.log.append('\nData loaded from a file: ' + self.filename + '\n')
+        self.rnt = rantest.RantestBatch(df, self.log)
+        self.log.append('Loaded {0:d} samples: '.format(self.rnt.n)) 
+        self.log.append(str(self.rnt.df.describe()))
+
+    def run_rantest(self):
+        self.nran = int(self.ed1.text())
+        self.rnt.run_rantest(self.nran)
 
 
 class RandomisationContTab(QWidget):
@@ -417,6 +431,6 @@ def load_multi_samples_from_excel_with_pandas(filename):
     dialog = ExcelSheetDlg(xl.sheet_names) #self
     if dialog.exec_():
         xlssheet = dialog.returnSheet()
-    dt = xl.parse(xlssheet)
-    return dt
+    df = xl.parse(xlssheet)
+    return df
 

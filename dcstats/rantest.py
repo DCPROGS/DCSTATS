@@ -146,3 +146,27 @@ class RantestContinuous():
         '\t(greater than or equal in absolute value to observed)' +
         '\nPequal = {0:.3e}'.format(self.pequal) +
         '\t(equal in absolute value to observed)')
+
+
+class RantestBatch():
+    def __init__(self, dataframe, log):
+        """ 
+        Parameters
+        ----------
+        dataframe : Pandas data frame containing multiple samples
+        """   
+        self.df = dataframe
+        self.names = self.df.columns.tolist()
+        self.n = len(self.names)
+        self.log = log
+
+    def run_rantest(self, nran):
+        for i in range(self.n-1):
+            for j in range(i+1, self.n):
+                rnt = RantestContinuous(self.df.iloc[:, i].dropna().values.tolist(), 
+                                        self.df.iloc[:, j].dropna().values.tolist())
+                rnt.run_rantest(nran)
+                self.log.append('\n*****   ' + self.names[i] + ' versus ' + 
+                                self.names[j] + '   *****')
+                self.log.append(rnt.describe_data())
+                self.log.append(str(rnt))
