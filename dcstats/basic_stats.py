@@ -164,7 +164,7 @@ class TTestContinuous(object):
 
     def __repr__(self):
         
-        repr_string = ('n \t\t {0:d}      \t\t  {1:d}'.format(len(self.X), len(self.Y)) +
+        repr_string = ('n \t\t {0:d}     \t\t{1:d}'.format(len(self.X), len(self.Y)) +
             '\nMean \t\t {0:.6f}    \t  {1:.6f}'.format(mean(self.X), mean(self.Y)) +
             '\nSD \t\t {0:.6f}     \t  {1:.6f}'.format(sd(self.X), sd(self.Y)) +
             '\nSDM \t\t {0:.6f}     \t  {1:.6f}'.format(sdm(self.X), sdm(self.Y)) +
