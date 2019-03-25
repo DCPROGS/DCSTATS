@@ -117,6 +117,7 @@ class RantestContinuous():
 
             
     def run_rantest(self, nran):
+        """ Resample without replacement nran times and get statistics of obtained distribution. """
         self.nran = nran
         self.randiff = np.zeros(nran)
         if self.are_paired:
