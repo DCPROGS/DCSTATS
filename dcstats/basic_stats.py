@@ -1,7 +1,8 @@
 #!/usr/bin python
 """ Some basic statistics functions. To be merged to statistics_EJ.py. """
 
-from math import sqrt, fabs
+#math import sqrt, fabs, erf, exp
+import math
 
 from dcstats.statistics_EJ import incompleteBeta
 
@@ -27,7 +28,7 @@ def sd(X):
         ----------
         X : a list of values
     """   
-    return sqrt(variance(X))   
+    return math.sqrt(variance(X))   
 
 def sdm(X):
     """ Calculate standard deviation of the mean.
@@ -35,15 +36,58 @@ def sdm(X):
         ----------
         X : a list of values
     """   
-    return sd(X) / sqrt(len(X))
+    return sd(X) / math.sqrt(len(X))
+
+def _pdf(x, mu, sd):
+    """Normal distribution density """
+    return 1 / (sd * math.sqrt(2 * math.pi)) * math.exp( - (x - mu)**2 / (2 * sd**2)) 
+
+def _cdf(x, mu, sd):
+    """Cumulative density function for normal distribution """
+    return (1.0 + math.erf((x - mu) / (sd * math.sqrt(2.0)))) / 2.0
+
+def _phi(x):
+    """Cumulative density function for the standard normal distribution """
+    return (1.0 + math.erf(x / math.sqrt(2.0))) / 2.0
+
+def _beta_two_tail(m1, s1, n1, m2, s2, n2):
+    """ beta-error two-tailed for alpha = 0.05"""
+    z025 = 1.96
+    z = (m1 - m2) / math.sqrt(s1**2  / n1 + s2**2 / n2)
+    return _phi(z025 - z) - _phi(-z025 - z)
+
+def power(m1, s1, n1, m2, s2, n2):
+    """Statistical power (1 - beta error)"""
+    return 1 - _beta_two_tail(m1, s1, n1, m2, s2, n2)
+
+def ci95lower(X):
+    """ Calculate 95% confidence interval (lower) for the mean.
+        Parameters
+        ----------
+        X : a list of values
+    """ 
+    z = 1.96 # z*-value from the standard normal distribution for 95% confidence level
+    #TODO: allow calculation for desired confidence level
+    return mean(X) - z * sdm(X) 
+
+def ci95upper(X):
+    """ Calculate 95% confidence intervals (upper) for the mean.
+        Parameters
+        ----------
+        X : a list of values
+    """ 
+    z = 1.96 # z*-value from the standard normal distribution for 95% confidence level
+    #TODO: allow calculation for desired confidence level
+    return mean(X) + z * sdm(X) 
+
 
 def ttest_independent(X, Y):
     """Calculate t-value and probability for un-paired t-test."""
     df = len(X) + len(Y) - 2
     xbar, sdx = mean(X), sd(X)
     ybar, sdy = mean(Y), sd(Y)
-    tval = (xbar - ybar) / sqrt(sdx**2 / len(X) + sdy**2 / len(Y))
-    P = ttestPDF(fabs(tval), df)
+    tval = (xbar - ybar) / math.sqrt(sdx**2 / len(X) + sdy**2 / len(Y))
+    P = ttestPDF(math.fabs(tval), df)
     return tval, P, df
 
 def ttest_paired(X, Y):
@@ -88,12 +132,12 @@ class TTestBinomial():
     def __t_test(self):
         """" Use Gaussian approx to do 2 sample t test. """
         ppool = float(self.ir1 + self.ir2) / float(self.n1 + self.n2)
-        self.sd1 = sqrt(self.p1 * (1.0 - self.p1) / float(self.n1))
-        self.sd2 = sqrt(self.p2 * (1.0 - self.p2) / float(self.n2))
-        sd1p = sqrt(ppool * (1.0 - ppool) / float(self.n1))
-        sd2p = sqrt(ppool * (1.0 - ppool) / float(self.n2))
-        sdiff = sqrt(sd1p * sd1p + sd2p * sd2p)
-        self.tval = fabs(self.p1 - self.p2) / sdiff
+        self.sd1 = math.sqrt(self.p1 * (1.0 - self.p1) / float(self.n1))
+        self.sd2 = math.sqrt(self.p2 * (1.0 - self.p2) / float(self.n2))
+        sd1p = math.sqrt(ppool * (1.0 - ppool) / float(self.n1))
+        sd2p = math.sqrt(ppool * (1.0 - ppool) / float(self.n2))
+        sdiff = math.sqrt(sd1p * sd1p + sd2p * sd2p)
+        self.tval = math.fabs(self.p1 - self.p2) / sdiff
         df = 100000    # to get Gaussian
         self.P = ttestPDF(self.tval, df)
         
@@ -131,7 +175,7 @@ class TTestContinuous(object):
                 self.D.append(self.X[i] - self.Y[i])    # differences for paired test
             self.dbar, self.sdd, self.sdmd = mean(self.D), sd(self.D), sdm(self.D)
         else:
-            self.dbar = fabs(self.xbar - self.ybar)
+            self.dbar = math.fabs(mean(self.X) - mean(self.Y))
             self.are_paired = False
         self.__t_test()
         
@@ -143,10 +187,13 @@ class TTestContinuous(object):
 
     def __repr__(self):
         
-        repr_string = ('n \t\t {0:d}      \t  {1:d}'.format(len(self.X), len(self.Y)) +
+        repr_string = ('n \t\t {0:d}     \t{1:d}'.format(len(self.X), len(self.Y)) +
             '\nMean \t\t {0:.6f}    \t  {1:.6f}'.format(mean(self.X), mean(self.Y)) +
             '\nSD \t\t {0:.6f}     \t  {1:.6f}'.format(sd(self.X), sd(self.Y)) +
-            '\nSDM \t\t {0:.6f}     \t  {1:.6f}'.format(sdm(self.X), sdm(self.Y)))
+            '\nSDM \t\t {0:.6f}     \t  {1:.6f}'.format(sdm(self.X), sdm(self.Y)) +
+            '\n95% confidence intervals:' +
+            '\nlower \t\t {0:.6f}    \t  {1:.6f}'.format(ci95lower(self.X), ci95lower(self.Y)) +
+            '\nupper \t\t {0:.6f}    \t  {1:.6f}'.format(ci95upper(self.X), ci95upper(self.Y)))
             
         if len(self.X) == len(self.Y):
             repr_string += ('\n\n Mean difference (dbar) = \t {0:.6f}'.format(self.dbar) +
@@ -160,6 +207,9 @@ class TTestContinuous(object):
         else:
             repr_string += ('\n\n Two-sample unpaired Student''s t-test:' +
                 '\n t = \t {0:.6f}'.format(float(self.tval)) +
-                '\n two tail P = \t {0:.6f}'.format(self.P))
+                '\n two tail P = \t {0:.3E}'.format(self.P) +
+                '\n\n statistical power = {0:.3f}'.
+                format(power(mean(self.X), sd(self.X), len(self.X), 
+                             mean(self.Y), sd(self.Y), len(self.X))))
             
         return repr_string

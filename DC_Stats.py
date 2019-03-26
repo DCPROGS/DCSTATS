@@ -13,7 +13,7 @@ if __name__ == "__main__":
         from PyQt5.QtWidgets import QApplication
         from GUI import QTrantest
         app = QApplication(sys.argv)
-        form = QTrantest.rantestQT()
+        form = QTrantest.RantestQT()
         form.show()
         app.exec_()
         

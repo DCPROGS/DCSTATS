@@ -11,8 +11,8 @@ else:
     from tkinter import filedialog as tkFileDialog
     
 from dcstats import dataIO
-from dcstats.rantest import Rantest
-from dcstats.rantest import RantestContinuous
+import dcstats.rantest as rantest
+#from dcstats.rantest import RantestContinuous
 from dcstats.Hedges import Hedges_d
 from dcstats.basic_stats import TTestContinuous
 
@@ -36,7 +36,7 @@ class FrameRantestContinuous:
         self.frame.config(background="#dcdcdc") #well, it has to be, right?
         
         #self.frame.geometry('600x800')
-        message = Message(self.frame, text="\n"+Rantest.introd, justify=LEFT, padx=10, width=500, font=("Helvetica", 12), bg="#dcdcdc")
+        message = Message(self.frame, text="\n"+rantest.RTINTROD, justify=LEFT, padx=10, width=500, font=("Helvetica", 12), bg="#dcdcdc")
         message.grid(row=0, column=0, rowspan=6, columnspan=2, sticky=W)
 
         s = Separator(self.frame, orient=HORIZONTAL)
@@ -163,7 +163,7 @@ class FrameRantestContinuous:
         'Calls Rantest and Hedges to calculate statistics.'
         self.nran = int(self.e5.get())
         ttc = TTestContinuous(self.X, self.Y, self.paired)
-        rnt = RantestContinuous(self.X, self.Y, self.paired)
+        rnt = rantest.RantestContinuous(self.X, self.Y, self.paired)
         rnt.run_rantest(self.nran)
         self.meanToPlot = rnt.dbar
         self.randiff = rnt.randiff
