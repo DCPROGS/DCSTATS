@@ -14,8 +14,8 @@ from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
 
+import dcstats
 from dcstats import rantest
-from dcstats import dataIO
 from dcstats.fieller import Fieller
 from dcstats.basic_stats import TTestBinomial
 
@@ -33,7 +33,6 @@ class RantestQT(QDialog):
         self.results = ResultBox()
         main_box.addWidget(self.results)       
         # Right side: controls and plot
-
         self.plot_area = QVBoxLayout()
         self.plot_area.addWidget(WelcomeScreen())
         
@@ -408,7 +407,7 @@ class ResultBox(QTextBrowser):
     def __init__(self, parent=None):
         super(ResultBox, self).__init__(parent)
         self.setFixedWidth(500)
-        self.append("DC-stats")
+        self.append("DC-stats version: {0}".format(dcstats.__version__))
         self.append(sys.version)
         self.append("Date and time of analysis: " + str(datetime.datetime.now())[:19])
         self.append("Machine: {0};   System: {1}".format(socket.gethostname(), sys.platform))
@@ -431,8 +430,9 @@ def single_button(bt):
     return b_layout
 
 def load_two_samples_from_excel_with_pandas(filename):
-    #TODO: currently loads only firs two columns. Allow multiple column load.
-    # TODO: consider moving out of this class
+    """ Load two columns from a selected sheet in Excel file. 
+        Return two samples as lists. """
+    # TODO: should be moved to dataIO but need to agree on refactoring IO
     xl = pd.ExcelFile(filename)
     dialog = ExcelSheetDlg(xl.sheet_names) #self
     if dialog.exec_():
@@ -443,8 +443,9 @@ def load_two_samples_from_excel_with_pandas(filename):
     return X, Y
 
 def load_multi_samples_from_excel_with_pandas(filename):
-    #TODO: currently loads only firs two columns. Allow multiple column load.
-    # TODO: consider moving out of this class
+    """ Load all columns from a selected sheet in Excel file. Uses pandas.
+        Return pandas data frame"""
+    # TODO: should be moved to dataIO but need to agree on refactoring IO
     xl = pd.ExcelFile(filename)
     dialog = ExcelSheetDlg(xl.sheet_names) #self
     if dialog.exec_():

@@ -10,10 +10,6 @@ import numpy as np
 import dcstats.basic_stats as bs
 from dcstats.Hedges import Hedges_d
 
-# AP 091202 Minor corrections to spelling and spacing of introd.
-# AP 140418 more cosmetic changes for deposition
-# AP 150512 corrected implementation of paired tests, more verbose output.
-
 __author__="Remis Lape"
 __date__ ="$01-May-2009 17:42:28$"
 
