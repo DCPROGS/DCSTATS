@@ -13,7 +13,7 @@ If you work with Python version 2.7 (as packaged with macOS), you will get the T
 
 Examples of how to use modules are provided in Jupyter notebooks (.ipynb files). 
 
-To run, open the Terminal, navigate to the DC-Stats-for-Mac directory and type:
+To run, open the Terminal, navigate to the DC-Stats directory and type:
 
   python DC_Stats.py
 
