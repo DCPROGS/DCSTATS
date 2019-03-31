@@ -1,9 +1,15 @@
 # DC Stats
 Python port of David Colquhoun's Statistics Tools
 
-Work porting to Python from original FORTRAN was begun by Remigijus Lape at UCL. This port takes advantage of the nice Tkinter implementation in macOS. 
+Work porting to Python from original FORTRAN was begun by Remigijus Lape at UCL. 
 
-Working out of the box on MacOS X 10.8 - 10.13 with no dependencies. Expected to work with Python version 2.7.15 (packaged with macOS) or Python 3.
+Qt5 GUI under Python 3.7 is now the preferred environment. 
+Dependencies are pandas, numpy and scipy 
+You can get everything you need on any platform quite easily with Anaconda. 
+
+Tested on macOS 10.14. Windows and Linux should also be fine. 
+
+If you work with Python version 2.7 (as packaged with macOS), you will get the Tkinter GUI that is no longer maintained. This version should work with old versions of OSX like 10.6
 
 Examples of how to use modules are provided in Jupyter notebooks (.ipynb files). 
 
@@ -18,7 +24,6 @@ To use data from Excel, save the two sets of values in two columns as tab-delimi
 # Projected ongoing development
 This software is under development. Output is not fully tested, and therefore you should exercise caution if you plan to use the results for production / publication. 
 
-Full Qt GUI is planned for Windows. We hope this approach will work in Linux too.  
-Ultimately, we wish to include batch processing of data, and intuitive import and export.
+Batch processing of data is now implemented for Rantest. Intuitive import and export should follow.
 
 
