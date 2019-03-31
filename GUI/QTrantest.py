@@ -297,9 +297,10 @@ class RandomisationContTab(QWidget):
             self.path = os.path.split(str(self.filename))[0]
             #TODO: allow loading from other format files
             self.X, self.Y = load_two_samples_from_excel_with_pandas(self.filename)
-            self.initiate_rantest()
+            
         except:
             pass
+        self.initiate_rantest()
         
     def initiate_rantest(self):
         # Display basic statistics
@@ -485,8 +486,8 @@ def load_two_samples_from_excel_with_pandas(filename):
     if dialog.exec_():
         xlssheet = dialog.returnSheet()
     dt = xl.parse(xlssheet)
-    X = dt.iloc[:,0].dropna().values.tolist()
-    Y = dt.iloc[:,1].dropna().values.tolist()
+    X = dt.iloc[:,0].dropna().values #.tolist()
+    Y = dt.iloc[:,1].dropna().values #.tolist()
     return X, Y
 
 def load_multi_samples_from_excel_with_pandas(filename):
