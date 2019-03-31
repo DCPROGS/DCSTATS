@@ -34,6 +34,18 @@ class RantestQT(QDialog):
         left_box.addWidget(WelcomeScreen())
         self.results = ResultBox()
         left_box.addWidget(self.results)
+
+        buttonHBox = QHBoxLayout()
+        clearButton = QPushButton("Clear")
+        clearButton.clicked.connect(self.on_clear)
+        buttonHBox.addWidget(clearButton)
+        savePrtButton = QPushButton("Save Printout")
+        savePrtButton.clicked.connect(self.on_save)
+        buttonHBox.addWidget(savePrtButton)
+        #saveHTMLButton = QPushButton("Save HTML")
+        #saveHTMLButton.clicked.connect(self.on_save_html)
+        #buttonHBox.addWidget(saveHTMLButton)
+        left_box.addLayout(buttonHBox)
         
         # Right side: controls and plot
         right_box = QVBoxLayout()
@@ -61,16 +73,30 @@ class RantestQT(QDialog):
 
         main_box.addLayout(left_box)
         main_box.addLayout(right_box)
-
         self.setLayout(main_box)
         
-
     def tab_changed(self):
         item = self.plot_area.takeAt(0).widget()
         self.plot_area.removeWidget(item)
         item.deleteLater()
         self.plot_area.addWidget(GraphPlaceholder())
 
+    def on_clear(self):
+        self.results.clear()
+        self.results.append_info()
+
+    def on_save(self):
+        try:
+            printOutFilename, filt = QFileDialog.getSaveFileName(self,
+                    "Save as PRT file...", ".prt",
+                    "PRT files (*.prt)")
+            #self.results.selectAll()
+            fout = open(printOutFilename,'w')
+            fout.write(self.results.toPlainText())
+            fout.close()
+            self.results.append('\nSession saved to printout file:' + printOutFilename)
+        except:
+            pass
 
 class FiellerTab(QWidget):
     def __init__(self, log, parent=None):
@@ -204,9 +230,9 @@ class RandomisationBatchTab(QWidget):
             self.path = os.path.split(str(self.filename))[0]
             #TODO: allow loading from other format files
             df = load_multi_samples_from_excel_with_pandas(self.filename)
+            self.initiate_rantest(df)
         except:
             pass
-        self.initiate_rantest(df)
 
     def initiate_rantest(self, df):
         # Display basic statistics
@@ -425,13 +451,16 @@ class ResultBox(QTextBrowser):
         super(ResultBox, self).__init__(parent)
         self.setFixedWidth(500)
         self.setFixedHeight(500)
+        self.append_info()
+
+    def append_info(self):
         self.append("DC-stats version: {0}".format(dcstats.__version__))
         self.append("Machine: {0};  System: {1};\nSystem Version: {2}".format(socket.gethostname(), sys.platform, sys.version))
         self.append("Date and time of analysis: " + str(datetime.datetime.now())[:19])
     
-
     def separate(self):
         self.append('*' * 10)
+
 
 def ok_cancel_button(parent):
     buttonBox = QDialogButtonBox(QDialogButtonBox.Ok|QDialogButtonBox.Cancel)
