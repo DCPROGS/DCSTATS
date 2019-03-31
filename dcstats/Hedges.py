@@ -99,6 +99,8 @@ class Hedges_d:
         # repeats is the number of times that it is repeated.
         # bCA: bias-corrected and accelerated - recommended to improve pctile coverage
         # bCA not implemented yet
+
+        random.seed(1984)
         
         hedges_d_bs = []     #unbiased, values from bootstrap
         
