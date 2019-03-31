@@ -26,16 +26,18 @@ __date__ ="$03-Jan-2010 15:26:00$"
 class RantestQT(QDialog):
     def __init__(self, parent=None):
         super(RantestQT, self).__init__(parent)
-        self.setWindowTitle("DC_PyPs: Statistics")
-
+        self.setWindowTitle("DC's Statistics Tools")
         main_box = QHBoxLayout()
-        # Left side: Result text box
-        self.results = ResultBox()
-        main_box.addWidget(self.results)       
-        # Right side: controls and plot
-        self.plot_area = QVBoxLayout()
-        self.plot_area.addWidget(WelcomeScreen())
         
+        # Left side: Welcome and Results text box
+        left_box = QVBoxLayout()
+        left_box.addWidget(WelcomeScreen())
+        self.results = ResultBox()
+        left_box.addWidget(self.results)
+        
+        # Right side: controls and plot
+        right_box = QVBoxLayout()
+        self.plot_area = QVBoxLayout()
         self.tab_widget = QTabWidget()
         self.tab_widget.addTab(RandomisationContTab(self.results, self.plot_area), 
                           "Rantest: two-sample")
@@ -43,23 +45,32 @@ class RantestQT(QDialog):
         self.tab_widget.addTab(RandomisationBinTab(self.results), "Rantest: binary")
         self.tab_widget.addTab(FiellerTab(self.results), "Fieller")
         self.tab_widget.setFixedWidth(600)
+        self.tab_widget.setFixedHeight(400)
         self.tab_widget.currentChanged.connect(self.tab_changed)
-
-        right_box = QVBoxLayout()
+        
+        self.plot_area.addWidget(GraphPlaceholder())
         right_box.addWidget(self.tab_widget)
         right_box.addLayout(self.plot_area)
-        quitButton = QPushButton("&QUIT")
+        
+        quitButton = QPushButton("&Quit")
         quitButton.clicked.connect(self.close)
-        right_box.addLayout(single_button(quitButton))
+        quit_box = QHBoxLayout()
+        quit_box.addStretch(1)
+        quit_box.addLayout(single_button(quitButton))
+        right_box.addLayout(quit_box)
+
+        main_box.addLayout(left_box)
         main_box.addLayout(right_box)
+
         self.setLayout(main_box)
+        
 
     def tab_changed(self):
         item = self.plot_area.takeAt(0).widget()
         self.plot_area.removeWidget(item)
         item.deleteLater()
-        self.plot_area.addWidget(WelcomeScreen())
-        
+        self.plot_area.addWidget(GraphPlaceholder())
+
 
 class FiellerTab(QWidget):
     def __init__(self, log, parent=None):
@@ -307,7 +318,7 @@ class PlotCanvas(FigureCanvas):
     def __init__(self, parent=None):
         self.figure = plt.figure()
         FigureCanvas.__init__(self, self.figure)
-        self.setFixedHeight(400)
+        self.setFixedHeight(300)
         self.setFixedWidth(600)
 
         self.ax1 = self.figure.add_subplot(1, 2, 1)
@@ -344,23 +355,29 @@ class PlotCanvas(FigureCanvas):
         plt.tight_layout()
         self.draw()
 
+class GraphPlaceholder(QWidget):
+    def __init__(self, parent=None):
+        super(GraphPlaceholder, self).__init__(parent)
+        self.setFixedHeight(300)
+        self.setFixedWidth(600)
 
 class WelcomeScreen(QWidget):
     """"""
     def __init__(self, parent=None):
         super(WelcomeScreen, self).__init__(parent)
-        self.setFixedHeight(400)
-        self.setStyleSheet("QWidget { background-color: %s }"% "white")
+        self.setFixedWidth(500)
+        self.setFixedHeight(250)
         self.layout = QVBoxLayout(self)
-        self.layout.addWidget(QLabel("<p align=center><b>Welcome to DC_PyPs: "
-            "Statistics!</b></p>"))
+        self.layout.addWidget(QLabel("<p align=left>Welcome to DC's Statistics Tools. "
+        "Select a statistical test from the tabs.</p>"))
         self.layout.addWidget(self.movie_screen())
-        self.layout.addWidget(QLabel("<p align=center><b>To continue select a "
-        "statistical test from visible tabs.</b></p>"))
+        self.layout.addWidget(QLabel("<p align=right><i>David Colquhoun  </i></p>"))
+    
 
     def movie_screen(self):
         """Set up the gif movie screen."""
         movie_screen = QLabel()
+        movie_screen.setStyleSheet("QWidget { background-color: %s }"% "white")
         # expand and center the label
         movie_screen.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         movie_screen.setAlignment(Qt.AlignCenter)
@@ -407,10 +424,11 @@ class ResultBox(QTextBrowser):
     def __init__(self, parent=None):
         super(ResultBox, self).__init__(parent)
         self.setFixedWidth(500)
+        self.setFixedHeight(500)
         self.append("DC-stats version: {0}".format(dcstats.__version__))
-        self.append(sys.version)
+        self.append("Machine: {0};  System: {1};\nSystem Version: {2}".format(socket.gethostname(), sys.platform, sys.version))
         self.append("Date and time of analysis: " + str(datetime.datetime.now())[:19])
-        self.append("Machine: {0};   System: {1}".format(socket.gethostname(), sys.platform))
+    
 
     def separate(self):
         self.append('*' * 10)
