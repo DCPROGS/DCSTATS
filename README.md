@@ -21,7 +21,7 @@ You can do a randomization test on continuous or binomial data, and look at Fiel
 
 To use data from Excel, save the two sets of values in two columns as tab-delimited text without titles.
 
-![screenshot](https://github.com/aplested/DC-Stats/screenshot.png)
+![screenshot](screenshot.png)
 
 # Projected ongoing development
 This software is under development. Output is not fully tested, and therefore you should exercise caution if you plan to use the results for production / publication. 
