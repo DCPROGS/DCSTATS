@@ -212,8 +212,11 @@ def get_boxplot(df):
     figure = plt.figure()
     ax = figure.add_subplot(1, 1, 1)
     ax = df.boxplot()
+    names = df.columns.tolist()
     for i in range(df.shape[1]):
-        X = df.iloc[:, i].dropna().values #.tolist()
+        X = df.iloc[:, i].dropna().values
         x = np.random.normal(i+1, 0.04, size=len(X))
         ax.plot(x, X, '.', alpha=0.4)
+    plt.setp(ax, xticks=list(range(1, df.shape[1]+1)), xticklabels=names)
+    ax.set_ylabel('measurment values')
     return figure

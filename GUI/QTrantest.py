@@ -443,7 +443,7 @@ def load_two_samples_from_excel_with_pandas(filename):
     dialog = ExcelSheetDlg(xl.sheet_names) #self
     if dialog.exec_():
         xlssheet = dialog.returnSheet()
-    df = xl.parse(xlssheet, usecols=2)
+    df = xl.parse(xlssheet, usecols=1)
     #X = dt.iloc[:,0].dropna().values #.tolist()
     #Y = dt.iloc[:,1].dropna().values #.tolist()
     #return X, Y
