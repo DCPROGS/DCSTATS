@@ -6,6 +6,7 @@ import sys
 import math
 import random
 import numpy as np
+import matplotlib.pyplot as plt
 
 import dcstats.basic_stats as bs
 from dcstats.hedges import Hedges_d
@@ -167,3 +168,13 @@ class RantestBatch():
                                 self.names[j] + '   *****')
                 self.log.append(rnt.describe_data())
                 self.log.append(str(rnt))
+
+    def get_boxplot(self):
+        figure = plt.figure()
+        ax = figure.add_subplot(1, 1, 1)
+        ax = self.df.boxplot()
+        for i in range(self.df.shape[1]):
+            X = self.df.iloc[:, i].dropna().values #.tolist()
+            x = np.random.normal(i+1, 0.04, size=len(X))
+            ax.plot(x, X, '.', alpha=0.4)
+        return figure

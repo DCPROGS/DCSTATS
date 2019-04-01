@@ -230,9 +230,10 @@ class RandomisationBatchTab(QWidget):
             self.path = os.path.split(str(self.filename))[0]
             #TODO: allow loading from other format files
             df = load_multi_samples_from_excel_with_pandas(self.filename)
-            self.initiate_rantest(df)
+            
         except:
             pass
+        self.initiate_rantest(df)
 
     def initiate_rantest(self, df):
         # Display basic statistics
@@ -245,9 +246,9 @@ class RandomisationBatchTab(QWidget):
         item = self.plot_area.takeAt(0).widget()
         self.plot_area.removeWidget(item)
         item.deleteLater()
-        self.bbp = RantestBatchPlot(df)
+        self.bbp = RantestBatchPlot(self.rnt.get_boxplot())
         self.plot_area.addWidget(self.bbp)
-
+        
     def run_rantest(self):
         self.nran = int(self.ed1.text())
         self.rnt.run_rantest(self.nran)
@@ -324,21 +325,16 @@ class RandomisationContTab(QWidget):
                               self.rnt.lo95lim, self.rnt.hi95lim)
 
 
+
 class RantestBatchPlot(FigureCanvas):
     """"""
-    def __init__(self, df, parent=None):
-        self.figure = plt.figure()
+    def __init__(self, fig, parent=None):
+        self.figure = fig
         FigureCanvas.__init__(self, self.figure)
         self.setFixedHeight(400)
         self.setFixedWidth(600)
-        self.ax1 = self.figure.add_subplot(1, 1, 1)
-        self.ax1 = df.boxplot()
-        for i in range(df.shape[1]):
-            X = df.iloc[:, i].dropna().values.tolist()
-            x = np.random.normal(i+1, 0.04, size=len(X))
-            self.ax1.plot(x, X, '.', alpha=0.4)
         self.draw()
-
+        
 
 class PlotCanvas(FigureCanvas):
     """"""
