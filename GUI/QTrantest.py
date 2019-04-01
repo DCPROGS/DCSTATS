@@ -327,6 +327,11 @@ class RandomisationContTab(QWidget):
         self.log.append(str(self.rnt))
         #self.pc.add_randhisto(self.rnt.randiff, self.rnt.dbar, 
         #                      self.rnt.lo95lim, self.rnt.hi95lim)
+        item = self.plot_area.takeAt(0).widget()
+        self.plot_area.removeWidget(item)
+        item.deleteLater()
+        pc = PlotCanvas(rantest.get_randhisto(self.rnt))
+        self.plot_area.addWidget(pc)
 
 
 class PlotCanvas(FigureCanvas):
@@ -459,4 +464,3 @@ def load_multi_samples_from_excel_with_pandas(filename):
         xlssheet = dialog.returnSheet()
     df = xl.parse(xlssheet)
     return df
-

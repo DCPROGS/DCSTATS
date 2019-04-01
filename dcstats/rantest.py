@@ -138,43 +138,9 @@ class RantestContinuous():
         self.lo95lim = np.percentile(self.randiff, 2.5)
         self.hi95lim = np.percentile(self.randiff, 97.5)
 
-    
-
-
     #    self.ax1 = self.figure.add_subplot(1, 2, 1)
     #    self.ax2 = self.figure.add_subplot(1, 2, 2)
 
-    def add_boxplot(self, X, Y, sample_names=None):
-        if sample_names is None:
-            names = ['sample 1', 'sample 2']
-        else:
-            names = sample_names
-        self.ax1.clear()
-        self.ax1.boxplot((X, Y))
-        # Add some random "jitter" to the x-axis
-        x = np.random.normal(1, 0.04, size=len(X))
-        self.ax1.plot(x, X, '.', alpha=0.4)
-        y = np.random.normal(2, 0.04, size=len(Y))
-        self.ax1.plot(y, Y, '.', alpha=0.4)
-        plt.setp(self.ax1, xticks=[1, 2], xticklabels=names)
-        self.ax1.set_ylabel('measurment values')
-        
-        
-
-    def add_randhisto(self, randiff, dbar, lo95lim, hi95lim):
-        self.ax2.clear()
-        self.ax2.hist(randiff, bins=20)
-        self.ax2.axvline(x=dbar, color='r', label='observed difference')
-        self.ax2.axvline(x=-dbar, color='r')
-        self.ax2.axvline(x=lo95lim, color='k', linestyle='--', label='2.5% limits')
-        self.ax2.axvline(x=hi95lim, color='k', linestyle='--')
-        self.ax2.set_xlabel('difference between means')
-        self.ax2.set_ylabel('frequency')
-        self.ax2.legend(bbox_to_anchor=(0., 1.02, 1., .102), loc=3,
-                        borderaxespad=0.)
-        plt.tight_layout()
-
-        
     def __repr__(self):
         return ('\nRantest:  {0:d} randomisations'.format(self.nran) +
         '\nTwo-tailed P = {0:.3e}'.format(self.p2tail) + 
@@ -209,8 +175,9 @@ class RantestBatch():
 
 
 def get_boxplot(df):
-    figure = plt.figure()
+    figure = plt.figure(tight_layout=True)
     ax = figure.add_subplot(1, 1, 1)
+    ax.clear()
     ax = df.boxplot()
     names = df.columns.tolist()
     for i in range(df.shape[1]):
@@ -219,4 +186,20 @@ def get_boxplot(df):
         ax.plot(x, X, '.', alpha=0.4)
     plt.setp(ax, xticks=list(range(1, df.shape[1]+1)), xticklabels=names)
     ax.set_ylabel('measurment values')
+    plt.tight_layout()
+    return figure
+
+def get_randhisto(rnt): #randiff, dbar, lo95lim, hi95lim):
+    figure = plt.figure(tight_layout=True)
+    ax = figure.add_subplot(1, 1, 1)
+    ax.clear()
+    ax.hist(rnt.randiff, bins=20)
+    ax.axvline(x=rnt.dbar, color='r', label='observed difference')
+    ax.axvline(x=-rnt.dbar, color='r')
+    ax.axvline(x=rnt.lo95lim, color='k', linestyle='--', label='2.5% limits')
+    ax.axvline(x=rnt.hi95lim, color='k', linestyle='--')
+    ax.set_xlabel('difference between means')
+    ax.set_ylabel('frequency')
+    ax.legend(bbox_to_anchor=(0., 1.02, 1., .102), loc=3,
+                    borderaxespad=0.)
     return figure
