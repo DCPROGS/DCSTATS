@@ -11,8 +11,8 @@ from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
-#import matplotlib.pyplot as plt
-#from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
+import matplotlib.pyplot as plt
+from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
 
 import dcstats
 from dcstats import rantest
@@ -229,26 +229,25 @@ class RandomisationBatchTab(QWidget):
                 "Open Data File...", self.path, "MS Excel Files (*.xlsx)")
             self.path = os.path.split(str(self.filename))[0]
             #TODO: allow loading from other format files
-            self.df = load_multi_samples_from_excel_with_pandas(self.filename)
-            
+            df = load_multi_samples_from_excel_with_pandas(self.filename)
+            self.initiate_rantest(df)
         except:
             pass
-        self.initiate_rantest()
 
-    def initiate_rantest(self):
+    def initiate_rantest(self, df):
         # Display basic statistics
         self.log.separate()
         self.log.append('\nData loaded from a file: ' + self.filename + '\n')
-        self.rnt = rantest.RantestBatch(self.df, self.log)
+        self.rnt = rantest.RantestBatch(df, self.log)
         self.log.append('Loaded {0:d} samples: '.format(self.rnt.n)) 
         self.log.append(str(self.rnt.df.describe()))
 
         item = self.plot_area.takeAt(0).widget()
         self.plot_area.removeWidget(item)
         item.deleteLater()
-        self.bbp = PlotCanvas(rantest.get_boxplot(self.df))
+        self.bbp = RantestBatchPlot(df)
         self.plot_area.addWidget(self.bbp)
-        
+
     def run_rantest(self):
         self.nran = int(self.ed1.text())
         self.rnt.run_rantest(self.nran)
@@ -297,8 +296,7 @@ class RandomisationContTab(QWidget):
                 "Open Data File...", self.path, "MS Excel Files (*.xlsx)")
             self.path = os.path.split(str(self.filename))[0]
             #TODO: allow loading from other format files
-            #self.X, self.Y = load_two_samples_from_excel_with_pandas(self.filename)
-            self.df = load_two_samples_from_excel_with_pandas(self.filename)
+            self.X, self.Y = load_two_samples_from_excel_with_pandas(self.filename)
             
         except:
             pass
@@ -308,48 +306,87 @@ class RandomisationContTab(QWidget):
         # Display basic statistics
         self.log.separate()
         self.log.append('\nData loaded from a file: ' + self.filename + '\n')
-        #self.rnt = rantest.RantestContinuous(self.X, self.Y, self.paired)
-        self.rnt = rantest.RantestContinuous(self.df, self.paired)
+        self.rnt = rantest.RantestContinuous(self.X, self.Y, self.paired)
         self.log.append(self.rnt.describe_data())
 
         item = self.plot_area.takeAt(0).widget()
         self.plot_area.removeWidget(item)
         item.deleteLater()
-        #self.pc = PlotCanvas()
-        #self.pc.add_boxplot(self.X, self.Y)
-        #self.pc.add_boxplot(self.df)
-        self.pc = PlotCanvas(rantest.get_boxplot(self.df))
+        self.pc = PlotCanvas()
+        self.pc.add_boxplot(self.X, self.Y)
         self.plot_area.addWidget(self.pc)
 
     def run_rantest(self):
         """Called by RUN TEST button in Tab2."""
         self.rnt.run_rantest(self.nran)
         self.log.append(str(self.rnt))
-        #self.pc.add_randhisto(self.rnt.randiff, self.rnt.dbar, 
-        #                      self.rnt.lo95lim, self.rnt.hi95lim)
-        item = self.plot_area.takeAt(0).widget()
-        self.plot_area.removeWidget(item)
-        item.deleteLater()
-        pc = PlotCanvas(rantest.get_randhisto(self.rnt))
-        self.plot_area.addWidget(pc)
+        self.pc.add_randhisto(self.rnt.randiff, self.rnt.dbar, 
+                              self.rnt.lo95lim, self.rnt.hi95lim)
+
+
+class RantestBatchPlot(FigureCanvas):
+    """"""
+    def __init__(self, df, parent=None):
+        self.figure = plt.figure()
+        FigureCanvas.__init__(self, self.figure)
+        self.setFixedHeight(400)
+        self.setFixedWidth(600)
+        self.ax1 = self.figure.add_subplot(1, 1, 1)
+        self.ax1 = df.boxplot()
+        for i in range(df.shape[1]):
+            X = df.iloc[:, i].dropna().values.tolist()
+            x = np.random.normal(i+1, 0.04, size=len(X))
+            self.ax1.plot(x, X, '.', alpha=0.4)
+        self.draw()
 
 
 class PlotCanvas(FigureCanvas):
     """"""
-    def __init__(self, fig, parent=None):
-        self.figure = fig
+    def __init__(self, parent=None):
+        self.figure = plt.figure()
         FigureCanvas.__init__(self, self.figure)
         self.setFixedHeight(300)
         self.setFixedWidth(600)
+
+        self.ax1 = self.figure.add_subplot(1, 2, 1)
+        self.ax2 = self.figure.add_subplot(1, 2, 2)
+
+    def add_boxplot(self, X, Y, sample_names=None):
+        if sample_names is None:
+            names = ['sample 1', 'sample 2']
+        else:
+            names = sample_names
+        self.ax1.clear()
+        self.ax1.boxplot((X, Y))
+        # Add some random "jitter" to the x-axis
+        x = np.random.normal(1, 0.04, size=len(X))
+        self.ax1.plot(x, X, '.', alpha=0.4)
+        y = np.random.normal(2, 0.04, size=len(Y))
+        self.ax1.plot(y, Y, '.', alpha=0.4)
+        plt.setp(self.ax1, xticks=[1, 2], xticklabels=names)
+        self.ax1.set_ylabel('measurment values')
+        plt.tight_layout()
         self.draw()
 
-        
+    def add_randhisto(self, randiff, dbar, lo95lim, hi95lim):
+        self.ax2.clear()
+        self.ax2.hist(randiff, bins=20)
+        self.ax2.axvline(x=dbar, color='r', label='observed difference')
+        self.ax2.axvline(x=-dbar, color='r')
+        self.ax2.axvline(x=lo95lim, color='k', linestyle='--', label='2.5% limits')
+        self.ax2.axvline(x=hi95lim, color='k', linestyle='--')
+        self.ax2.set_xlabel('difference between means')
+        self.ax2.set_ylabel('frequency')
+        self.ax2.legend(bbox_to_anchor=(0., 1.02, 1., .102), loc=3,
+                        borderaxespad=0.)
+        plt.tight_layout()
+        self.draw()
+
 class GraphPlaceholder(QWidget):
     def __init__(self, parent=None):
         super(GraphPlaceholder, self).__init__(parent)
         self.setFixedHeight(300)
         self.setFixedWidth(600)
-
 
 class WelcomeScreen(QWidget):
     """"""
@@ -448,11 +485,10 @@ def load_two_samples_from_excel_with_pandas(filename):
     dialog = ExcelSheetDlg(xl.sheet_names) #self
     if dialog.exec_():
         xlssheet = dialog.returnSheet()
-    df = xl.parse(xlssheet, usecols=1)
-    #X = dt.iloc[:,0].dropna().values #.tolist()
-    #Y = dt.iloc[:,1].dropna().values #.tolist()
-    #return X, Y
-    return df
+    dt = xl.parse(xlssheet)
+    X = dt.iloc[:,0].dropna().values #.tolist()
+    Y = dt.iloc[:,1].dropna().values #.tolist()
+    return X, Y
 
 def load_multi_samples_from_excel_with_pandas(filename):
     """ Load all columns from a selected sheet in Excel file. Uses pandas.
@@ -464,3 +500,4 @@ def load_multi_samples_from_excel_with_pandas(filename):
         xlssheet = dialog.returnSheet()
     df = xl.parse(xlssheet)
     return df
+

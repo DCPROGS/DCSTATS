@@ -6,7 +6,6 @@ import sys
 import math
 import random
 import numpy as np
-import matplotlib.pyplot as plt
 
 import dcstats.basic_stats as bs
 from dcstats.hedges import Hedges_d
@@ -84,17 +83,16 @@ class RantestBinomial():
 
 
 class RantestContinuous():
-    def __init__(self, df, are_paired=False):
+    def __init__(self, X, Y, are_paired=False):
         """ 
         Parameters
         ----------
-        df : pandas DataFrame with two columns containing two samples 
+        X : observations in first trial, list of floats
+        Y : observations in second trial, list of floats
         are_paired : are observations paired, boolean
         """   
-        self.df = df
-        self.X = df.iloc[:,0].dropna().values #.tolist()
-        self.Y = df.iloc[:,1].dropna().values #.tolist()
-        self.nx, self.ny = len(self.X), len(self.Y)
+        self.X, self.Y = X, Y
+        self.nx, self.ny = len(X), len(Y)
         self.are_paired = are_paired
         random.seed(1984)
         np.random.seed(1984)
@@ -113,6 +111,7 @@ class RantestContinuous():
         #option to have bootstrap calculated CIs should go here
         return str(ttc) + str(hedges_calculation)
 
+            
     def run_rantest(self, nran):
         """ Resample without replacement nran times and get statistics of obtained distribution. """
         self.nran = nran
@@ -137,10 +136,7 @@ class RantestContinuous():
         self.pequal = self.nequal / float(self.nran)
         self.lo95lim = np.percentile(self.randiff, 2.5)
         self.hi95lim = np.percentile(self.randiff, 97.5)
-
-    #    self.ax1 = self.figure.add_subplot(1, 2, 1)
-    #    self.ax2 = self.figure.add_subplot(1, 2, 2)
-
+        
     def __repr__(self):
         return ('\nRantest:  {0:d} randomisations'.format(self.nran) +
         '\nTwo-tailed P = {0:.3e}'.format(self.p2tail) + 
@@ -164,42 +160,10 @@ class RantestBatch():
     def run_rantest(self, nran):
         for i in range(self.n-1):
             for j in range(i+1, self.n):
-                #rnt = RantestContinuous(self.df.iloc[:, i].dropna().values, 
-                #                        self.df.iloc[:, j].dropna().values)
-                rnt = RantestContinuous(self.df.iloc[:, [i, j]])
+                rnt = RantestContinuous(self.df.iloc[:, i].dropna().values.tolist(), 
+                                        self.df.iloc[:, j].dropna().values.tolist())
                 rnt.run_rantest(nran)
                 self.log.append('\n*****   ' + self.names[i] + ' versus ' + 
                                 self.names[j] + '   *****')
                 self.log.append(rnt.describe_data())
                 self.log.append(str(rnt))
-
-
-def get_boxplot(df):
-    figure = plt.figure(tight_layout=True)
-    ax = figure.add_subplot(1, 1, 1)
-    ax.clear()
-    ax = df.boxplot()
-    names = df.columns.tolist()
-    for i in range(df.shape[1]):
-        X = df.iloc[:, i].dropna().values
-        x = np.random.normal(i+1, 0.04, size=len(X))
-        ax.plot(x, X, '.', alpha=0.4)
-    plt.setp(ax, xticks=list(range(1, df.shape[1]+1)), xticklabels=names)
-    ax.set_ylabel('measurment values')
-    plt.tight_layout()
-    return figure
-
-def get_randhisto(rnt): #randiff, dbar, lo95lim, hi95lim):
-    figure = plt.figure(tight_layout=True)
-    ax = figure.add_subplot(1, 1, 1)
-    ax.clear()
-    ax.hist(rnt.randiff, bins=20)
-    ax.axvline(x=rnt.dbar, color='r', label='observed difference')
-    ax.axvline(x=-rnt.dbar, color='r')
-    ax.axvline(x=rnt.lo95lim, color='k', linestyle='--', label='2.5% limits')
-    ax.axvline(x=rnt.hi95lim, color='k', linestyle='--')
-    ax.set_xlabel('difference between means')
-    ax.set_ylabel('frequency')
-    ax.legend(bbox_to_anchor=(0., 1.02, 1., .102), loc=3,
-                    borderaxespad=0.)
-    return figure
