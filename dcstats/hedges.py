@@ -99,6 +99,8 @@ class Hedges_d:
         # repeats is the number of times that it is repeated.
         # bCA: bias-corrected and accelerated - recommended to improve pctile coverage
         # bCA not implemented yet
+
+        random.seed(1984)
         
         hedges_d_bs = []     #unbiased, values from bootstrap
         
@@ -108,8 +110,11 @@ class Hedges_d:
         
         for n in range (repeats):
             
-            br1 = bootstrap(self.s1)
-            br2 = bootstrap(self.s2)
+            # bootstrap  # RL 31/03/19 removed call to local bootstrap function (redundant)
+            #br1 = bootstrap(self.s1)
+            br1 = random.choices(self.s1, k=len(self.s1))
+            #br2 = bootstrap(self.s2)
+            br2 = random.choices(self.s2, k=len(self.s2))
         
             #means and SDs of bootstrap sampled distributions
             mbr1, sbr1 = mean_SD(br1)
@@ -144,10 +149,10 @@ class Hedges_d:
     def bias_corrected_bs_CI(self):
         pass
 
-def bootstrap (sample):
-    #if sample is [], then the same is returned
-    l = len(sample)
-    sup_s = sample * l             #concatenate l identical copies
-    return random.sample(sup_s, l)
+#def bootstrap (sample):
+#    #if sample is [], then the same is returned
+#    l = len(sample)
+#    sup_s = sample * l             #concatenate l identical copies
+#    return random.sample(sup_s, l)
 
 

@@ -8,7 +8,7 @@ import random
 import numpy as np
 
 import dcstats.basic_stats as bs
-from dcstats.Hedges import Hedges_d
+from dcstats.hedges import Hedges_d
 
 __author__="Remis Lape"
 __date__ ="$01-May-2009 17:42:28$"

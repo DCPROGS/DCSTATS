@@ -13,7 +13,7 @@ else:
 from dcstats import dataIO
 import dcstats.rantest as rantest
 #from dcstats.rantest import RantestContinuous
-from dcstats.Hedges import Hedges_d
+from dcstats.hedges import Hedges_d
 from dcstats.basic_stats import TTestContinuous
 
 from GUI.data_screen import Data_Screen

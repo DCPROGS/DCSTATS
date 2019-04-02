@@ -6,3 +6,9 @@ __pycache__
 .ipynb_checkpoints
 *.bat
 analysis
+dcstats.egg-info/PKG-INFO
+dcstats.egg-info/SOURCES.txt
+dcstats.egg-info/dependency_links.txt
+dcstats.egg-info/not-zip-safe
+dcstats.egg-info/requires.txt
+dcstats.egg-info/top_level.txt
