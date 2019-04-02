@@ -23,6 +23,19 @@ To use data from Excel, save the two sets of values in two columns as tab-delimi
 
 ![screenshot](DC-Stats.png)
 
+## Installation
+
+`dcstats` package can be installed locally with (note a space and a dot at the end):
+
+`pip install .`
+
+or
+
+`pip install -e .`
+
+The later creates symlink which allows any source code change be immeediately available locally.
+
+
 # Projected ongoing development
 This software is under development. Output is not fully tested, and therefore you should exercise caution if you plan to use the results for production / publication. 
 
