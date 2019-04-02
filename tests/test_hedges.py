@@ -1,4 +1,4 @@
-from dcstats.Hedges import Hedges_d
+from dcstats.hedges import Hedges_d
 from dcstats.statistics_EJ import simple_stats as mean_SD
 import random
 import math
