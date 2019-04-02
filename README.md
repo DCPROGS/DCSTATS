@@ -1,19 +1,19 @@
 # DC Stats
-Python port of David Colquhoun's Statistics Tools
+Python port and extension of David Colquhoun's Statistics Tools
 
 Work porting to Python from original FORTRAN was begun by Remigijus Lape at UCL. 
 
 Qt5 GUI under Python 3.7 is now the preferred environment. 
-Dependencies are pandas, numpy and scipy 
+Dependencies are: pandas, numpy and scipy 
 You can get everything you need on any platform quite easily with Anaconda. 
 
-Tested on macOS 10.14. Windows and Linux should also be fine. 
+Tested on macOS 10.14 and Windows. Linux should also be fine. 
 
-If you work with Python version 2.7 (as packaged with macOS), you will get the Tkinter GUI that is no longer maintained. This version should work with old versions of OSX like 10.6
+If you work with Python version 2.7 (as packaged with macOS), you will get the Tkinter GUI that is no longer maintained. This version should work with old versions of OSX like 10.6 though.
 
 Examples of how to use modules are provided in Jupyter notebooks (.ipynb files). 
 
-To run, open the Terminal, navigate to the DC-Stats directory and type:
+To run, open the Terminal (Mac/Linux) or cmd.exe (Windows), navigate to the DC-Stats directory and type:
 
   python DC_Stats.py
 
@@ -25,7 +25,7 @@ To use data from Excel, save the two sets of values in two columns as tab-delimi
 
 ## Installation
 
-`dcstats` package can be installed locally with (note a space and a dot at the end):
+If you are using 'pip' then the `dcstats` package can be installed locally with (note a space and a dot at the end):
 
 `pip install .`
 
@@ -33,7 +33,7 @@ or
 
 `pip install -e .`
 
-The later creates symlink which allows any source code change be immeediately available locally.
+The latter creates symlink which allows any source code change be available locally immediately.
 
 
 # Projected ongoing development
