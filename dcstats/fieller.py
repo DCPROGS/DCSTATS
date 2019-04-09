@@ -35,7 +35,7 @@ Alpha-level deviation is for two tailed distribution (e.g. 0.05 leaves 90% area)
 
     def __calculate_t(self):
         self.df = self.Ntot - 2
-        two_tail = 1 - float(self.alpha)
+        two_tail = 1 - float(self.alpha) / 2.0
         self.tval = s.InverseStudentT(self.df, two_tail)
 
     def calcFieller(self):
@@ -77,11 +77,9 @@ Alpha-level deviation is for two tailed distribution (e.g. 0.05 leaves 90% area)
 
     def __repr__(self):
         return ('\n Fieller calculation result: ' +
-            '\n Ratio (=a/b) = {0:.6f}'.format(self.ratio) +
-            '\n g = {0:.6f};\n alpha = {1:.2f};\n degree of freedom  = {2:d};\n t(df, alpha) = {3:.6f}'.
-            format(self.g, self.alpha, int(self.df), self.tval) +
+            '\n Ratio (a/b) = {0:.6f}'.format(self.ratio) +
+            '\n t(df={0:d}, alpha={1:.2f}) = {2:.6f}'.format(int(self.df), self.alpha, self.tval) +
             '\n\n Confidence limits: lower {0:.6f}, upper {1:.6f}'.format(self.clower, self.cupper) +
-            '\n i.e deviations: lower {0:.6f}, upper {1:.6f}'.format(self.dlow, self.dhi) + 
             '\n Approximate SD of ratio = {0:.6f}'.format(self.appsd) +
             '\n Approximate CV of ratio (%) = {0:.6f}'.format(self.cvr) + 
             '\n Approximate limits: lower {0:.6f}, upper {0:.6f}'.format(self.applo, self.apphi))
