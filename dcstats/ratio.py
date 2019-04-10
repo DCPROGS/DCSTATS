@@ -54,6 +54,32 @@ class Ratio:
         upper = np.mean(A) / np.mean(B) + tval * self.approximate_SDM(A, B)
         return lower, upper
 
+    def fieller_CIs(self, A, B, alpha=0.05, r=0):
+        """Calculate Fieller confidence intervals)"""
+        mA, mB = np.mean(A), np.mean(B)
+        sA = np.std(A, ddof=1) / math.sqrt(len(A))
+        sB = np.std(B, ddof=1) / math.sqrt(len(B)) 
+        vA, vB = sA**2, sB**2
+        cov = r * sA * sB
+        df = len(A) + len(B) - 2
+        tval = s.InverseStudentT(df, 1 - alpha / 2.0)
+        g = tval**2 * vB / mB**2
+        ratio = mA / mB
+        # Write disc in a way that does not appear to divide by vb so OK to use vb=0
+        # disc=va - 2.0*ratio*cov + rat2*vb - g*(va-cov*cov/vb)
+        disc = vA - 2.0 * ratio * cov + ratio**2 * vB - g * (vA - r**2 * vA)
+        clower, cupper = 0.0, 0.0
+        if disc >= 0:
+            d = (tval / mB) * math.sqrt(disc)
+            # Write pre in a way that does not appear to divide by vb
+            # (which actually cancels) so OK to use vb=0 (use g=tval*tval*vb/(b*b))
+            #	pre=ratio - g*cov/vb
+            pre = ratio - (tval**2 * cov) / mB**2
+            f = 1.0 / (1.0 - g)
+            clower = f * (pre - d)
+            cupper = f * (pre + d)
+        return clower, cupper
+
     def df(self):
         return len(self.A) + len(self.B) - 2
 
@@ -85,22 +111,24 @@ class Ratio:
     def __repr__(self):
         repr_string = ('\nRatio = {0:.3g} +/- {1:.2g} (approximate SDM)'.
             format(self.ratio(), self.ratio_approxSDM()) +
-            '\napproximate 95% confidence limits:\n\tlower= {0:.3g}; upper= {1:.3g}'.
+            '\n\tapproximate 95% confidence limits:\n\tlower= {0:.3g}; upper= {1:.3g}'.
             format(self.ratio_approxCIs(alpha=0.05)[0], self.ratio_approxCIs(alpha=0.05)[1]) +
-            '\nReciprocal = {0:.3g} +/- {1:.2g} (approximate SDM)'.
+            '\n\tFieller 95% confidence limits:\n\tlower= {0:.3g}; upper= {1:.3g}'.
+            format(self.fieller_CIs(self.A, self.B, alpha=0.05)[0], self.fieller_CIs(self.A, self.B, alpha=0.05)[1]) +
+            '\n\nReciprocal = {0:.3g} +/- {1:.2g} (approximate SDM)'.
             format(self.reciprocal(), self.reciprocal_approxSDM()) +
-            '\napproximate 95% confidence limits:\n\tlower= {0:.3g}; upper= {1:.3g}'.
+            '\n\tapproximate 95% confidence limits:\n\tlower= {0:.3g}; upper= {1:.3g}'.
             format(self.reciprocal_approxCIs(alpha=0.05)[0], self.reciprocal_approxCIs(alpha=0.05)[1])
             )
         if self.__ratio_is_bootstrapped:
-            repr_string += ('\n\nBootsrapping statistics; repeats = {0:d}'.format(self.__runs) +
+            repr_string += ('\n\nBootsrapping statistics (repeats = {0:d}):'.format(self.__runs) +
             '\nRatio= {0:.3g} +/- {1:.2g} (bootstrapped SDM); bias= {2:.2g}'.
             format(self.ratio(), self.__booted_sdm_ratio, self.__ratio_bias) +
-            '\n95% confidence limits (bootstrapped):\n\tlower= {0:.3g}; upper= {1:.3g}'.
+            '\n\t95% confidence limits (bootstrapped):\n\tlower= {0:.3g}; upper= {1:.3g}'.
             format(self.ratio_lower95CI, self.ratio_upper95CI) +
             '\nReciprocal= {0:.3g} +/- {1:.2g} (bootstrapped SDM)'.
             format(self.reciprocal(), self.__booted_sdm_recip) +
-            '\n95% confidence limits (bootstrapped):\n\tlower= {0:.3g}; upper= {1:.3g}'.
+            '\n\t95% confidence limits (bootstrapped):\n\tlower= {0:.3g}; upper= {1:.3g}'.
             format(self.reciprocal_lower95CI, self.reciprocal_upper95CI)            
             )
         return repr_string
