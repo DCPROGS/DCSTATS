@@ -2,6 +2,8 @@
 """fieller.py -- To calculate Fieller''s theorem\
                Converted from FORTRAN version FIELLER.FOR"""
 
+import warnings
+
 import math
 import dcstats.statistics_EJ as s
 
@@ -25,6 +27,11 @@ or calculated from alpha and the degrees of freedom. \
 Alpha-level deviation is for two tailed distribution (e.g. 0.05 leaves 90% area)\n'
 
     def __init__(self, a, b, sa, sb, r, alpha, Ntot):
+        warnings.warn(
+            "fieller module is deprecated. Use ratio.py instead to calculate\
+             ratio of means SD and confidence intervals",
+            DeprecationWarning
+        )
         self.a, self.b = a, b
         self.sa, self.sb = sa, sb
         self.r = r
@@ -82,4 +89,4 @@ Alpha-level deviation is for two tailed distribution (e.g. 0.05 leaves 90% area)
             '\n\n Confidence limits: lower {0:.6f}, upper {1:.6f}'.format(self.clower, self.cupper) +
             '\n Approximate SD of ratio = {0:.6f}'.format(self.appsd) +
             '\n Approximate CV of ratio (%) = {0:.6f}'.format(self.cvr) + 
-            '\n Approximate limits: lower {0:.6f}, upper {0:.6f}'.format(self.applo, self.apphi))
+            '\n Approximate limits: lower {0:.6f}, upper {1:.6f}'.format(self.applo, self.apphi))
