@@ -5,4 +5,4 @@ def test_ratio():
     T1 = [2, 2, 2, 2, 2, 2]
     T2 = [1, 1, 1, 1, 1, 1]
     rt = Ratio(T1, T2)
-    assert rt.ratio() == 2.0 
+    assert rt.ratio == 2.0 

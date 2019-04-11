@@ -3,6 +3,7 @@
 
 import math
 import numpy as np
+import matplotlib.pyplot as plt
 
 import dcstats.statistics_EJ as s
 
@@ -10,126 +11,155 @@ __author__="remis"
 __date__ ="$09-Apr-2019 13:48:16$"
 
 class Ratio:
-    def __init__(self, S1, S2):
+    def __init__(self, S1, S2, r=0):
         """ 
+        Calculate statistics of a ratio of two means.
+
         Parameters
         ----------
-        S1 : observations in first trial, numpy array or list
-        S2 : observations in second trial, numpy array or list
+        S1, S2 : ndarrays
+            Observations in first and second trials.
+        r : float
+             Correlation coefficient.
+
+        Attributes
+        ----------
+        A, B : ndarray
+            Observations in first and second trials with wich
+            Ratio class is initialised. 
+        r : float
+            Correlation coefficient.
+        df : integer
+            Degree of freedom.
+        ratio : float
+            Ratio of means.
+        meanA, meanB : floats
+            Means of samples A and B.
+        sdA, sdB : floats
+            Standard deviations of samples A and B.
+        sdmA, sdmB :floats
+            Standard deviation of the mean of samples A and B.
+
+        Methods
+        -------
+        approximate_SDM
+        approximate_CIs
+        fieller_CIs
+        bootstrap_ratio
+        run_bootstrap
+        bootstrapped_CIs
+
         """   
-        self.A = S1
-        self.B = S2
+        self.A, self.B = S1, S2
+        self.r = r
+        self.df = len(self.A) + len(self.B) - 2
+        self.ratio = np.mean(self.A) / np.mean(self.B)
+
+        self.meanA, self.meanB = np.mean(self.A), np.mean(self.B)
+        self.sdA, self.sdB = np.std(self.A, ddof=1), np.std(self.B, ddof=1) 
+        self.sdmA = self.sdA / math.sqrt(len(self.A))
+        self.sdmB = self.sdB / math.sqrt(len(self.B)) 
+
         self.__ratio_is_bootstrapped = False
-     
-    def ratio(self):
-        return np.mean(self.A) / np.mean(self.B)
-
-    def ratio_approxSDM(self):
-        return self.approximate_SDM(self.A, self.B)
-
-    def ratio_approxCIs(self, alpha=0.05):
-        return self.approximate_CIs(self.A, self.B, alpha)
-
-    def reciprocal(self):
-        return np.mean(self.B) / np.mean(self.A)
-
-    def reciprocal_approxSDM(self):
-        return self.approximate_SDM(self.B, self.A)
-
-    def reciprocal_approxCIs(self, alpha=0.05):
-        return self.approximate_CIs(self.B, self.A, alpha)
-
-    def approximate_SDM(self, A, B, r=0.0):
-        mA = np.mean(A)
-        mB = np.mean(B)
-        sA = np.std(A, ddof=1) / math.sqrt(len(A))
-        sB = np.std(B, ddof=1) / math.sqrt(len(B))
-        var = (mA / mB) * ((sA / mA)**2 + (sB / mB)**2 - 2.0 * r * sA * sB / (mA * mB))
+    
+    def approximate_SDM(self):
+        """ Calculate approximate standard deviation of the mean for the ratio
+            of two means.""" 
+        var = ((self.meanA / self.meanB) * ((self.sdmA / self.meanA)**2 + 
+            (self.sdmB / self.meanB)**2 - 
+            2.0 * self.r * self.sdmA * self.sdmB / (self.meanA * self.meanB)))
         return math.sqrt(var)
 
-    def approximate_CIs(self, A, B, alpha=0.05):
-        df = len(A) + len(B) - 2
-        tval = s.InverseStudentT(df, 1 - alpha / 2.0)
-        lower = np.mean(A) / np.mean(B) - tval * self.approximate_SDM(A, B)
-        upper = np.mean(A) / np.mean(B) + tval * self.approximate_SDM(A, B)
+    def approximate_CIs(self, alpha=0.05):
+        """ Calculate approximate confidence intervals for the ratio of two means. """
+        tval = s.InverseStudentT(self.df, 1 - alpha / 2.0)
+        lower = self.ratio - tval * self.approximate_SDM()
+        upper = self.ratio + tval * self.approximate_SDM()
         return lower, upper
 
-    def fieller_CIs(self, A, B, alpha=0.05, r=0):
-        """Calculate Fieller confidence intervals)"""
-        mA, mB = np.mean(A), np.mean(B)
-        sA = np.std(A, ddof=1) / math.sqrt(len(A))
-        sB = np.std(B, ddof=1) / math.sqrt(len(B)) 
-        vA, vB = sA**2, sB**2
-        cov = r * sA * sB
-        df = len(A) + len(B) - 2
-        tval = s.InverseStudentT(df, 1 - alpha / 2.0)
-        g = tval**2 * vB / mB**2
-        ratio = mA / mB
+    def fieller_CIs(self, alpha=0.05):
+        """Calculate exact confidence intervals for the ratio of two means according to 
+        Fiellers theorem."""
+        vA, vB = self.sdmA**2, self.sdmB**2
+        cov = self.r * self.sdmA * self.sdmB
+        tval = s.InverseStudentT(self.df, 1 - alpha / 2.0)
+        g = tval**2 * vB / self.meanB**2
         # Write disc in a way that does not appear to divide by vb so OK to use vb=0
         # disc=va - 2.0*ratio*cov + rat2*vb - g*(va-cov*cov/vb)
-        disc = vA - 2.0 * ratio * cov + ratio**2 * vB - g * (vA - r**2 * vA)
+        disc = vA - 2.0 * self.ratio * cov + self.ratio**2 * vB - g * (vA - self.r**2 * vA)
         clower, cupper = 0.0, 0.0
         if disc >= 0:
-            d = (tval / mB) * math.sqrt(disc)
+            d = (tval / self.meanB) * math.sqrt(disc)
             # Write pre in a way that does not appear to divide by vb
             # (which actually cancels) so OK to use vb=0 (use g=tval*tval*vb/(b*b))
             #	pre=ratio - g*cov/vb
-            pre = ratio - (tval**2 * cov) / mB**2
+            pre = self.ratio - (tval**2 * cov) / self.meanB**2
             f = 1.0 / (1.0 - g)
             clower = f * (pre - d)
             cupper = f * (pre + d)
         return clower, cupper
 
-    def df(self):
-        return len(self.A) + len(self.B) - 2
-
-    def __bootstrap(self, runs=5000):
-        self.__bratios = np.zeros(runs)
-        self.__breciprocals = np.zeros(runs)
+    def bootstrap_ratio(self, A, B, runs=5000):
+        """Bootstrap samples to get distribution for the ratio of two means."""
+        bratios = np.zeros(runs)
         for i in range(runs):
-            a = np.mean(np.random.choice(self.A, size=len(self.A), replace=True))
-            b = np.mean(np.random.choice(self.B, size=len(self.B), replace=True))
-            self.__bratios[i] = a / b
-            self.__breciprocals[i] = b / a
-        self.__bratios.sort()
-        self.__breciprocals.sort()
+            a = np.mean(np.random.choice(A, size=len(A), replace=True))
+            b = np.mean(np.random.choice(B, size=len(B), replace=True))
+            bratios[i] = a / b
+        bratios.sort()
+        return bratios
 
-    def CIs_bootstrap(self, runs=5000):
-        self.__bootstrap(runs)
+    def run_bootstrap(self, runs=5000):
+        """Bootstrap the ratio of two means and calculate statistics 
+        of bootstrapped distribution."""
+        self.boot = self.bootstrap_ratio(self.A, self.B, runs)
+        self.bootstrap_mean = np.mean(self.boot)
+        self.bootstrap_sdm = np.std(self.boot, ddof=1)
+        self.bootstrap_runs = runs
+        self.bootstrap_bias = self.ratio - np.mean(self.boot)
         self.__ratio_is_bootstrapped = True
-        self.__booted_mean_ratio = np.mean(self.__bratios)
-        self.__booted_mean_recip = np.mean(self.__breciprocals)
-        self.__booted_sdm_ratio = np.std(self.__bratios, ddof=1)
-        self.__booted_sdm_recip = np.std(self.__breciprocals, ddof=1)
-        self.__runs = runs
-        self.__ratio_bias = self.ratio() - np.mean(self.__bratios)
-        self.ratio_lower95CI = self.__bratios[int(0.025 * runs)]
-        self.ratio_upper95CI = self.__bratios[int(0.975 * runs)]
-        self.reciprocal_lower95CI = self.__breciprocals[int(0.025 * runs)]
-        self.reciprocal_upper95CI = self.__breciprocals[int(0.975 * runs)]
-        
+
+    def bootstrapped_CIs(self, alpha=0.05):
+        """Calculate confidence intervals for the bootstrapped ratios."""
+        lowerCI = self.boot[int((alpha / 2.0) * self.bootstrap_runs)]
+        upperCI = self.boot[int((1 - alpha / 2.0) * self.bootstrap_runs)]
+        return lowerCI, upperCI
+
+    def plot_bootstrap(self):
+        """Plot bootstrapped distribution."""
+        lower95CI, upper95CI = self.bootstrapped_CIs(alpha=0.05)
+        fig, ax  = plt.subplots(1,1, figsize=(4,4))
+        ax.hist(self.boot, 20)
+        ax.axvline(x=self.ratio, color='k', label='observed ratio')
+        ax.axvline(x=self.bootstrap_mean, color='k', linestyle="dashed", 
+                   label='bootstrapped ratio')
+        ax.axvline(x=lower95CI, color='r', linestyle="dashed", label='2.5% limits')
+        ax.axvline(x=upper95CI, color='r', linestyle="dashed")
+        ax.set_ylabel("Frequency")
+        ax.set_xlabel('Ratio (mean A / mean B)')
+        ax.legend(bbox_to_anchor=(0., 1.02, 1., .102), loc=3,
+                        borderaxespad=0.)
+        plt.tight_layout()
+        return fig
+
     def __repr__(self):
+        aprox_lower95CI, aprox_upper95CI = self.approximate_CIs(alpha=0.05)
+        fieller_lower95CI, fieller_upper95CI = self.fieller_CIs(alpha=0.05)
         repr_string = ('\nRatio = {0:.3g} +/- {1:.2g} (approximate SDM)'.
-            format(self.ratio(), self.ratio_approxSDM()) +
+            format(self.ratio, self.approximate_SDM()) +
             '\n\tapproximate 95% confidence limits:\n\tlower= {0:.3g}; upper= {1:.3g}'.
-            format(self.ratio_approxCIs(alpha=0.05)[0], self.ratio_approxCIs(alpha=0.05)[1]) +
+            format(aprox_lower95CI, aprox_upper95CI) +
             '\n\tFieller 95% confidence limits:\n\tlower= {0:.3g}; upper= {1:.3g}'.
-            format(self.fieller_CIs(self.A, self.B, alpha=0.05)[0], self.fieller_CIs(self.A, self.B, alpha=0.05)[1]) +
-            '\n\nReciprocal = {0:.3g} +/- {1:.2g} (approximate SDM)'.
-            format(self.reciprocal(), self.reciprocal_approxSDM()) +
-            '\n\tapproximate 95% confidence limits:\n\tlower= {0:.3g}; upper= {1:.3g}'.
-            format(self.reciprocal_approxCIs(alpha=0.05)[0], self.reciprocal_approxCIs(alpha=0.05)[1])
+            format(fieller_lower95CI, fieller_upper95CI)
             )
         if self.__ratio_is_bootstrapped:
-            repr_string += ('\n\nBootsrapping statistics (repeats = {0:d}):'.format(self.__runs) +
+            lower95CI, upper95CI = self.bootstrapped_CIs(alpha=0.05)
+            repr_string += ('\n\nBootsrapping statistics (repeats = {0:d}):'.
+            format(self.bootstrap_runs) +
             '\nRatio= {0:.3g} +/- {1:.2g} (bootstrapped SDM); bias= {2:.2g}'.
-            format(self.ratio(), self.__booted_sdm_ratio, self.__ratio_bias) +
+            format(self.ratio, self.bootstrap_sdm, self.bootstrap_bias) +
             '\n\t95% confidence limits (bootstrapped):\n\tlower= {0:.3g}; upper= {1:.3g}'.
-            format(self.ratio_lower95CI, self.ratio_upper95CI) +
-            '\nReciprocal= {0:.3g} +/- {1:.2g} (bootstrapped SDM)'.
-            format(self.reciprocal(), self.__booted_sdm_recip) +
-            '\n\t95% confidence limits (bootstrapped):\n\tlower= {0:.3g}; upper= {1:.3g}'.
-            format(self.reciprocal_lower95CI, self.reciprocal_upper95CI)            
+            format(lower95CI, upper95CI)
             )
         return repr_string
 
