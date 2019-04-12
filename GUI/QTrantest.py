@@ -18,6 +18,9 @@ import dcstats
 from dcstats import rantest
 from dcstats.fieller import Fieller
 from dcstats.basic_stats import TTestBinomial
+import dcstats.basic_stats as bs
+from dcstats.hedges import Hedges_d
+from dcstats.ratio import Ratio
 
 __author__="remis"
 __date__ ="$03-Jan-2010 15:26:00$"
@@ -263,11 +266,20 @@ class CompareTwoSamplesTab(QWidget):
         #self.plot_area = plot_area
         self.path = ''
         
+        layout.addStretch()
+        layout.addWidget(QLabel('Calculate:'))
+        layout.addWidget(QLabel('\t- two-sample Student t-test;' +
+                                '\n\t- Hedges effect size with 95% confidence limits (bootstrapped);' +
+                                '\n\t- randomisation P;' +
+                                '\n\t- ratio with 95% confidence limits (approximate, Fieller, bootstrapped);' +
+                                '\n\t- inverse of ratio with 95% confidence limits (approximate, Fieller, bootstrapped)'))
+
         bt1 = QPushButton("Get data from Excel file")
         layout.addLayout(single_button(bt1))
         layout1 = QHBoxLayout()
         bt2 = QPushButton("Get statistics")
         layout.addLayout(single_button(bt2))
+        layout.addStretch()
 
         bt1.clicked.connect(self.open_file)
         bt2.clicked.connect(self.compare_two_samples)
@@ -278,15 +290,45 @@ class CompareTwoSamplesTab(QWidget):
             self.filename, filt = QFileDialog.getOpenFileName(self,
                 "Open Data File...", self.path, "MS Excel Files (*.xlsx)")
             self.path = os.path.split(str(self.filename))[0]
-            self.X, self.Y = load_two_samples_from_excel_with_pandas(self.filename)
+            #self.X, self.Y = load_two_samples_from_excel_with_pandas(self.filename)
+            self.df = load_multi_samples_from_excel_with_pandas(self.filename)
+            self.initiate_two_sample_comparison()
         except:
             pass
-    
-    def compare_two_samples(self):
-        # Display basic statistics
+
+    def initiate_two_sample_comparison(self):
         self.log.separate()
         self.log.append('\nData loaded from a file: ' + self.filename + '\n')
+        #self.log.append(str(self.df.describe()))
+        self.X = self.df.iloc[:,0].dropna().values #.tolist()
+        self.Y = self.df.iloc[:,1].dropna().values #.tolist()
+        self.names = self.df.columns.tolist()
+    
+    def compare_two_samples(self):
         
+        ttc = bs.TTestContinuous(self.X, self.Y, False)
+        self.log.append(str(ttc))
+
+        hedges_calculation = Hedges_d(self.X, self.Y)
+        hedges_calculation.hedges_d_unbiased()
+        hedges_calculation.bootstrap_CI(5000)
+        self.log.append(str(hedges_calculation))
+
+        randt = rantest.RantestContinuous(self.X, self.Y)
+        randt.run_rantest(10000)
+        self.log.append(str(randt))
+
+        self.log.append('\nRatio: ' + self.names[0] + '/' + self.names[1])
+        ratio = Ratio(self.X, self.Y)
+        ratio.run_bootstrap(10000)
+        self.log.append(str(ratio))
+
+        self.log.append('\nReciprocal of ratio: ' + self.names[1] + '/' + self.names[0])
+        recip = Ratio(self.Y, self.X)
+        recip.run_bootstrap(10000)
+        self.log.append(str(recip))
+        
+
 class RandomisationContTab(QWidget):
     def __init__(self, log, plot_area, parent=None):
         QWidget.__init__(self, parent)
