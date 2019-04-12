@@ -55,7 +55,9 @@ class RantestQT(QDialog):
                           "Rantest: two-sample")
         self.tab_widget.addTab(RandomisationBatchTab(self.results, self.plot_area), "Rantest: multi")
         self.tab_widget.addTab(RandomisationBinTab(self.results), "Rantest: binary")
-        self.tab_widget.addTab(FiellerTab(self.results), "Fieller")
+        #self.tab_widget.addTab(FiellerTab(self.results), "Fieller")
+        self.tab_widget.addTab(CompareTwoSamplesTab(self.results), "Compare two samples")
+        
         self.tab_widget.setFixedWidth(600)
         self.tab_widget.setFixedHeight(400)
         self.tab_widget.currentChanged.connect(self.tab_changed)
@@ -253,6 +255,38 @@ class RandomisationBatchTab(QWidget):
         self.rnt.run_rantest(self.nran)
 
 
+class CompareTwoSamplesTab(QWidget):
+    def __init__(self, log, plot_area=None, parent=None):
+        QWidget.__init__(self, parent)
+        layout = QVBoxLayout(self)
+        self.log = log
+        #self.plot_area = plot_area
+        self.path = ''
+        
+        bt1 = QPushButton("Get data from Excel file")
+        layout.addLayout(single_button(bt1))
+        layout1 = QHBoxLayout()
+        bt2 = QPushButton("Get statistics")
+        layout.addLayout(single_button(bt2))
+
+        bt1.clicked.connect(self.open_file)
+        bt2.clicked.connect(self.compare_two_samples)
+
+    def open_file(self):
+        """Called by GET DATA FROM EXCEL FILE button"""
+        try:
+            self.filename, filt = QFileDialog.getOpenFileName(self,
+                "Open Data File...", self.path, "MS Excel Files (*.xlsx)")
+            self.path = os.path.split(str(self.filename))[0]
+            self.X, self.Y = load_two_samples_from_excel_with_pandas(self.filename)
+        except:
+            pass
+    
+    def compare_two_samples(self):
+        # Display basic statistics
+        self.log.separate()
+        self.log.append('\nData loaded from a file: ' + self.filename + '\n')
+        
 class RandomisationContTab(QWidget):
     def __init__(self, log, plot_area, parent=None):
         QWidget.__init__(self, parent)
