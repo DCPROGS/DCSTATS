@@ -54,6 +54,8 @@ class RantestQT(QDialog):
         right_box = QVBoxLayout()
         self.plot_area = QVBoxLayout()
         self.tab_widget = QTabWidget()
+        self.tab_widget.addTab(OneStopShopTab(self.results, self.plot_area), 
+                          "One Stop Shop")
         self.tab_widget.addTab(RandomisationContTab(self.results, self.plot_area), 
                           "Rantest: two-sample")
         self.tab_widget.addTab(RandomisationBatchTab(self.results, self.plot_area), "Rantest: multi")
@@ -102,6 +104,90 @@ class RantestQT(QDialog):
             self.results.append('\nSession saved to printout file:' + printOutFilename)
         except:
             pass
+
+class OneStopShopTab(QWidget):
+    def __init__(self, log, canvas, parent=None):
+        QWidget.__init__(self, parent)
+        layout = QVBoxLayout(self)
+        self.log = log
+        self.canvas = canvas
+        self.path = ''
+        
+        layout.addStretch()
+        layout1 = QVBoxLayout()
+        bt1 = QPushButton("Get data from Excel file")
+        layout1.addWidget(bt1)
+        self.label_file = QLabel('No data loaded yet...')
+        layout1.addWidget(self.label_file)
+        layout.addLayout(layout1)
+        layout2 = QHBoxLayout()
+        self.sample1 = QComboBox()
+        self.sample2 = QComboBox()
+        layout2.addWidget(self.sample1)
+        layout2.addWidget(self.sample2)
+        layout.addLayout(layout2)
+        bt2 = QPushButton("Calculate ratio of means")
+        layout.addWidget(bt2)
+        layout.addStretch()
+
+        bt1.clicked.connect(self.open_file)
+        bt2.clicked.connect(self.get_ratio)
+
+    def get_ratio(self):
+        i = self.sample1.currentIndex()
+        j = self.sample2.currentIndex()
+
+        A = self.df.iloc[:, i].dropna().values.tolist()
+        B = self.df.iloc[:, j].dropna().values.tolist()
+
+        self.log.append('\nRatio: ' + self.names[i] + '/' + self.names[j])
+        ratio = Ratio(A, B)
+        ratio.run_bootstrap(10000)
+        self.log.append(str(ratio))
+
+        self.log.append('\nReciprocal of ratio: ' + self.names[j] + '/' + self.names[i])
+        recip = Ratio(B, A)
+        recip.run_bootstrap(10000)
+        self.log.append(str(recip))
+
+        item = self.canvas.takeAt(0).widget()
+        self.canvas.removeWidget(item)
+        item.deleteLater()
+        self.pco = PlotCanvasOne()
+        self.pco.figure = ratio.plot_bootstrap()
+        self.canvas.addWidget(self.pco)
+        
+
+    def open_file(self):
+        """Called by TAKE DATA FROM FILE button in Tab2"""
+        try:
+            self.filename, filt = QFileDialog.getOpenFileName(self,
+                "Open Data File...", self.path, "MS Excel Files (*.xlsx)")
+            self.path = os.path.split(str(self.filename))[0]
+            #TODO: allow loading from other format files
+            self.df = load_multi_samples_from_excel_with_pandas(self.filename)
+            self.initiate_shop()
+            self.label_file.setText('Loaded: ' + self.filename)
+            self.log.append('\nData loaded from a file: ' + self.filename + '\n')
+        except:
+            pass
+
+    def initiate_shop(self):
+        self.names = self.df.columns.tolist()
+        for name in self.names:
+            self.sample1.addItem(name)
+            self.sample2.addItem(name)
+        self.sample2.setCurrentIndex(1)
+
+
+class PlotCanvasOne(FigureCanvas):
+    """"""
+    def __init__(self, parent=None):
+        self.figure = plt.figure()
+        FigureCanvas.__init__(self, self.figure)
+        self.setFixedHeight(300)
+        self.setFixedWidth(600)
+
 
 class FiellerTab(QWidget):
     def __init__(self, log, parent=None):
