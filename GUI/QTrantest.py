@@ -53,7 +53,6 @@ class RantestQT(QDialog):
         self.plot_area = QVBoxLayout()
         self.canvas = GraphPlaceholder()
         self.plot_area.addWidget(self.canvas)
-        #self.plot_area.addWidget(PlotCanvasOne())
         
         # Right side: controls and plot
         right_box = QVBoxLayout()
@@ -66,7 +65,6 @@ class RantestQT(QDialog):
         self.tab_widget.addTab(RandomisationBatchTab(self.results, self.plot_area), "Rantest: multi")
         self.tab_widget.addTab(RandomisationBinTab(self.results), "Rantest: binary")
         #self.tab_widget.addTab(FiellerTab(self.results), "Fieller")
-        self.tab_widget.addTab(CompareTwoSamplesTab(self.results), "Compare two samples")
         
         self.tab_widget.setFixedWidth(600)
         self.tab_widget.setFixedHeight(400)
@@ -363,77 +361,6 @@ class RandomisationBatchTab(QWidget):
         self.nran = int(self.ed1.text())
         self.rnt.run_rantest(self.nran)
 
-
-class CompareTwoSamplesTab(QWidget):
-    def __init__(self, log, plot_area=None, parent=None):
-        QWidget.__init__(self, parent)
-        layout = QVBoxLayout(self)
-        self.log = log
-        #self.plot_area = plot_area
-        self.path = ''
-        
-        layout.addStretch()
-        layout.addWidget(QLabel('Calculate:'))
-        layout.addWidget(QLabel('\t- two-sample Student t-test;' +
-                                '\n\t- Hedges effect size with 95% confidence limits (bootstrapped);' +
-                                '\n\t- randomisation P;' +
-                                '\n\t- ratio with 95% confidence limits (approximate, Fieller, bootstrapped);' +
-                                '\n\t- inverse of ratio with 95% confidence limits (approximate, Fieller, bootstrapped)'))
-
-        bt1 = QPushButton("Get data from Excel file")
-        layout.addLayout(single_button(bt1))
-        layout1 = QHBoxLayout()
-        bt2 = QPushButton("Get statistics")
-        layout.addLayout(single_button(bt2))
-        layout.addStretch()
-
-        bt1.clicked.connect(self.open_file)
-        bt2.clicked.connect(self.compare_two_samples)
-
-    def open_file(self):
-        """Called by GET DATA FROM EXCEL FILE button"""
-        try:
-            self.filename, filt = QFileDialog.getOpenFileName(self,
-                "Open Data File...", self.path, "MS Excel Files (*.xlsx)")
-            self.path = os.path.split(str(self.filename))[0]
-            #self.X, self.Y = load_two_samples_from_excel_with_pandas(self.filename)
-            self.df = load_multi_samples_from_excel_with_pandas(self.filename)
-            self.initiate_two_sample_comparison()
-        except:
-            pass
-
-    def initiate_two_sample_comparison(self):
-        self.log.separate()
-        self.log.append('\nData loaded from a file: ' + self.filename + '\n')
-        #self.log.append(str(self.df.describe()))
-        self.X = self.df.iloc[:,0].dropna().values #.tolist()
-        self.Y = self.df.iloc[:,1].dropna().values #.tolist()
-        self.names = self.df.columns.tolist()
-    
-    def compare_two_samples(self):
-        
-        ttc = bs.TTestContinuous(self.X, self.Y, False)
-        self.log.append(str(ttc))
-
-        hedges_calculation = Hedges_d(self.X, self.Y)
-        hedges_calculation.hedges_d_unbiased()
-        hedges_calculation.bootstrap_CI(5000)
-        self.log.append(str(hedges_calculation))
-
-        randt = rantest.RantestContinuous(self.X, self.Y)
-        randt.run_rantest(10000)
-        self.log.append(str(randt))
-
-        self.log.append('\nRatio: ' + self.names[0] + '/' + self.names[1])
-        ratio = Ratio(self.X, self.Y)
-        ratio.run_bootstrap(10000)
-        self.log.append(str(ratio))
-
-        self.log.append('\nReciprocal of ratio: ' + self.names[1] + '/' + self.names[0])
-        recip = Ratio(self.Y, self.X)
-        recip.run_bootstrap(10000)
-        self.log.append(str(recip))
-        
 
 class RandomisationContTab(QWidget):
     def __init__(self, log, plot_area, parent=None):
