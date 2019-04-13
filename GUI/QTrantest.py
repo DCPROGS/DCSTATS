@@ -49,12 +49,17 @@ class RantestQT(QDialog):
         #saveHTMLButton.clicked.connect(self.on_save_html)
         #buttonHBox.addWidget(saveHTMLButton)
         left_box.addLayout(buttonHBox)
+
+        self.plot_area = QVBoxLayout()
+        self.canvas = GraphPlaceholder()
+        self.plot_area.addWidget(self.canvas)
+        #self.plot_area.addWidget(PlotCanvasOne())
         
         # Right side: controls and plot
         right_box = QVBoxLayout()
-        self.plot_area = QVBoxLayout()
+        
         self.tab_widget = QTabWidget()
-        self.tab_widget.addTab(OneStopShopTab(self.results, self.plot_area), 
+        self.tab_widget.addTab(OneStopShopTab(self.results, self.canvas), 
                           "One Stop Shop")
         self.tab_widget.addTab(RandomisationContTab(self.results, self.plot_area), 
                           "Rantest: two-sample")
@@ -67,7 +72,6 @@ class RantestQT(QDialog):
         self.tab_widget.setFixedHeight(400)
         self.tab_widget.currentChanged.connect(self.tab_changed)
         
-        self.plot_area.addWidget(GraphPlaceholder())
         right_box.addWidget(self.tab_widget)
         right_box.addLayout(self.plot_area)
         
@@ -86,7 +90,8 @@ class RantestQT(QDialog):
         item = self.plot_area.takeAt(0).widget()
         self.plot_area.removeWidget(item)
         item.deleteLater()
-        self.plot_area.addWidget(GraphPlaceholder())
+        self.canvas = GraphPlaceholder()
+        self.plot_area.addWidget(self.canvas)
 
     def on_clear(self):
         self.results.clear()
@@ -110,6 +115,7 @@ class OneStopShopTab(QWidget):
         QWidget.__init__(self, parent)
         layout = QVBoxLayout(self)
         self.log = log
+
         self.canvas = canvas
         self.path = ''
         
@@ -150,12 +156,8 @@ class OneStopShopTab(QWidget):
         rnt.run_rantest(10000)
         self.log.append(str(rnt))
 
-        item = self.canvas.takeAt(0).widget()
-        self.canvas.removeWidget(item)
-        item.deleteLater()
-        self.pco = PlotCanvasOne()
-        self.pco.figure = rnt.plot_rantest()
-        self.canvas.addWidget(self.pco)
+        rnt.plot_rantest(self.canvas.figure)
+        self.canvas.draw()
 
     def get_ratio(self):
         i = self.sample1.currentIndex()
@@ -174,13 +176,8 @@ class OneStopShopTab(QWidget):
         recip.run_bootstrap(10000)
         self.log.append(str(recip))
 
-        item = self.canvas.takeAt(0).widget()
-        self.canvas.removeWidget(item)
-        item.deleteLater()
-        self.pco = PlotCanvasOne()
-        self.pco.figure = ratio.plot_bootstrap()
-        self.canvas.addWidget(self.pco)
-        
+        ratio.plot_bootstrap(self.canvas.figure)
+        self.canvas.draw()       
 
     def open_file(self):
         """Called by TAKE DATA FROM FILE button in Tab2"""
@@ -203,8 +200,7 @@ class OneStopShopTab(QWidget):
             self.sample2.addItem(name)
         self.sample2.setCurrentIndex(1)
 
-
-class PlotCanvasOne(FigureCanvas):
+class GraphPlaceholder(FigureCanvas):
     """"""
     def __init__(self, parent=None):
         self.figure = plt.figure()
@@ -483,9 +479,11 @@ class RandomisationContTab(QWidget):
             self.path = os.path.split(str(self.filename))[0]
             #TODO: allow loading from other format files
             self.X, self.Y = load_two_samples_from_excel_with_pandas(self.filename)
-            self.initiate_rantest()
+            
         except:
             pass
+
+        self.initiate_rantest()
         
     def initiate_rantest(self):
         # Display basic statistics
@@ -566,12 +564,6 @@ class PlotCanvas(FigureCanvas):
                         borderaxespad=0.)
         plt.tight_layout()
         self.draw()
-
-class GraphPlaceholder(QWidget):
-    def __init__(self, parent=None):
-        super(GraphPlaceholder, self).__init__(parent)
-        self.setFixedHeight(300)
-        self.setFixedWidth(600)
 
 class WelcomeScreen(QWidget):
     """"""

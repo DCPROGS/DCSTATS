@@ -125,10 +125,14 @@ class Ratio:
         upperCI = self.boot[int((1 - alpha / 2.0) * self.bootstrap_runs)]
         return lowerCI, upperCI
 
-    def plot_bootstrap(self):
+    def plot_bootstrap(self, fig=None):
         """Plot bootstrapped distribution."""
         lower95CI, upper95CI = self.bootstrapped_CIs(alpha=0.05)
-        fig, ax  = plt.subplots(1,1, figsize=(4,4))
+        if fig is None:
+            fig, ax  = plt.subplots(1,1) #, figsize=(4,4))
+        else: 
+            fig.clf()
+            ax = fig.add_subplot(1,1,1)
         ax.hist(self.boot, 20)
         ax.axvline(x=self.ratio, color='k', label='observed ratio')
         ax.axvline(x=self.bootstrap_mean, color='k', linestyle="dashed", 

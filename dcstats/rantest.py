@@ -138,9 +138,13 @@ class RantestContinuous():
         self.lo95lim = np.percentile(self.randiff, 2.5)
         self.hi95lim = np.percentile(self.randiff, 97.5)
 
-    def plot_rantest(self):
+    def plot_rantest(self, fig=None):
         """Plot randomisation distribution."""
-        fig, ax  = plt.subplots(1,1, figsize=(4,4))
+        if fig is None:
+            fig, ax  = plt.subplots(1,1) #, figsize=(4,4))
+        else: 
+            fig.clf()
+            ax = fig.add_subplot(1,1,1)
         ax.hist(self.randiff, 20)
         ax.axvline(x=self.dbar, color='r', label='observed difference')
         ax.axvline(x=-self.dbar, color='r')
