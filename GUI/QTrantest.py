@@ -113,25 +113,49 @@ class OneStopShopTab(QWidget):
         self.canvas = canvas
         self.path = ''
         
-        layout.addStretch()
+#        layout.addStretch()
         layout1 = QVBoxLayout()
         bt1 = QPushButton("Get data from Excel file")
+        bt1.clicked.connect(self.open_file)
         layout1.addWidget(bt1)
         self.label_file = QLabel('No data loaded yet...')
         layout1.addWidget(self.label_file)
         layout.addLayout(layout1)
+        
         layout2 = QHBoxLayout()
         self.sample1 = QComboBox()
         self.sample2 = QComboBox()
         layout2.addWidget(self.sample1)
         layout2.addWidget(self.sample2)
         layout.addLayout(layout2)
-        bt2 = QPushButton("Calculate ratio of means")
+
+        bt2 = QPushButton("Calculate P by randomisation")
+        bt2.clicked.connect(self.get_randomisation)
         layout.addWidget(bt2)
+
+        bt3 = QPushButton("Calculate ratio of means")
+        bt3.clicked.connect(self.get_ratio)
+        layout.addWidget(bt3)
         layout.addStretch()
 
-        bt1.clicked.connect(self.open_file)
-        bt2.clicked.connect(self.get_ratio)
+    def get_randomisation(self):
+        i = self.sample1.currentIndex()
+        j = self.sample2.currentIndex()
+
+        A = self.df.iloc[:, i].dropna().values.tolist()
+        B = self.df.iloc[:, j].dropna().values.tolist()
+
+        rnt = rantest.RantestContinuous(A, B, False)
+        self.log.append(rnt.describe_data())
+        rnt.run_rantest(10000)
+        self.log.append(str(rnt))
+
+        item = self.canvas.takeAt(0).widget()
+        self.canvas.removeWidget(item)
+        item.deleteLater()
+        self.pco = PlotCanvasOne()
+        self.pco.figure = rnt.plot_rantest()
+        self.canvas.addWidget(self.pco)
 
     def get_ratio(self):
         i = self.sample1.currentIndex()

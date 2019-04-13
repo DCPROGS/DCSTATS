@@ -6,6 +6,7 @@ import sys
 import math
 import random
 import numpy as np
+import matplotlib.pyplot as plt
 
 import dcstats.basic_stats as bs
 from dcstats.hedges import Hedges_d
@@ -136,6 +137,21 @@ class RantestContinuous():
         self.pequal = self.nequal / float(self.nran)
         self.lo95lim = np.percentile(self.randiff, 2.5)
         self.hi95lim = np.percentile(self.randiff, 97.5)
+
+    def plot_rantest(self):
+        """Plot randomisation distribution."""
+        fig, ax  = plt.subplots(1,1, figsize=(4,4))
+        ax.hist(self.randiff, 20)
+        ax.axvline(x=self.dbar, color='r', label='observed difference')
+        ax.axvline(x=-self.dbar, color='r')
+        ax.axvline(x=self.lo95lim, color='k', linestyle='--', label='2.5% limits')
+        ax.axvline(x=self.hi95lim, color='k', linestyle='--')
+        ax.set_xlabel('difference between means')
+        ax.set_ylabel('frequency')
+        ax.legend(bbox_to_anchor=(0., 1.02, 1., .102), loc=3,
+                        borderaxespad=0.)
+        plt.tight_layout()
+        return fig
         
     def __repr__(self):
         return ('\nRantest:  {0:d} randomisations'.format(self.nran) +
