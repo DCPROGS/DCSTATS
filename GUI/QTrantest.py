@@ -60,15 +60,14 @@ class RantestQT(QDialog):
         self.tab_widget = QTabWidget()
         self.tab_widget.addTab(OneStopShopTab(self.results, self.canvas), 
                           "One Stop Shop")
-        self.tab_widget.addTab(RandomisationContTab(self.results, self.plot_area), 
+        self.tab_widget.addTab(RandomisationContTab(self.results, self.canvas), 
                           "Rantest: two-sample")
-        self.tab_widget.addTab(RandomisationBatchTab(self.results, self.plot_area), "Rantest: multi")
+        self.tab_widget.addTab(RandomisationBatchTab(self.results, self.canvas), "Rantest: multi")
         self.tab_widget.addTab(RandomisationBinTab(self.results), "Rantest: binary")
         #self.tab_widget.addTab(FiellerTab(self.results), "Fieller")
         
         self.tab_widget.setFixedWidth(600)
         self.tab_widget.setFixedHeight(400)
-        self.tab_widget.currentChanged.connect(self.tab_changed)
         
         right_box.addWidget(self.tab_widget)
         right_box.addLayout(self.plot_area)
@@ -198,14 +197,6 @@ class OneStopShopTab(QWidget):
             self.sample2.addItem(name)
         self.sample2.setCurrentIndex(1)
 
-class GraphPlaceholder(FigureCanvas):
-    """"""
-    def __init__(self, parent=None):
-        self.figure = plt.figure()
-        FigureCanvas.__init__(self, self.figure)
-        self.setFixedHeight(300)
-        self.setFixedWidth(600)
-
 
 class FiellerTab(QWidget):
     def __init__(self, log, parent=None):
@@ -310,12 +301,12 @@ class RandomisationBinTab(QWidget):
 
 
 class RandomisationBatchTab(QWidget):
-    def __init__(self, log, plot_area, parent=None):
+    def __init__(self, log, canvas, parent=None):
         QWidget.__init__(self, parent)
         layout = QVBoxLayout(self)
         layout.addWidget(QLabel(rantest.RTINTROD))
         self.log = log
-        self.plot_area = plot_area
+        self.canvas = canvas
         self.nran = 5000
         self.path = ""
 
@@ -339,9 +330,11 @@ class RandomisationBatchTab(QWidget):
             self.path = os.path.split(str(self.filename))[0]
             #TODO: allow loading from other format files
             df = load_multi_samples_from_excel_with_pandas(self.filename)
-            self.initiate_rantest(df)
+            
         except:
             pass
+
+        self.initiate_rantest(df)
 
     def initiate_rantest(self, df):
         # Display basic statistics
@@ -351,11 +344,14 @@ class RandomisationBatchTab(QWidget):
         self.log.append('Loaded {0:d} samples: '.format(self.rnt.n)) 
         self.log.append(str(self.rnt.df.describe()))
 
-        item = self.plot_area.takeAt(0).widget()
-        self.plot_area.removeWidget(item)
-        item.deleteLater()
-        self.bbp = RantestBatchPlot(df)
-        self.plot_area.addWidget(self.bbp)
+        self.canvas.figure.clf()
+        self.ax = self.canvas.figure.add_subplot(1, 1, 1)
+        self.ax = df.boxplot()
+        for i in range(df.shape[1]):
+            X = df.iloc[:, i].dropna().values.tolist()
+            x = np.random.normal(i+1, 0.04, size=len(X))
+            self.ax.plot(x, X, '.', alpha=0.4)
+        self.canvas.draw()       
 
     def run_rantest(self):
         self.nran = int(self.ed1.text())
@@ -363,11 +359,11 @@ class RandomisationBatchTab(QWidget):
 
 
 class RandomisationContTab(QWidget):
-    def __init__(self, log, plot_area, parent=None):
+    def __init__(self, log, canvas, parent=None):
         QWidget.__init__(self, parent)
         layout = QVBoxLayout(self)
         self.log = log
-        self.plot_area = plot_area
+        self.canvas = canvas
         layout.addWidget(QLabel(rantest.RTINTROD))
 
         self.nran = 5000
@@ -406,12 +402,10 @@ class RandomisationContTab(QWidget):
             self.path = os.path.split(str(self.filename))[0]
             #TODO: allow loading from other format files
             self.X, self.Y = load_two_samples_from_excel_with_pandas(self.filename)
-            
+            self.initiate_rantest()
         except:
             pass
 
-        self.initiate_rantest()
-        
     def initiate_rantest(self):
         # Display basic statistics
         self.log.separate()
@@ -419,38 +413,39 @@ class RandomisationContTab(QWidget):
         self.rnt = rantest.RantestContinuous(self.X, self.Y, self.paired)
         self.log.append(self.rnt.describe_data())
 
-        item = self.plot_area.takeAt(0).widget()
-        self.plot_area.removeWidget(item)
-        item.deleteLater()
-        self.pc = PlotCanvas()
-        self.pc.add_boxplot(self.X, self.Y)
-        self.plot_area.addWidget(self.pc)
+        self.canvas.figure.clf()
+        self.ax1 = self.canvas.figure.add_subplot(1, 2, 1)
+        names = ['sample 1', 'sample 2']
+        self.ax1.boxplot((self.X, self.Y))
+        # Add some random "jitter" to the x-axis
+        x = np.random.normal(1, 0.04, size=len(self.X))
+        self.ax1.plot(x, self.X, '.', alpha=0.4)
+        y = np.random.normal(2, 0.04, size=len(self.Y))
+        self.ax1.plot(y, self.Y, '.', alpha=0.4)
+        plt.setp(self.ax1, xticks=[1, 2], xticklabels=names)
+        self.ax1.set_ylabel('measurment values')
+        plt.tight_layout()
+        self.canvas.draw()
 
     def run_rantest(self):
         """Called by RUN TEST button in Tab2."""
         self.rnt.run_rantest(self.nran)
         self.log.append(str(self.rnt))
-        self.pc.add_randhisto(self.rnt.randiff, self.rnt.dbar, 
-                              self.rnt.lo95lim, self.rnt.hi95lim)
+        self.ax2 = self.canvas.figure.add_subplot(1, 2, 2)
+        self.ax2.hist(self.rnt.randiff, bins=20)
+        self.ax2.axvline(x=self.rnt.dbar, color='r', label='observed difference')
+        self.ax2.axvline(x=-self.rnt.dbar, color='r')
+        self.ax2.axvline(x=self.rnt.lo95lim, color='k', linestyle='--', label='2.5% limits')
+        self.ax2.axvline(x=self.rnt.hi95lim, color='k', linestyle='--')
+        self.ax2.set_xlabel('difference between means')
+        self.ax2.set_ylabel('frequency')
+        self.ax2.legend(bbox_to_anchor=(0., 1.02, 1., .102), loc=3,
+                        borderaxespad=0.)
+        plt.tight_layout()
+        self.canvas.draw()
 
 
-class RantestBatchPlot(FigureCanvas):
-    """"""
-    def __init__(self, df, parent=None):
-        self.figure = plt.figure()
-        FigureCanvas.__init__(self, self.figure)
-        self.setFixedHeight(400)
-        self.setFixedWidth(600)
-        self.ax1 = self.figure.add_subplot(1, 1, 1)
-        self.ax1 = df.boxplot()
-        for i in range(df.shape[1]):
-            X = df.iloc[:, i].dropna().values.tolist()
-            x = np.random.normal(i+1, 0.04, size=len(X))
-            self.ax1.plot(x, X, '.', alpha=0.4)
-        self.draw()
-
-
-class PlotCanvas(FigureCanvas):
+class GraphPlaceholder(FigureCanvas):
     """"""
     def __init__(self, parent=None):
         self.figure = plt.figure()
@@ -458,39 +453,6 @@ class PlotCanvas(FigureCanvas):
         self.setFixedHeight(300)
         self.setFixedWidth(600)
 
-        self.ax1 = self.figure.add_subplot(1, 2, 1)
-        self.ax2 = self.figure.add_subplot(1, 2, 2)
-
-    def add_boxplot(self, X, Y, sample_names=None):
-        if sample_names is None:
-            names = ['sample 1', 'sample 2']
-        else:
-            names = sample_names
-        self.ax1.clear()
-        self.ax1.boxplot((X, Y))
-        # Add some random "jitter" to the x-axis
-        x = np.random.normal(1, 0.04, size=len(X))
-        self.ax1.plot(x, X, '.', alpha=0.4)
-        y = np.random.normal(2, 0.04, size=len(Y))
-        self.ax1.plot(y, Y, '.', alpha=0.4)
-        plt.setp(self.ax1, xticks=[1, 2], xticklabels=names)
-        self.ax1.set_ylabel('measurment values')
-        plt.tight_layout()
-        self.draw()
-
-    def add_randhisto(self, randiff, dbar, lo95lim, hi95lim):
-        self.ax2.clear()
-        self.ax2.hist(randiff, bins=20)
-        self.ax2.axvline(x=dbar, color='r', label='observed difference')
-        self.ax2.axvline(x=-dbar, color='r')
-        self.ax2.axvline(x=lo95lim, color='k', linestyle='--', label='2.5% limits')
-        self.ax2.axvline(x=hi95lim, color='k', linestyle='--')
-        self.ax2.set_xlabel('difference between means')
-        self.ax2.set_ylabel('frequency')
-        self.ax2.legend(bbox_to_anchor=(0., 1.02, 1., .102), loc=3,
-                        borderaxespad=0.)
-        plt.tight_layout()
-        self.draw()
 
 class WelcomeScreen(QWidget):
     """"""
@@ -504,7 +466,6 @@ class WelcomeScreen(QWidget):
         self.layout.addWidget(self.movie_screen())
         self.layout.addWidget(QLabel("<p align=right><i>David Colquhoun  </i></p>"))
     
-
     def movie_screen(self):
         """Set up the gif movie screen."""
         movie_screen = QLabel()
