@@ -21,6 +21,7 @@ from dcstats.basic_stats import TTestBinomial
 import dcstats.basic_stats as bs
 from dcstats.hedges import Hedges_d
 from dcstats.ratio import Ratio
+from dcstats.difference import Difference
 
 __author__="remis"
 __date__ ="$03-Jan-2010 15:26:00$"
@@ -139,6 +140,10 @@ class OneStopShopTab(QWidget):
         bt3 = QPushButton("Calculate ratio of means")
         bt3.clicked.connect(self.get_ratio)
         layout.addWidget(bt3)
+
+        bt4 = QPushButton("Calculate difference of means")
+        bt4.clicked.connect(self.get_difference)
+        layout.addWidget(bt4)
         layout.addStretch()
 
     def get_randomisation(self):
@@ -174,6 +179,21 @@ class OneStopShopTab(QWidget):
         self.log.append(str(recip))
 
         ratio.plot_bootstrap(self.canvas.figure)
+        self.canvas.draw()       
+
+    def get_difference(self):
+        i = self.sample1.currentIndex()
+        j = self.sample2.currentIndex()
+
+        A = self.df.iloc[:, i].dropna().values.tolist()
+        B = self.df.iloc[:, j].dropna().values.tolist()
+
+        self.log.append('\nDifference: ' + self.names[i] + '-' + self.names[j])
+        diff = Difference(A, B)
+        diff.run_bootstrap(10000)
+        self.log.append(str(diff))
+
+        diff.plot_bootstrap(self.canvas.figure)
         self.canvas.draw()       
 
     def open_file(self):
