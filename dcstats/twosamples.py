@@ -13,7 +13,7 @@ __author__="remis"
 __date__ ="$14-Apr-2019 14:04:05$"
 
 class TwoSamples:
-    def __init__(self, df2, are_paired=False, r=0):
+    def __init__(self, df2, are_paired=False, r=0, runs=10000):
         """ 
         Bootstrap samples and calculate statistics.
 
@@ -48,6 +48,7 @@ class TwoSamples:
         self.B = self.df2.iloc[:, 1].dropna().values.tolist()
         self.r = r
         self.are_paired = are_paired
+        self.runs = runs
 
     def describe_data(self):
         """ Run Student's two-tailed t-test for a difference between two samples
@@ -62,6 +63,47 @@ class TwoSamples:
         hedges_calculation.bootstrap_CI(5000)
         #option to have bootstrap calculated CIs should go here
         return str(ttc) + str(hedges_calculation)
+
+    def plot_bootstrapped_distributions(self, fig=None):
+        sample1 = Sample(self.A)
+        sample1.run_bootstrap(self.runs)
+        lower95CI1, upper95CI1 = sample1.bootstrapped_CIs(alpha=0.05)
+        
+        sample2 = Sample(self.B)
+        sample2.run_bootstrap(self.runs)
+        lower95CI2, upper95CI2 = sample2.bootstrapped_CIs(alpha=0.05)
+        
+        if fig is None:
+            fig = plt.Figure()
+        else: 
+            fig.clf()
+        ax1 = fig.add_subplot(1, 2, 1)
+        ax1.hist(sample1.boot, bins=20)
+        ax1.axvline(x=sample1.meanA, color='k', label='observed mean')
+        ax1.axvline(x=sample1.bootstrap_mean, color='k', linestyle="dashed", 
+                   label='bootstrapped mean')
+        ax1.axvline(x=lower95CI1, color='r', linestyle="dashed", label='2.5% limits')
+        ax1.axvline(x=upper95CI1, color='r', linestyle="dashed")
+        ax1.set_ylabel("Frequency")
+        ax1.set_xlabel('Mean')
+        ax1.legend(bbox_to_anchor=(0., 1.02, 1., .102), loc=3,
+                        borderaxespad=0.)
+
+        ax2 = fig.add_subplot(1, 2, 2)
+        ax2.hist(sample2.boot, bins=20)
+        ax2.axvline(x=sample2.meanA, color='k', label='observed mean')
+        ax2.axvline(x=sample2.bootstrap_mean, color='k', linestyle="dashed", 
+                   label='bootstrapped mean')
+        ax2.axvline(x=lower95CI2, color='r', linestyle="dashed", label='2.5% limits')
+        ax2.axvline(x=upper95CI2, color='r', linestyle="dashed")
+        ax2.set_ylabel("Frequency")
+        ax2.set_xlabel('Mean')
+        ax2.legend(bbox_to_anchor=(0., 1.02, 1., .102), loc=3,
+                        borderaxespad=0.)
+
+        plt.tight_layout()
+        return fig
+
 
     def plot_boxplot(self, fig=None):
         if fig is None:
@@ -114,15 +156,15 @@ class Sample:
         self.sdmA = self.sdA / math.sqrt(len(self.A))
         self.__sample_is_bootstrapped = False
 
-    def bootstrap_sample(self, A, runs=5000):
+    def bootstrap_sample(self, A, runs=10000):
         """Bootstrap sample to get distribution of mean."""
         bmeans = np.zeros(runs)
         for i in range(runs):
-            bmeans = np.mean(np.random.choice(A, size=len(A), replace=True))
+            bmeans[i] = np.mean(np.random.choice(A, size=len(A), replace=True))
         bmeans.sort()
         return bmeans
 
-    def run_bootstrap(self, runs=5000):
+    def run_bootstrap(self, runs=10000):
         """Bootstrap the sample and calculate statistics 
         of bootstrapped distribution."""
         self.boot = self.bootstrap_sample(self.A, runs)

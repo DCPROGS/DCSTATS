@@ -23,6 +23,7 @@ from dcstats.hedges import Hedges_d
 from dcstats.ratio import Ratio
 from dcstats.difference import Difference
 from dcstats.twosamples import TwoSamples
+from dcstats.twosamples import Sample
 
 __author__="remis"
 __date__ ="$03-Jan-2010 15:26:00$"
@@ -167,7 +168,7 @@ class OneStopShopTab(QWidget):
         layout5.addWidget(QLabel("Number of iterations:"))
         self.ed1 = QLineEdit(str(self.nran))
         self.ed1.editingFinished.connect(self.ran_changed)
-        self.ch1 = QCheckBox("&Paired test?")
+        self.ch1 = QCheckBox("&Paired samples?")
         self.ch1.stateChanged.connect(self.ran_changed)
         layout5.addWidget(self.ed1)
         layout5.addWidget(self.ch1)
@@ -178,7 +179,10 @@ class OneStopShopTab(QWidget):
         pass
 
     def bootstrap_selected_samples(self):
-        pass
+        df2 = self.get_2sample_df()
+        twosamples = TwoSamples(df2, runs=self.nran)
+        twosamples.plot_bootstrapped_distributions(self.canvas.figure)
+        self.canvas.draw()
 
     def get_2sample_df(self):
         i = self.sample1.currentIndex()
