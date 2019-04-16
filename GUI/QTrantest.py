@@ -118,6 +118,7 @@ class OneStopShopTab(QWidget):
         self.canvas = canvas
         self.path = ''
         self.nran = 10000
+        self.paired = 0
         
 #        layout.addStretch()
         layout1 = QVBoxLayout()
@@ -165,9 +166,9 @@ class OneStopShopTab(QWidget):
         layout5 = QHBoxLayout()
         layout5.addWidget(QLabel("Number of iterations:"))
         self.ed1 = QLineEdit(str(self.nran))
-        #self.ed1.editingFinished.connect(self.ran_changed)
+        self.ed1.editingFinished.connect(self.ran_changed)
         self.ch1 = QCheckBox("&Paired test?")
-        #self.ch1.stateChanged.connect(self.ran_changed)
+        self.ch1.stateChanged.connect(self.ran_changed)
         layout5.addWidget(self.ed1)
         layout5.addWidget(self.ch1)
         layout.addLayout(layout5)
@@ -184,6 +185,13 @@ class OneStopShopTab(QWidget):
         j = self.sample2.currentIndex()
         df2 = self.df.iloc[:, [i, j]]
         return df2
+
+    def ran_changed(self):
+        if self.ch1.isChecked():
+            self.paired = 1
+        else:
+            self.paired = 0
+        self.nran = int(self.ed1.text()) 
 
     def get_basic_stats(self):
         df2 = self.get_2sample_df()
@@ -203,7 +211,7 @@ class OneStopShopTab(QWidget):
 
         rnt = rantest.RantestContinuous(A, B, False)
         self.log.append(rnt.describe_data())
-        rnt.run_rantest(10000)
+        rnt.run_rantest(self.nran)
         self.log.append(str(rnt))
 
         rnt.plot_rantest(self.canvas.figure)
@@ -218,12 +226,12 @@ class OneStopShopTab(QWidget):
 
         self.log.append('\nRatio: ' + self.names[i] + '/' + self.names[j])
         ratio = Ratio(A, B)
-        ratio.run_bootstrap(10000)
+        ratio.run_bootstrap(self.nran)
         self.log.append(str(ratio))
 
         self.log.append('\nReciprocal of ratio: ' + self.names[j] + '/' + self.names[i])
         recip = Ratio(B, A)
-        recip.run_bootstrap(10000)
+        recip.run_bootstrap(self.nran)
         self.log.append(str(recip))
 
         ratio.plot_bootstrap(self.canvas.figure)
@@ -238,7 +246,7 @@ class OneStopShopTab(QWidget):
 
         self.log.append('\nDifference: ' + self.names[i] + '-' + self.names[j])
         diff = Difference(A, B)
-        diff.run_bootstrap(10000)
+        diff.run_bootstrap(self.nran)
         self.log.append(str(diff))
 
         diff.plot_bootstrap(self.canvas.figure)
