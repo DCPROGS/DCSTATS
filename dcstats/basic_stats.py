@@ -187,13 +187,14 @@ class TTestContinuous(object):
 
     def __repr__(self):
         
-        repr_string = ('n \t\t {0:d}     \t{1:d}'.format(len(self.X), len(self.Y)) +
-            '\nMean \t\t {0:.6f}    \t  {1:.6f}'.format(mean(self.X), mean(self.Y)) +
-            '\nSD \t\t {0:.6f}     \t  {1:.6f}'.format(sd(self.X), sd(self.Y)) +
-            '\nSDM \t\t {0:.6f}     \t  {1:.6f}'.format(sdm(self.X), sdm(self.Y)) +
-            '\n95% confidence intervals:' +
-            '\nlower \t\t {0:.6f}    \t  {1:.6f}'.format(ci95lower(self.X), ci95lower(self.Y)) +
-            '\nupper \t\t {0:.6f}    \t  {1:.6f}'.format(ci95upper(self.X), ci95upper(self.Y)))
+        repr_string = ''
+        #('n \t\t {0:d}     \t{1:d}'.format(len(self.X), len(self.Y)) +
+        #    '\nMean \t\t {0:.6f}    \t  {1:.6f}'.format(mean(self.X), mean(self.Y)) +
+        #    '\nSD \t\t {0:.6f}     \t  {1:.6f}'.format(sd(self.X), sd(self.Y)) +
+        #    '\nSDM \t\t {0:.6f}     \t  {1:.6f}'.format(sdm(self.X), sdm(self.Y)) +
+        #    '\n95% confidence intervals:' +
+        #    '\nlower \t\t {0:.6f}    \t  {1:.6f}'.format(ci95lower(self.X), ci95lower(self.Y)) +
+        #    '\nupper \t\t {0:.6f}    \t  {1:.6f}'.format(ci95upper(self.X), ci95upper(self.Y)))
             
         if len(self.X) == len(self.Y):
             repr_string += ('\n\n Mean difference (dbar) = \t {0:.6f}'.format(self.dbar) +
@@ -206,6 +207,7 @@ class TTestContinuous(object):
 
         else:
             repr_string += ('\n\n Two-sample unpaired Student''s t-test:' +
+                '\n Mean difference (dbar) = \t {0:.6f}'.format(self.dbar) +
                 '\n t = \t {0:.6f}'.format(float(self.tval)) +
                 '\n two tail P = \t {0:.3E}'.format(self.P) +
                 '\n\n statistical power = {0:.3f}'.

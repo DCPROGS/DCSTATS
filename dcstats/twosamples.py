@@ -1,0 +1,174 @@
+#!/usr/bin python
+"""twosamples.py -- calculate statistics of bootstrapped samples."""
+
+import math
+import numpy as np
+import matplotlib.pyplot as plt
+
+import dcstats.statistics_EJ as s
+import dcstats.basic_stats as bs
+from dcstats.hedges import Hedges_d
+
+__author__="remis"
+__date__ ="$14-Apr-2019 14:04:05$"
+
+class TwoSamples:
+    def __init__(self, df2, are_paired=False, r=0):
+        """ 
+        Bootstrap samples and calculate statistics.
+
+        Parameters
+        ----------
+        df2 : pandas DataFrame
+            Observations in first and second trials.
+        r : float
+             Correlation coefficient.
+
+        Attributes
+        ----------
+        A, B : type ndarray
+            Observations in first and second trials with wich
+            Ratio class is initialised. 
+        r : float
+            Correlation coefficient.
+        df : integer
+            Degree of freedom.
+        meanA, meanB : floats
+            Means of samples A and B.
+        sdA, sdB : floats
+            Standard deviations of samples A and B.
+        sdmA, sdmB :floats
+            Standard deviation of the mean of samples A and B.
+
+        Methods
+        -------
+        """   
+        self.df2 = df2
+        self.A = self.df2.iloc[:, 0].dropna().values.tolist()
+        self.B = self.df2.iloc[:, 1].dropna().values.tolist()
+        self.r = r
+        self.are_paired = are_paired
+
+    def describe_data(self):
+        """ Run Student's two-tailed t-test for a difference between two samples
+        and calculate Hedges effect size. Return results as string. """
+        ttc = bs.TTestContinuous(self.A, self.B, self.are_paired)
+        #calculation of hedges d and approximate 95% confidence intervals
+        #not tested against known values yet AP 170518
+        hedges_calculation = Hedges_d(self.A, self.B)
+        hedges_calculation.hedges_d_unbiased()
+        #lowerCI, upperCI = hedges_calculation.approx_CI(self.paired)
+        #paired needed for degrees of freedom
+        hedges_calculation.bootstrap_CI(5000)
+        #option to have bootstrap calculated CIs should go here
+        return str(ttc) + str(hedges_calculation)
+
+    def plot_boxplot(self, fig=None):
+        if fig is None:
+            fig, ax  = plt.subplots(1,1) #, figsize=(4,4))
+        else: 
+            fig.clf()
+            ax = fig.add_subplot(1,1,1)
+        ax = self.df2.boxplot()
+        for i in range(self.df2.shape[1]):
+            X = self.df2.iloc[:, i].dropna().values.tolist()
+            x = np.random.normal(i+1, 0.04, size=len(X))
+            ax.plot(x, X, '.', alpha=0.4)
+        plt.tight_layout()
+        return fig
+
+
+class Sample:
+    def __init__(self, S):
+        """ 
+        Calculate statistics of a single sample.
+
+        Parameters
+        ----------
+        S : ndarray
+            Observations.
+
+        Attributes
+        ----------
+        A : ndarray
+            Sample of observations with wich class is initialised. 
+        meanA : float
+            Mean of sample A.
+        sdA : float
+            Standard deviations of sample A.
+        sdmA :float
+            Standard deviation of the mean of sample A.
+
+        Methods
+        -------
+        SDM
+        CIs
+        bootstrap_sample
+        run_bootstrap
+        bootstrapped_CIs
+
+        """   
+        self.A = S
+        self.meanA = np.mean(self.A)
+        self.sdA = np.std(self.A, ddof=1)
+        self.sdmA = self.sdA / math.sqrt(len(self.A))
+        self.__sample_is_bootstrapped = False
+
+    def bootstrap_sample(self, A, runs=5000):
+        """Bootstrap sample to get distribution of mean."""
+        bmeans = np.zeros(runs)
+        for i in range(runs):
+            bmeans = np.mean(np.random.choice(A, size=len(A), replace=True))
+        bmeans.sort()
+        return bmeans
+
+    def run_bootstrap(self, runs=5000):
+        """Bootstrap the sample and calculate statistics 
+        of bootstrapped distribution."""
+        self.boot = self.bootstrap_sample(self.A, runs)
+        self.bootstrap_mean = np.mean(self.boot)
+        self.bootstrap_sdm = np.std(self.boot, ddof=1)
+        self.bootstrap_runs = runs
+        self.bootstrap_bias = self.meanA - np.mean(self.boot)
+        self.__sample_is_bootstrapped = True
+
+    def bootstrapped_CIs(self, alpha=0.05):
+        """Calculate confidence intervals for the bootstrapped ratios."""
+        lowerCI = self.boot[int((alpha / 2.0) * self.bootstrap_runs)]
+        upperCI = self.boot[int((1 - alpha / 2.0) * self.bootstrap_runs)]
+        return lowerCI, upperCI
+
+    def plot_bootstrap(self, fig=None):
+        """Plot bootstrapped distribution."""
+        lower95CI, upper95CI = self.bootstrapped_CIs(alpha=0.05)
+        if fig is None:
+            fig, ax  = plt.subplots(1,1) #, figsize=(4,4))
+        else: 
+            fig.clf()
+            ax = fig.add_subplot(1,1,1)
+        ax.hist(self.boot, 20)
+        ax.axvline(x=self.meanA, color='k', label='observed ratio')
+        ax.axvline(x=self.bootstrap_mean, color='k', linestyle="dashed", 
+                   label='bootstrapped sample mean')
+        ax.axvline(x=lower95CI, color='r', linestyle="dashed", label='2.5% limits')
+        ax.axvline(x=upper95CI, color='r', linestyle="dashed")
+        ax.set_ylabel("Frequency")
+        ax.set_xlabel('Bootstrapped sample mean')
+        ax.legend(bbox_to_anchor=(0., 1.02, 1., .102), loc=3,
+                        borderaxespad=0.)
+        plt.tight_layout()
+        return fig
+
+    def __repr__(self):
+        if self.__sample_is_bootstrapped:
+            lower95CI, upper95CI = self.bootstrapped_CIs(alpha=0.05)
+            repr_string += ('\n\nBootsrapped sample statistics (repeats = {0:d}):'.
+            format(self.bootstrap_runs) +
+            '\nMean= {0:.3g} +/- {1:.2g} (bootstrapped SDM); bias= {2:.2g}'.
+            format(self.meanA, self.bootstrap_sdm, self.bootstrap_bias) +
+            '\n\t95% confidence limits (bootstrapped):\n\tlower= {0:.3g}; upper= {1:.3g}'.
+            format(lower95CI, upper95CI)
+            )
+        return repr_string
+
+

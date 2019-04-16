@@ -22,6 +22,7 @@ import dcstats.basic_stats as bs
 from dcstats.hedges import Hedges_d
 from dcstats.ratio import Ratio
 from dcstats.difference import Difference
+from dcstats.twosamples import TwoSamples
 
 __author__="remis"
 __date__ ="$03-Jan-2010 15:26:00$"
@@ -116,6 +117,7 @@ class OneStopShopTab(QWidget):
 
         self.canvas = canvas
         self.path = ''
+        self.nran = 10000
         
 #        layout.addStretch()
         layout1 = QVBoxLayout()
@@ -133,18 +135,64 @@ class OneStopShopTab(QWidget):
         layout2.addWidget(self.sample2)
         layout.addLayout(layout2)
 
+        layout3 = QHBoxLayout()
+        bt5 = QPushButton("Basic statistics of selected samples")
+        bt5.clicked.connect(self.get_basic_stats)
         bt2 = QPushButton("Calculate P by randomisation")
         bt2.clicked.connect(self.get_randomisation)
-        layout.addWidget(bt2)
+        layout3.addWidget(bt5)
+        layout3.addWidget(bt2)
+        layout.addLayout(layout3)
 
+        layout4 = QHBoxLayout()
+        bt6 = QPushButton("Bootstrap samples")
+        bt6.clicked.connect(self.bootstrap_selected_samples)
+        bt7 = QPushButton("Q-Q plots")
+        bt7.clicked.connect(self.get_qq_plots)
+        layout4.addWidget(bt6)
+        layout4.addWidget(bt7)
+        layout.addLayout(layout4)
+        
+        layout5 = QHBoxLayout()
         bt3 = QPushButton("Calculate ratio of means")
         bt3.clicked.connect(self.get_ratio)
-        layout.addWidget(bt3)
-
         bt4 = QPushButton("Calculate difference of means")
         bt4.clicked.connect(self.get_difference)
-        layout.addWidget(bt4)
-        layout.addStretch()
+        layout5.addWidget(bt3)
+        layout5.addWidget(bt4)
+        layout.addLayout(layout5)
+
+        layout5 = QHBoxLayout()
+        layout5.addWidget(QLabel("Number of iterations:"))
+        self.ed1 = QLineEdit(str(self.nran))
+        #self.ed1.editingFinished.connect(self.ran_changed)
+        self.ch1 = QCheckBox("&Paired test?")
+        #self.ch1.stateChanged.connect(self.ran_changed)
+        layout5.addWidget(self.ed1)
+        layout5.addWidget(self.ch1)
+        layout.addLayout(layout5)
+        #layout.addStretch()
+
+    def get_qq_plots(self):
+        pass
+
+    def bootstrap_selected_samples(self):
+        pass
+
+    def get_2sample_df(self):
+        i = self.sample1.currentIndex()
+        j = self.sample2.currentIndex()
+        df2 = self.df.iloc[:, [i, j]]
+        return df2
+
+    def get_basic_stats(self):
+        df2 = self.get_2sample_df()
+        twosamples = TwoSamples(df2)
+        self.log.append('\n\n********************')
+        self.log.append(str(df2.describe()))
+        self.log.append(str(twosamples.describe_data()))
+        twosamples.plot_boxplot(self.canvas.figure)
+        self.canvas.draw()
 
     def get_randomisation(self):
         i = self.sample1.currentIndex()
