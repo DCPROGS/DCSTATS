@@ -272,6 +272,8 @@ class OneStopShopTab(QWidget):
 
     def initiate_shop(self):
         self.names = self.df.columns.tolist()
+        self.sample1.clear() 
+        self.sample2.clear() 
         for name in self.names:
             self.sample1.addItem(name)
             self.sample2.addItem(name)
