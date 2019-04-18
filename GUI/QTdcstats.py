@@ -176,7 +176,10 @@ class OneStopShopTab(QWidget):
         #layout.addStretch()
 
     def get_qq_plots(self):
-        pass
+        df2 = self.get_2sample_df()
+        twosamples = TwoSamples(df2, runs=self.nran)
+        twosamples.plot_qq_plots(self.canvas.figure)
+        self.canvas.draw()
 
     def bootstrap_selected_samples(self):
         df2 = self.get_2sample_df()

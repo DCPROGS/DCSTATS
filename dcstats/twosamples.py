@@ -104,6 +104,31 @@ class TwoSamples:
         plt.tight_layout()
         return fig
 
+    def plot_qq_plots(self, fig=None):
+
+        sample1 = Sample(self.A)
+        q11, q12, min1, max1 = sample1.get_qq()
+        sample2 = Sample(self.B)
+        q21, q22, min2, max2 = sample2.get_qq()
+        
+        if fig is None:
+            fig = plt.Figure()
+        else: 
+            fig.clf()
+        ax1 = fig.add_subplot(1, 2, 1)
+        ax1.plot(q11, q12, 'o')
+        ax1.plot([min1, max1],[min1, max1],'k--')
+        ax1.set_ylabel('Normal sample quantiles')
+        ax1.set_xlabel('Normal theoretical quantiles')
+
+        ax2 = fig.add_subplot(1, 2, 2)
+        ax2.plot(q21, q22, 'o')
+        ax2.plot([min2, max2],[min2, max2],'k--')
+        ax2.set_ylabel('Normal sample quantiles')
+        ax2.set_xlabel('Normal theoretical quantiles')
+
+        plt.tight_layout()
+        return fig
 
     def plot_boxplot(self, fig=None):
         if fig is None:
@@ -151,6 +176,7 @@ class Sample:
 
         """   
         self.A = S
+        self.nA = len(self.A)
         self.meanA = np.mean(self.A)
         self.sdA = np.std(self.A, ddof=1)
         self.sdmA = self.sdA / math.sqrt(len(self.A))
@@ -200,6 +226,23 @@ class Sample:
                         borderaxespad=0.)
         plt.tight_layout()
         return fig
+
+    def get_qq(self):
+        # Sample to test for normality
+        self.A.sort()
+        quantile_levels1 = np.arange(self.nA, dtype=float) / self.nA
+        quantiles1 = self.A
+
+        #Calculate quantiles by generating samples from hypothetical normal distribution
+        nSN = 1000
+        SN = np.random.normal(self.meanA, self.sdA, nSN)
+        SN.sort()
+        quantile_levels2 = np.arange(nSN, dtype=float) / nSN
+        quantiles2 = np.interp(quantile_levels1, quantile_levels2, SN)
+
+        maxval = max(self.A[-1], SN[-1])
+        minval = min(self.A[0], SN[0])
+        return quantiles2, quantiles1, minval, maxval
 
     def __repr__(self):
         if self.__sample_is_bootstrapped:
