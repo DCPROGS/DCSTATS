@@ -165,15 +165,24 @@ class OneStopShopTab(QWidget):
         layout.addLayout(layout5)
 
         layout5 = QHBoxLayout()
+        layout5.addStretch()
         layout5.addWidget(QLabel("Number of iterations:"))
         self.ed1 = QLineEdit(str(self.nran))
         self.ed1.editingFinished.connect(self.ran_changed)
-        self.ch1 = QCheckBox("&Paired samples?")
-        self.ch1.stateChanged.connect(self.ran_changed)
+        #self.ch1 = QCheckBox("&Paired samples?")
+        #self.ch1.stateChanged.connect(self.ran_changed)
         layout5.addWidget(self.ed1)
-        layout5.addWidget(self.ch1)
+        #layout5.addWidget(self.ch1)
+        layout5.addStretch()
         layout.addLayout(layout5)
+
+        bt8 = QPushButton("Process all samples and save HTML report")
+        bt8.clicked.connect(self.process_all)
+        layout.addWidget(bt8)
         #layout.addStretch()
+
+    def process_all(self):
+        pass
 
     def get_qq_plots(self):
         df2 = self.get_2sample_df()
