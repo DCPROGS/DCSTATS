@@ -11,9 +11,9 @@ if __name__ == "__main__":
     try:
         from PyQt5.QtGui import *
         from PyQt5.QtWidgets import QApplication
-        from GUI import QTrantest
+        from GUI import QTdcstats
         app = QApplication(sys.argv)
-        form = QTrantest.RantestQT()
+        form = QTdcstats.DCStatsQT()
         form.show()
         app.exec_()
         
