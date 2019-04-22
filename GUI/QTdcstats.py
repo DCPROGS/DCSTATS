@@ -614,12 +614,18 @@ class ResultBox(QTextBrowser):
         self.append_info()
 
     def append_info(self):
-        self.append("DC-stats version: {0}".format(dcstats.__version__))
-        self.append("Machine: {0};  System: {1};\nSystem Version: {2}".format(socket.gethostname(), sys.platform, sys.version))
-        self.append("Date and time of analysis: " + str(datetime.datetime.now())[:19])
+        self.append(get_sys_info())
+        #self.append("DC-stats version: {0}".format(dcstats.__version__))
+        #self.append("Machine: {0};  System: {1};\nSystem Version: {2}".format(socket.gethostname(), sys.platform, sys.version))
+        #self.append("Date and time of analysis: " + str(datetime.datetime.now())[:19])
     
     def separate(self):
         self.append('*' * 10)
+
+def get_sys_info():
+    return ("DC-stats version: {0}".format(dcstats.__version__) +
+            "Machine: {0};  System: {1};\nSystem Version: {2}".format(socket.gethostname(), sys.platform, sys.version) +
+            "Date and time of analysis: " + str(datetime.datetime.now())[:19])
 
 
 def ok_cancel_button(parent):
