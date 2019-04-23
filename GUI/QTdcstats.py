@@ -189,7 +189,7 @@ class OneStopShopTab(QWidget):
         # TODO: get sheet name
         fname = fname + '_' + self.shname
 
-        new_path = os.path.join(path, "temp")
+        new_path = os.path.join(path, fname)
         if not os.path.exists(new_path):
             os.mkdir(new_path)
         os.chdir(new_path)
