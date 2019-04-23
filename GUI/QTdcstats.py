@@ -187,7 +187,7 @@ class OneStopShopTab(QWidget):
         path, fname = os.path.split(self.filename)
         fname = os.path.splitext(fname)[0]
         # TODO: get sheet name
-        #fname = fname + '_EC50'
+        fname = fname + '_' + self.shname
 
         new_path = os.path.join(path, "temp")
         if not os.path.exists(new_path):
@@ -198,9 +198,14 @@ class OneStopShopTab(QWidget):
         report = Report(fname, get_sys_info())
         report.title('Original data:', 1)
         report.paragraph('Number of samples loaded: ' + str(n))
+        report.paragraph(str(self.df.describe()))
+
+        self.log.append('\n\nBatch-processing all sample pairs...')
 
         for i in range(n-1):
             for j in range(i+1, n):
+                self.log.append('\nProcessing: ' + self.names[i] + ' versus ' + self.names[j])
+                self.log.repaint()
                 df2 = self.df.iloc[:, [i, j]]
                 A = self.df.iloc[:, i].dropna().values.tolist()
                 B = self.df.iloc[:, j].dropna().values.tolist()
@@ -355,10 +360,11 @@ class OneStopShopTab(QWidget):
                 "Open Data File...", self.path, "MS Excel Files (*.xlsx)")
             self.path = os.path.split(str(self.filename))[0]
             #TODO: allow loading from other format files
-            self.df = load_multi_samples_from_excel_with_pandas(self.filename)
+            self.df, self.shname = load_multi_samples_from_excel_with_pandas(self.filename)
             self.initiate_shop()
-            self.label_file.setText('Loaded: ' + self.filename)
-            self.log.append('\nData loaded from a file: ' + self.filename + '\n')
+            self.label_file.setText('Loaded: ' + self.filename + '; sheet: ' + self.shname)
+            self.log.append('\nData loaded from a file: ' + self.filename +
+                            '; sheet: ' + self.shname + '\n')
         except:
             pass
 
@@ -744,5 +750,5 @@ def load_multi_samples_from_excel_with_pandas(filename):
     if dialog.exec_():
         xlssheet = dialog.returnSheet()
     df = xl.parse(xlssheet)
-    return df
+    return df, xl.sheet_names[xlssheet]
 
