@@ -130,19 +130,19 @@ class TwoSamples:
         plt.tight_layout()
         return fig
 
-    def plot_boxplot(self, fig=None):
-        if fig is None:
-            fig, ax  = plt.subplots(1,1) #, figsize=(4,4))
-        else: 
-            fig.clf()
-            ax = fig.add_subplot(1,1,1)
-        ax = self.df2.boxplot()
-        for i in range(self.df2.shape[1]):
-            X = self.df2.iloc[:, i].dropna().values.tolist()
-            x = np.random.normal(i+1, 0.04, size=len(X))
-            ax.plot(x, X, '.', alpha=0.4)
-        plt.tight_layout()
-        return fig
+def plot_boxplot(df, fig=None):
+    if fig is None:
+        fig, ax  = plt.subplots(1,1) #, figsize=(4,4))
+    else: 
+        fig.clf()
+        ax = fig.add_subplot(1,1,1)
+    ax = df.boxplot()
+    for i in range(df.shape[1]):
+        X = df.iloc[:, i].dropna().values.tolist()
+        x = np.random.normal(i+1, 0.04, size=len(X))
+        ax.plot(x, X, '.', alpha=0.4)
+    plt.tight_layout()
+    return fig
 
 
 class Sample:

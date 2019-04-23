@@ -22,6 +22,7 @@ from dcstats.hedges import Hedges_d
 from dcstats.ratio import Ratio
 from dcstats.difference import Difference
 from dcstats.twosamples import TwoSamples
+from dcstats.twosamples import plot_boxplot
 from dcstats.twosamples import Sample
 
 from GUI.report import Report 
@@ -200,7 +201,17 @@ class OneStopShopTab(QWidget):
         report.paragraph('Number of samples loaded: ' + str(n))
         report.paragraph(str(self.df.describe()))
 
+        fig = plot_boxplot(self.df)
+        fname_boxplot_all = fname  + '_boxplot_all.svg'
+        fig.savefig(fname_boxplot_all)
+        report.image(fname_boxplot_all)
+        plt.close(fig)
+
         self.log.append('\n\nBatch-processing all sample pairs...')
+
+        #for i in range(n):
+        #    self.log.append('\nProcessing sample: ' + self.names[i])
+        #    self.log.repaint()    
 
         for i in range(n-1):
             for j in range(i+1, n):
@@ -215,8 +226,7 @@ class OneStopShopTab(QWidget):
                         str(df2.describe()))
                 twosamples = TwoSamples(df2, runs=self.nran)
                 report.paragraph(str(twosamples.describe_data()))
-                #print(str(twosamples.describe_data()))
-                fig = twosamples.plot_boxplot()
+                fig = plot_boxplot(df2)
                 fname_boxplot = fname  + '_boxplot_' + self.names[i] + '_' + self.names[j] + '.svg'
                 fig.savefig(fname_boxplot)
                 report.image(fname_boxplot)
@@ -300,7 +310,7 @@ class OneStopShopTab(QWidget):
         self.log.append('\n\n********************')
         self.log.append(str(df2.describe()))
         self.log.append(str(twosamples.describe_data()))
-        twosamples.plot_boxplot(self.canvas.figure)
+        plot_boxplot(df2, self.canvas.figure)
         self.canvas.draw()
 
     def get_randomisation(self):
@@ -423,14 +433,8 @@ class RandomisationBatchTab(QWidget):
         self.log.append('Loaded {0:d} samples: '.format(self.rnt.n)) 
         self.log.append(str(self.rnt.df.describe()))
 
-        self.canvas.figure.clf()
-        self.ax = self.canvas.figure.add_subplot(1, 1, 1)
-        self.ax = df.boxplot()
-        for i in range(df.shape[1]):
-            X = df.iloc[:, i].dropna().values.tolist()
-            x = np.random.normal(i+1, 0.04, size=len(X))
-            self.ax.plot(x, X, '.', alpha=0.4)
-        self.canvas.draw()       
+        plot_boxplot(df, self.canvas.figure)
+        self.canvas.draw()
 
     def run_rantest(self):
         self.nran = int(self.ed1.text())
