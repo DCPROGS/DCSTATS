@@ -12,12 +12,10 @@ class Report(object):
     '''
     A class that makes markdown file and output it as html file
     '''
-    def __init__(self, filename, sysinfo, suffix=None, workdir=None):
+    def __init__(self, filename, sysinfo, workdir=None):
         
         self.filename = filename
-        self.mdfile = 'report_' + self.filename
-        if suffix is not None:
-            self.mdfile += ('_' + suffix) 
+        self.mdfile = self.filename
         self.mdfile += '.md'
         self.f = open(self.mdfile, 'w')
          
