@@ -710,8 +710,8 @@ class ResultBox(QTextBrowser):
 
 def get_sys_info():
     return ("DC-stats version: {0}".format(dcstats.__version__) +
-            "Machine: {0};  System: {1};\nSystem Version: {2}".format(socket.gethostname(), sys.platform, sys.version) +
-            "Date and time of analysis: " + str(datetime.datetime.now())[:19])
+            "\nMachine: {0};  \nSystem: {1};\nSystem Version: {2}".format(socket.gethostname(), sys.platform, sys.version) +
+            "\nDate and time of analysis: " + str(datetime.datetime.now())[:19])
 
 
 def ok_cancel_button(parent):
