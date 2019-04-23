@@ -12,7 +12,8 @@ class ExcelSheetDlg(QDialog):
         self.sheet = ''
         self.List = QListWidget()
         self.List.addItems(sheetlist)
-        self.List.itemSelectionChanged.connect(self.sheetSelected)
+        #self.List.itemSelectionChanged.connect(self.sheetSelected)
+        self.List.itemClicked.connect(self.sheetSelected)
         layout1 = QHBoxLayout()
         layout1.addWidget(self.List)
         layout2 = QVBoxLayout()
@@ -27,6 +28,8 @@ class ExcelSheetDlg(QDialog):
         Get selected sheet name.
         """
         self.sheet = self.List.currentRow()
+        self.accept()
+        
 
     def returnSheet(self):
         """
