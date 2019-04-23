@@ -209,9 +209,29 @@ class OneStopShopTab(QWidget):
 
         self.log.append('\n\nBatch-processing all sample pairs...')
 
-        #for i in range(n):
-        #    self.log.append('\nProcessing sample: ' + self.names[i])
-        #    self.log.repaint()    
+        for i in range(n):
+            self.log.append('\nProcessing sample: ' + self.names[i])
+            self.log.repaint()
+
+            report.title('\n\n********************', 1)
+            report.title('\n*****   ' + self.names[i]  + '   *****', 1) 
+
+            A = self.df.iloc[:, i].dropna().values #.tolist()
+            sample = Sample(A)
+            sample.run_bootstrap(self.nran)
+            fig = sample.plot_bootstrap()
+            fname_sample_boot = fname  + '_boot_sample_' + self.names[i] + '.svg'
+            fig.savefig(fname_sample_boot)
+            report.image(fname_sample_boot)
+            plt.close(fig)
+
+            #fig = twosamples.plot_qq_plots()
+            #fname_samples_boot = fname  + '_qq_' + names[i] + '_' + names[j] + '.svg'
+            #fig.savefig(fname_samples_boot)
+            #report.image(fname_samples_boot)
+            #plt.close(fig)
+
+
 
         for i in range(n-1):
             for j in range(i+1, n):
@@ -231,18 +251,6 @@ class OneStopShopTab(QWidget):
                 fig.savefig(fname_boxplot)
                 report.image(fname_boxplot)
                 plt.close(fig)
-
-                #fig = twosamples.plot_bootstrapped_distributions()
-                #fname_samples_boot = fname  + '_boot_samples_' + names[i] + '_' + names[j] + '.svg'
-                #fig.savefig(fname_samples_boot)
-                #report.image(fname_samples_boot)
-                #plt.close(fig)
-
-                #fig = twosamples.plot_qq_plots()
-                #fname_samples_boot = fname  + '_qq_' + names[i] + '_' + names[j] + '.svg'
-                #fig.savefig(fname_samples_boot)
-                #report.image(fname_samples_boot)
-                #plt.close(fig)
 
                 rnt = rantest.RantestContinuous(A, B, False)
                 rnt.run_rantest(self.nran)
