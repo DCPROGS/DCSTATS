@@ -509,17 +509,18 @@ class RandomisationBatchTab(QWidget):
                 "Open Data File...", self.path, "MS Excel Files (*.xlsx)")
             self.path = os.path.split(str(self.filename))[0]
             #TODO: allow loading from other format files
-            df = load_multi_samples_from_excel_with_pandas(self.filename)
+            df, sheet_name = load_multi_samples_from_excel_with_pandas(self.filename)
             
         except:
             pass
 
-        self.initiate_rantest(df)
+        self.initiate_rantest(df, sheet_name)
 
-    def initiate_rantest(self, df):
+    def initiate_rantest(self, df, sheet_name):
         # Display basic statistics
         self.log.separate()
-        self.log.append('\nData loaded from a file: ' + self.filename + '\n')
+        self.log.append('\nData loaded from a file: ' + self.filename + 
+                        '; sheet: ' + sheet_name + '\n')
         self.rnt = rantest.RantestBatch(df, self.log)
         self.log.append('Loaded {0:d} samples: '.format(self.rnt.n)) 
         self.log.append(str(self.rnt.df.describe()))
