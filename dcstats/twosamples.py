@@ -206,6 +206,20 @@ class Sample:
         upperCI = self.boot[int((1 - alpha / 2.0) * self.bootstrap_runs)]
         return lowerCI, upperCI
 
+    def plot_qq(self, fig=None):
+        q1, q2, min, max = self.get_qq()
+        if fig is None:
+            fig, ax  = plt.subplots(1,1) #, figsize=(4,4))
+        else: 
+            fig.clf()
+            ax = fig.add_subplot(1,1,1)
+        ax.plot(q1, q2, 'o')
+        ax.plot([min, max],[min, max],'k--')
+        ax.set_ylabel('Normal sample quantiles')
+        ax.set_xlabel('Normal theoretical quantiles')
+        plt.tight_layout()
+        return fig
+        
     def plot_bootstrap(self, fig=None):
         """Plot bootstrapped distribution."""
         lower95CI, upper95CI = self.bootstrapped_CIs(alpha=0.05)

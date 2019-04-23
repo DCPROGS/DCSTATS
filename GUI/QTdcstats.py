@@ -220,18 +220,16 @@ class OneStopShopTab(QWidget):
             sample = Sample(A)
             sample.run_bootstrap(self.nran)
             fig = sample.plot_bootstrap()
-            fname_sample_boot = fname  + '_boot_sample_' + self.names[i] + '.svg'
+            fname_sample_boot = fname  + '_sample_boot_' + self.names[i] + '.svg'
             fig.savefig(fname_sample_boot)
             report.image(fname_sample_boot)
             plt.close(fig)
 
-            #fig = twosamples.plot_qq_plots()
-            #fname_samples_boot = fname  + '_qq_' + names[i] + '_' + names[j] + '.svg'
-            #fig.savefig(fname_samples_boot)
-            #report.image(fname_samples_boot)
-            #plt.close(fig)
-
-
+            fig = sample.plot_qq()
+            fname_sample_qq = fname  + '_sample_qq_' + self.names[i] + '.svg'
+            fig.savefig(fname_sample_qq)
+            report.image(fname_sample_qq)
+            plt.close(fig)
 
         for i in range(n-1):
             for j in range(i+1, n):
