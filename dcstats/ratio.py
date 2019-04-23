@@ -134,11 +134,11 @@ class Ratio:
             fig.clf()
             ax = fig.add_subplot(1,1,1)
         ax.hist(self.boot, 20)
-        ax.axvline(x=self.ratio, color='k', label='observed ratio')
-        ax.axvline(x=self.bootstrap_mean, color='k', linestyle="dashed", 
+        ax.axvline(x=self.ratio, color='r', label='observed ratio')
+        ax.axvline(x=self.bootstrap_mean, color='r', linestyle="dashed", 
                    label='bootstrapped ratio')
-        ax.axvline(x=lower95CI, color='r', linestyle="dashed", label='2.5% limits')
-        ax.axvline(x=upper95CI, color='r', linestyle="dashed")
+        ax.axvline(x=lower95CI, color='k', linestyle="dashed", label='2.5% limits')
+        ax.axvline(x=upper95CI, color='k', linestyle="dashed")
         ax.set_ylabel("Frequency")
         ax.set_xlabel('Ratio (mean A / mean B)')
         ax.legend(bbox_to_anchor=(0., 1.02, 1., .102), loc=3,

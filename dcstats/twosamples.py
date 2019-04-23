@@ -79,11 +79,11 @@ class TwoSamples:
             fig.clf()
         ax1 = fig.add_subplot(1, 2, 1)
         ax1.hist(sample1.boot, bins=20)
-        ax1.axvline(x=sample1.meanA, color='k', label='observed mean')
-        ax1.axvline(x=sample1.bootstrap_mean, color='k', linestyle="dashed", 
+        ax1.axvline(x=sample1.meanA, color='r', label='observed mean')
+        ax1.axvline(x=sample1.bootstrap_mean, color='r', linestyle="dashed", 
                    label='bootstrapped mean')
-        ax1.axvline(x=lower95CI1, color='r', linestyle="dashed", label='2.5% limits')
-        ax1.axvline(x=upper95CI1, color='r', linestyle="dashed")
+        ax1.axvline(x=lower95CI1, color='k', linestyle="dashed", label='2.5% limits')
+        ax1.axvline(x=upper95CI1, color='k', linestyle="dashed")
         ax1.set_ylabel("Frequency")
         ax1.set_xlabel('Mean')
         ax1.legend(bbox_to_anchor=(0., 1.02, 1., .102), loc=3,
@@ -91,11 +91,11 @@ class TwoSamples:
 
         ax2 = fig.add_subplot(1, 2, 2)
         ax2.hist(sample2.boot, bins=20)
-        ax2.axvline(x=sample2.meanA, color='k', label='observed mean')
-        ax2.axvline(x=sample2.bootstrap_mean, color='k', linestyle="dashed", 
+        ax2.axvline(x=sample2.meanA, color='r', label='observed mean')
+        ax2.axvline(x=sample2.bootstrap_mean, color='r', linestyle="dashed", 
                    label='bootstrapped mean')
-        ax2.axvline(x=lower95CI2, color='r', linestyle="dashed", label='2.5% limits')
-        ax2.axvline(x=upper95CI2, color='r', linestyle="dashed")
+        ax2.axvline(x=lower95CI2, color='k', linestyle="dashed", label='2.5% limits')
+        ax2.axvline(x=upper95CI2, color='k', linestyle="dashed")
         ax2.set_ylabel("Frequency")
         ax2.set_xlabel('Mean')
         ax2.legend(bbox_to_anchor=(0., 1.02, 1., .102), loc=3,
