@@ -186,7 +186,6 @@ class OneStopShopTab(QWidget):
     def process_all(self):
         path, fname = os.path.split(self.filename)
         fname = os.path.splitext(fname)[0]
-        # TODO: get sheet name
         fname = fname + '_' + self.shname
 
         new_path = os.path.join(path, fname)
@@ -582,7 +581,7 @@ class RandomisationContTab(QWidget):
                 "Open Data File...", self.path, "MS Excel Files (*.xlsx)")
             self.path = os.path.split(str(self.filename))[0]
             #TODO: allow loading from other format files
-            self.X, self.Y = load_two_samples_from_excel_with_pandas(self.filename)
+            self.df, self.sheet_name = load_multi_samples_from_excel_with_pandas(self.filename)
             self.initiate_rantest()
         except:
             pass
@@ -591,6 +590,8 @@ class RandomisationContTab(QWidget):
         # Display basic statistics
         self.log.separate()
         self.log.append('\nData loaded from a file: ' + self.filename + '\n')
+        self.X = self.df.iloc[:,0].dropna().values #.tolist()
+        self.Y = self.df.iloc[:,1].dropna().values #.tolist()
         self.rnt = rantest.RantestContinuous(self.X, self.Y, self.paired)
         self.log.append(self.rnt.describe_data())
 
@@ -728,19 +729,6 @@ def single_button(bt):
     b_layout.addWidget(bt)
     b_layout.addStretch()
     return b_layout
-
-def load_two_samples_from_excel_with_pandas(filename):
-    """ Load two columns from a selected sheet in Excel file. 
-        Return two samples as lists. """
-    # TODO: should be moved to dataIO but need to agree on refactoring IO
-    xl = pd.ExcelFile(filename)
-    dialog = ExcelSheetDlg(xl.sheet_names) #self
-    if dialog.exec_():
-        xlssheet = dialog.returnSheet()
-    dt = xl.parse(xlssheet)
-    X = dt.iloc[:,0].dropna().values #.tolist()
-    Y = dt.iloc[:,1].dropna().values #.tolist()
-    return X, Y
 
 def load_multi_samples_from_excel_with_pandas(filename):
     """ Load all columns from a selected sheet in Excel file. Uses pandas.
