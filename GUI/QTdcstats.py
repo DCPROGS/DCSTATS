@@ -359,7 +359,7 @@ class OneStopShopTab(QWidget):
                 "Open Data File...", self.path, "MS Excel Files (*.xlsx)")
             self.path = os.path.split(str(self.filename))[0]
             #TODO: allow loading from other format files
-            self.df, self.shname = load_multi_samples_from_excel_with_pandas(self.filename)
+            self.df, self.shname = load_excel_sheet_with_pandas(self.filename)
             self.initiate_shop()
             self.label_file.setText('Loaded: ' + self.filename + '; sheet: ' + self.shname)
             self.log.append('\nData loaded from a file: ' + self.filename +
@@ -508,7 +508,7 @@ class RandomisationBatchTab(QWidget):
                 "Open Data File...", self.path, "MS Excel Files (*.xlsx)")
             self.path = os.path.split(str(self.filename))[0]
             #TODO: allow loading from other format files
-            df, sheet_name = load_multi_samples_from_excel_with_pandas(self.filename)
+            df, sheet_name = load_excel_sheet_with_pandas(self.filename)
             
         except:
             pass
@@ -581,7 +581,7 @@ class RandomisationContTab(QWidget):
                 "Open Data File...", self.path, "MS Excel Files (*.xlsx)")
             self.path = os.path.split(str(self.filename))[0]
             #TODO: allow loading from other format files
-            self.df, self.sheet_name = load_multi_samples_from_excel_with_pandas(self.filename)
+            self.df, self.sheet_name = load_excel_sheet_with_pandas(self.filename)
             self.initiate_rantest()
         except:
             pass
@@ -730,7 +730,7 @@ def single_button(bt):
     b_layout.addStretch()
     return b_layout
 
-def load_multi_samples_from_excel_with_pandas(filename):
+def load_excel_sheet_with_pandas(filename):
     """ Load all columns from a selected sheet in Excel file. Uses pandas.
         Return pandas data frame"""
     # TODO: should be moved to dataIO but need to agree on refactoring IO
