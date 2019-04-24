@@ -304,10 +304,10 @@ class OneStopShopTab(QWidget):
         return df2
 
     def ran_changed(self):
-        if self.ch1.isChecked():
-            self.paired = 1
-        else:
-            self.paired = 0
+        #if self.ch1.isChecked():
+        #    self.paired = 1
+        #else:
+        #    self.paired = 0
         self.nran = int(self.ed1.text()) 
 
     def get_basic_stats(self):
