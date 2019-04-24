@@ -106,7 +106,6 @@ class DCStatsQT(QDialog):
             printOutFilename, filt = QFileDialog.getSaveFileName(self,
                     "Save as PRT file...", ".prt",
                     "PRT files (*.prt)")
-            #self.results.selectAll()
             fout = open(printOutFilename,'w')
             fout.write(self.results.toPlainText())
             fout.close()
@@ -183,7 +182,6 @@ class OneStopShopTab(QWidget):
         bt8 = QPushButton("Process all samples and save HTML report")
         bt8.clicked.connect(self.process_all)
         layout.addWidget(bt8)
-        #layout.addStretch()
 
     def process_all(self):
         path, fname = os.path.split(self.filename)
@@ -422,13 +420,10 @@ class RandomisationBatchTab(QWidget):
             self.filename, filt = QFileDialog.getOpenFileName(self,
                 "Open Data File...", self.path, "MS Excel Files (*.xlsx)")
             self.path = os.path.split(str(self.filename))[0]
-            #TODO: allow loading from other format files
             df, sheet_name = load_excel_sheet_with_pandas(self.filename)
-            
+            self.initiate_rantest(df, sheet_name)
         except:
             pass
-
-        self.initiate_rantest(df, sheet_name)
 
     def initiate_rantest(self, df, sheet_name):
         # Display basic statistics
@@ -581,12 +576,10 @@ class ResultBox(QTextBrowser):
 
     def append_info(self):
         self.append(get_sys_info())
-        #self.append("DC-stats version: {0}".format(dcstats.__version__))
-        #self.append("Machine: {0};  System: {1};\nSystem Version: {2}".format(socket.gethostname(), sys.platform, sys.version))
-        #self.append("Date and time of analysis: " + str(datetime.datetime.now())[:19])
     
     def separate(self):
         self.append('*' * 10)
+
 
 def get_sys_info():
     return ("DC-stats version: {0}".format(dcstats.__version__) +

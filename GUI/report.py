@@ -1,10 +1,4 @@
-import os
-import sys
-#import time
-#import socket
 import codecs
-#import platform
-
 import numpy as np
 import markdown
 
@@ -20,11 +14,6 @@ class Report(object):
         self.f = open(self.mdfile, 'w')
          
         self.title("DC_Stats\n", 1)
-        #str = ("Date and time of analysis: %4d/%02d/%02d %02d:%02d:%02d\n"
-        #    %time.localtime()[0:6])
-        #machine = socket.gethostname()
-        #system = sys.platform
-        #str += "Machine: %s; System: %s\n" %(machine, system)
         self.f.write(sysinfo)
 
     def title(self, titletext, titlenumber):
