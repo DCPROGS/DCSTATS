@@ -12,6 +12,7 @@ setup(name='dcstats',
       install_requires=[
           'numpy',
           'pandas',
+          'markdown',
           'matplotlib',
           'PyQt5',
       ],
