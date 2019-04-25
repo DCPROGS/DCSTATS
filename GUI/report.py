@@ -28,6 +28,12 @@ class Report(object):
     def image(self, imagefile):
         self.f.write('\n' + '![Alt text](' + imagefile + ')' + '\n')
 
+    def two_images(self, image1, image2):
+        self.f.write('\n' +
+             '![bootstrapped sample](' + image1 + ') ![quantile-quantile](' + image2 + ')' +
+             '\n')
+ 
+
     def tabletitle(self, titlelist):
         writetable = np.repeat(titlelist, 2).astype(str)
         writetable[::2] = ' | '

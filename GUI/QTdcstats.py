@@ -217,17 +217,20 @@ class OneStopShopTab(QWidget):
             A = self.df.iloc[:, i].dropna().values #.tolist()
             sample = Sample(A)
             sample.run_bootstrap(self.nran)
+
             fig = sample.plot_bootstrap()
             fname_sample_boot = fname  + '_sample_boot_' + self.names[i] + '.svg'
+            fig.set_size_inches(5,4)
             fig.savefig(fname_sample_boot)
-            report.image(fname_sample_boot)
             plt.close(fig)
 
             fig = sample.plot_qq()
             fname_sample_qq = fname  + '_sample_qq_' + self.names[i] + '.svg'
+            fig.set_size_inches(5,4)
             fig.savefig(fname_sample_qq)
-            report.image(fname_sample_qq)
             plt.close(fig)
+
+            report.two_images(fname_sample_boot, fname_sample_qq)
 
         for i in range(n-1):
             for j in range(i+1, n):
@@ -244,18 +247,23 @@ class OneStopShopTab(QWidget):
                 report.paragraph(str(twosamples.describe_data()))
                 fig = plot_boxplot(df2)
                 fname_boxplot = fname  + '_boxplot_' + self.names[i] + '_' + self.names[j] + '.svg'
+                fig.set_size_inches(5,4)
                 fig.savefig(fname_boxplot)
-                report.image(fname_boxplot)
+                #report.image(fname_boxplot)
                 plt.close(fig)
 
                 rnt = rantest.RantestContinuous(A, B, False)
                 rnt.run_rantest(self.nran)
                 report.paragraph(str(rnt))
                 fig = rnt.plot_rantest()
-                fname_boxplot = fname  + '_rantest_' + self.names[i] + '_' + self.names[j] + '.svg'
-                fig.savefig(fname_boxplot)
-                report.image(fname_boxplot)
+                fname_boot = fname  + '_rantest_' + self.names[i] + '_' + self.names[j] + '.svg'
+                fig.set_size_inches(5,4)
+                fig.savefig(fname_boot)
+                #report.image(fname_boot)
                 plt.close(fig)
+
+                report.two_images(fname_boxplot, fname_boot)
+
 
                 report.title('\n Ratio:', 1)
                 ratio = Ratio(A, B)
@@ -267,8 +275,9 @@ class OneStopShopTab(QWidget):
                 report.paragraph(str(recip))
                 fig = ratio.plot_bootstrap()
                 fname_ratio = fname  + '_ratio_boot_' + self.names[i] + '_' + self.names[j] + '.svg'
+                fig.set_size_inches(5,4)
                 fig.savefig(fname_ratio)
-                report.image(fname_ratio)
+                #report.image(fname_ratio)
                 plt.close(fig)
 
                 report.title('\n Difference:', 1)
@@ -277,9 +286,11 @@ class OneStopShopTab(QWidget):
                 report.paragraph(str(diff))
                 fig = diff.plot_bootstrap()
                 fname_diff = fname  + '_diff_boot_' + self.names[i] + '_' + self.names[j] + '.svg'
+                fig.set_size_inches(5,4)
                 fig.savefig(fname_diff)
-                report.image(fname_diff)
+                #report.image(fname_diff)
                 plt.close(fig)
+                report.two_images(fname_ratio, fname_diff)
         report.outputhtml()
         self.log.append('\n\nHTML report done.')
 
