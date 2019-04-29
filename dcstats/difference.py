@@ -5,6 +5,7 @@ import math
 import numpy as np
 import matplotlib.pyplot as plt
 
+import dcstats.basic_stats as bs
 import dcstats.statistics_EJ as s
 
 __author__="remis"
@@ -108,7 +109,15 @@ class Difference:
         else: 
             fig.clf()
             ax = fig.add_subplot(1,1,1)
-        ax.hist(self.boot, 20)
+        ax.hist(self.boot, 20, density=True)
+
+        xmin = self.bootstrap_mean - 4 * np.std(self.boot, ddof=1)
+        xmax = self.bootstrap_mean + 4 * np.std(self.boot, ddof=1)
+        increase = (xmax - xmin) / 100
+        x = np.arange(xmin, xmax, increase)
+        pdf = [bs._pdf(x1, self.bootstrap_mean, np.std(self.boot, ddof=1)) for x1 in x]
+        ax.plot(x, pdf, 'k', label='normal pdf')
+
         ax.axvline(x=self.difference, color='r', label='observed difference')
         ax.axvline(x=self.bootstrap_mean, color='r', linestyle="dashed", 
                    label='bootstrapped difference')

@@ -145,7 +145,17 @@ class RantestContinuous():
         else: 
             fig.clf()
             ax = fig.add_subplot(1,1,1)
-        ax.hist(self.randiff, 20)
+        ax.hist(self.randiff, 20, density=True)
+
+        mu = np.mean(self.randiff)
+        sd = np.std(self.randiff, ddof=1)
+        xmin = mu - 4 * sd
+        xmax = mu + 4 * sd
+        increase = (xmax - xmin) / 100
+        x = np.arange(xmin, xmax, increase)
+        pdf = [bs._pdf(x1, mu, sd) for x1 in x]
+        ax.plot(x, pdf, 'k', label='normal pdf')
+
         ax.axvline(x=self.dbar, color='r', label='observed difference')
         ax.axvline(x=-self.dbar, color='r')
         ax.axvline(x=self.lo95lim, color='k', linestyle='--', label='2.5% limits')

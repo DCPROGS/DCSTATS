@@ -78,7 +78,15 @@ class TwoSamples:
         else: 
             fig.clf()
         ax1 = fig.add_subplot(1, 2, 1)
-        ax1.hist(sample1.boot, bins=20)
+        ax1.hist(sample1.boot, bins=20, density=True)
+        mu = np.mean(sample1.boot)
+        sd = np.std(sample1.boot, ddof=1)
+        xmin = mu - 4 * sd
+        xmax = mu + 4 * sd
+        increase = (xmax - xmin) / 100
+        x = np.arange(xmin, xmax, increase)
+        pdf = [bs._pdf(x1, mu, sd) for x1 in x]
+        ax1.plot(x, pdf, 'k', label='normal pdf')
         ax1.axvline(x=sample1.meanA, color='r', label='observed mean')
         ax1.axvline(x=sample1.bootstrap_mean, color='r', linestyle="dashed", 
                    label='bootstrapped mean')
@@ -90,7 +98,15 @@ class TwoSamples:
                         borderaxespad=0.)
 
         ax2 = fig.add_subplot(1, 2, 2)
-        ax2.hist(sample2.boot, bins=20)
+        ax2.hist(sample2.boot, bins=20, density=True)
+        mu = np.mean(sample2.boot)
+        sd = np.std(sample2.boot, ddof=1)
+        xmin = mu - 4 * sd
+        xmax = mu + 4 * sd
+        increase = (xmax - xmin) / 100
+        x = np.arange(xmin, xmax, increase)
+        pdf = [bs._pdf(x1, mu, sd) for x1 in x]
+        ax2.plot(x, pdf, 'k', label='normal pdf')
         ax2.axvline(x=sample2.meanA, color='r', label='observed mean')
         ax2.axvline(x=sample2.bootstrap_mean, color='r', linestyle="dashed", 
                    label='bootstrapped mean')
@@ -228,7 +244,17 @@ class Sample:
         else: 
             fig.clf()
             ax = fig.add_subplot(1,1,1)
-        ax.hist(self.boot, 20)
+        ax.hist(self.boot, 20, density=True)
+
+        mu = np.mean(self.boot)
+        sd = np.std(self.boot, ddof=1)
+        xmin = mu - 4 * sd
+        xmax = mu + 4 * sd
+        increase = (xmax - xmin) / 100
+        x = np.arange(xmin, xmax, increase)
+        pdf = [bs._pdf(x1, mu, sd) for x1 in x]
+        ax.plot(x, pdf, 'k', label='normal pdf')
+
         ax.axvline(x=self.meanA, color='k', label='observed ratio')
         ax.axvline(x=self.bootstrap_mean, color='k', linestyle="dashed", 
                    label='bootstrapped sample mean')
