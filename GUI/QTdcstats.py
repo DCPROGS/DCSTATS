@@ -401,6 +401,8 @@ class OneStopShopTab(QWidget):
             self.sample1.addItem(name)
             self.sample2.addItem(name)
         self.sample2.setCurrentIndex(1)
+        plot_boxplot(self.df, self.canvas.figure)
+        self.canvas.draw()
 
 
 class RandomisationBatchTab(QWidget):
