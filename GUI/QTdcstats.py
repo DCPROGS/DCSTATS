@@ -168,23 +168,26 @@ class OneStopShopTab(QWidget):
         layout5.addWidget(bt4)
         layout.addLayout(layout5)
 
-        layout5 = QHBoxLayout()
+        layout6 = QHBoxLayout()
         #layout5.addStretch()
-        layout5.addWidget(QLabel("Number of iterations:"))
+        layout6.addWidget(QLabel("Number of iterations:"))
         self.ed1 = QLineEdit(str(self.nran))
         self.ed1.editingFinished.connect(self.ran_changed)
         #self.ch1 = QCheckBox("&Paired samples?")
         #self.ch1.stateChanged.connect(self.ran_changed)
-        layout5.addWidget(self.ed1)
+        layout6.addWidget(self.ed1)
         #layout5.addWidget(self.ch1)
-        layout5.addStretch()
-        layout5.addWidget(QLabel("Trim data (%):"))
+        layout6.addStretch()
+        layout6.addWidget(QLabel("Trim data (%):"))
         self.trim1 = QLineEdit(str(self.trim))
         self.trim1.editingFinished.connect(self.ran_changed)
+        bt9 = QPushButton("Save trimmed data")
+        bt9.clicked.connect(self.save_trimmed)
         #self.ch1 = QCheckBox("&Paired samples?")
         #self.ch1.stateChanged.connect(self.ran_changed)
-        layout5.addWidget(self.trim1)
-        layout.addLayout(layout5)
+        layout6.addWidget(self.trim1)
+        layout6.addWidget(bt9)
+        layout.addLayout(layout6)
 
         bt8 = QPushButton("Process all samples and save HTML report")
         bt8.clicked.connect(self.process_all)
@@ -326,7 +329,7 @@ class OneStopShopTab(QWidget):
         #    self.paired = 0
         self.nran = int(self.ed1.text()) 
         self.trim = int(self.trim1.text())
-        self.df = self.trim_data(self.df_original, self.trim)
+        self.df = trim_data(self.df_original, self.trim)
 
     def get_basic_stats(self):
         df2 = self.get_2sample_df()
@@ -387,6 +390,14 @@ class OneStopShopTab(QWidget):
         diff.plot_bootstrap(self.canvas.figure)
         self.canvas.draw()       
 
+    def save_trimmed(self):
+        try:
+            path, ext = self.filename.split('.')
+            trimfname = path + '_trimmed_' + str(self.trim) + '.' + ext
+            self.df.to_excel(trimfname, sheet_name='trimmed_'+str(self.trim)+'%')
+        except:
+            pass
+
     def open_file(self):
         """Called by TAKE DATA FROM FILE button in Tab2"""
         try:
@@ -395,23 +406,13 @@ class OneStopShopTab(QWidget):
             self.path = os.path.split(str(self.filename))[0]
             #TODO: allow loading from other format files
             self.df_original, self.shname = load_excel_sheet_with_pandas(self.filename)
-            #self.initiate_shop()
+            self.initiate_shop()
             self.label_file.setText('Loaded: ' + self.filename + '; sheet: ' + self.shname)
             self.log.append('\nData loaded from a file: ' + self.filename +
                             '; sheet: ' + self.shname + '\n')
         except:
             pass
-        self.initiate_shop()
-
-    def trim_data(self, df, trim):
-        dfloc = df.copy()
-        names = df.columns.tolist()
-        low, high = trim / 200.0, 1.0 - trim / 200.0
-        q = df.quantile([low, high], axis=0)
-        for i in range(df.shape[1]):
-            dfloc.loc[(df[names[i]] < q.iloc[0, i]), names[i]] = np.nan
-            dfloc.loc[(df[names[i]] > q.iloc[1, i]), names[i]] = np.nan
-        return dfloc
+        #self.initiate_shop()
 
     def initiate_shop(self):
         self.names = self.df_original.columns.tolist()
@@ -421,11 +422,10 @@ class OneStopShopTab(QWidget):
             self.sample1.addItem(name)
             self.sample2.addItem(name)
         self.sample2.setCurrentIndex(1)
-        plot_boxplot(self.df_original, self.canvas.figure)
+        self.df = trim_data(self.df_original, self.trim)
+        plot_boxplot(self.df, self.canvas.figure)
         self.canvas.draw()
-        self.df = self.trim_data(self.df_original, self.trim)
-
-
+        
 class RandomisationBatchTab(QWidget):
     def __init__(self, log, canvas, parent=None):
         QWidget.__init__(self, parent)
@@ -632,3 +632,12 @@ def load_excel_sheet_with_pandas(filename):
     df = xl.parse(xlssheet)
     return df, xl.sheet_names[xlssheet]
 
+def trim_data(df, trim):
+    dfloc = df.copy()
+    names = df.columns.tolist()
+    low, high = trim / 200.0, 1.0 - trim / 200.0
+    q = df.quantile([low, high], axis=0)
+    for i in range(df.shape[1]):
+        dfloc.loc[(df[names[i]] < q.iloc[0, i]), names[i]] = np.nan
+        dfloc.loc[(df[names[i]] > q.iloc[1, i]), names[i]] = np.nan
+    return dfloc
