@@ -1,5 +1,6 @@
 import random
 import math
+import statistics as pyst
 from dcstats.statistics_EJ import simple_stats as mean_SD
 from dcstats.statistics_EJ import InverseStudentT
 
@@ -125,7 +126,11 @@ class Hedges_d:
             s_pooled = math.sqrt((n2m * sbr2 ** 2 + n1m * sbr1 ** 2) / (n1m + n2m))
         
             #Hedges' g
-            biased_d = (mbr2 - mbr1) / s_pooled
+            # RL: quick fix (probably not very meaningful) for a case of a sample with two measurments only
+            if s_pooled == 0.0:
+                biased_d = 0.0
+            else:
+                biased_d = (mbr2 - mbr1) / s_pooled
         
             # correction has no influence on the bootstrap distribution
             # so apply it later to save multiplications
